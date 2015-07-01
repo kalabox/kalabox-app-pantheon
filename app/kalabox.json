@@ -29,7 +29,7 @@
   "appComponents": {
     "appserver": {
       "image": {
-        "name": "nginx",
+        "name": "pantheon-appserver",
         "srcRoot": ":appRoot:"
       },
       "proxy": [

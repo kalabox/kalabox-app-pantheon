@@ -1,6 +1,6 @@
 # docker build -t kalabox/pantheon-nginx:mytag .
 
-FROM kalabox/debian:v0.9.0
+FROM kalabox/debian:stable
 
 # Install Nginx.
 RUN \
