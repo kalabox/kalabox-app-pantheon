@@ -7,7 +7,7 @@ A nginx container that approximates the one used on Pantheon.
 
 # docker build -t kalabox/pantheon-nginx:mytag .
 
-FROM kalabox/debian:v0.9.0
+FROM kalabox/debian:stable
 
 # Install Nginx.
 RUN \
@@ -34,7 +34,7 @@ RUN \
    apt-get clean -y && \
    apt-get autoclean -y && \
    apt-get autoremove -y && \
-   rm -rf /var/lib/apt && rm -rf /var/lib/dpkg && rm -rf /var/lib/cache && rm -rf /var/lib/log && rm -rf /tmp && \
+   rm -rf /var/lib/apt/* && rm -rf && rm -rf /var/lib/cache/* && rm -rf /var/lib/log/* && rm -rf /tmp/* && \
    mkdir /etc/nginx/sites-available && mkdir /etc/nginx/sites-enabled
 
 # The data container will manage these config files.
@@ -52,6 +52,5 @@ CMD ["/root/start.sh"]
 # Expose ports.
 EXPOSE 80
 EXPOSE 443
-
 
 ```

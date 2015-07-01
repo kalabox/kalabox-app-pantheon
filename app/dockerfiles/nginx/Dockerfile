@@ -27,7 +27,7 @@ RUN \
    apt-get clean -y && \
    apt-get autoclean -y && \
    apt-get autoremove -y && \
-   rm -rf /var/lib/apt/* && rm -rf /var/lib/dpkg/* && rm -rf /var/lib/cache/* && rm -rf /var/lib/log/* && rm -rf /tmp/* && \
+   rm -rf /var/lib/apt/* && rm -rf && rm -rf /var/lib/cache/* && rm -rf /var/lib/log/* && rm -rf /tmp/* && \
    mkdir /etc/nginx/sites-available && mkdir /etc/nginx/sites-enabled
 
 # The data container will manage these config files.
