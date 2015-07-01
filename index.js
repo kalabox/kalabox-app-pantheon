@@ -4,32 +4,36 @@ var _ = require('lodash');
 
 module.exports = function(kbox) {
 
-  var drupalMatrix = {
-    '6': {
+  var pantheonMatrix = {
+    'drupal6': {
       php: '5.3.29',
       drush: '5'
     },
-    '7': {
-      php: '5.4.40',
+    'drupal7': {
+      php: '5.3.29',
       drush: '6'
     },
-    '8': {
+    'wordpress': {
+      php: '5.3.29',
+      drush: '5'
+    },
+    'drupal8': {
       php: '5.5.24',
       drush: '7'
     }
   };
 
   // Declare our app to the world
-  kbox.create.add('drupal', {
+  kbox.create.add('pantheon', {
     task: {
-      name: 'Drupal',
-      module: 'kalabox-app-drupal',
-      description: 'Creates a Drupal app.'
+      name: 'Pantheon',
+      module: 'kalabox-app-pantheon',
+      description: 'Creates a Pantheon app.'
     }
   });
 
   // Add an option
-  kbox.create.add('drupal', {
+  kbox.create.add('pantheon', {
     option: {
       name: 'name',
       weight: -99,
@@ -47,7 +51,7 @@ module.exports = function(kbox) {
         filter: function(value) {
           return _.kebabCase(value);
         },
-        default: 'My Drupal App'
+        default: 'My Pantheon App'
       },
       conf: {
         type: 'global',
@@ -57,15 +61,15 @@ module.exports = function(kbox) {
   });
 
   // Add an option
-  kbox.create.add('drupal', {
+  kbox.create.add('pantheon', {
     option: {
-      name: 'drupal-version',
+      name: 'pantheon-type',
       weight: -98,
       inquire: {
         type: 'list',
-        message: 'What major version of drupal',
-        default: '7',
-        choices: Object.keys(drupalMatrix)
+        message: 'What kind of Pantheon app',
+        default: 'drupal7',
+        choices: Object.keys(pantheonMatrix)
       }
     }
   });
@@ -73,23 +77,23 @@ module.exports = function(kbox) {
   // Load php things
   require('./node_modules/kalabox-plugin-php/create.js')(
     kbox,
-    drupalMatrix,
-    'drupal'
+    pantheonMatrix,
+    'pantheon'
   );
 
   // Load drush things
   require('./node_modules/kalabox-plugin-drush/create.js')(
     kbox,
-    drupalMatrix,
-    'drupal'
+    pantheonMatrix,
+    'pantheon'
   );
 
   // Load git things
-  require('./node_modules/kalabox-plugin-git/create.js')(kbox, 'drupal');
+  require('./node_modules/kalabox-plugin-git/create.js')(kbox, 'pantheon');
 
   // Task to create kalabox apps
   kbox.tasks.add(function(task) {
-    kbox.create.buildTask(task, 'drupal');
+    kbox.create.buildTask(task, 'pantheon');
   });
 
 };
