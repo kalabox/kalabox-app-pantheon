@@ -29,7 +29,7 @@
   "appComponents": {
     "appserver": {
       "image": {
-        "name": "php-appserver",
+        "name": "nginx",
         "srcRoot": ":appRoot:"
       },
       "proxy": [
@@ -38,12 +38,6 @@
           "default": true
         }
       ]
-    },
-    "db": {
-      "image": {
-        "name": "mariadb",
-        "srcRoot": ":appRoot:"
-      }
     }
   }
 }
