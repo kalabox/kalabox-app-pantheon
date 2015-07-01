@@ -17,7 +17,7 @@ before-install() {
   if ([ $TRAVIS_BRANCH == "master" ] || [ ! -z "$TRAVIS_TAG" ]) &&
     [ $TRAVIS_PULL_REQUEST == "false" ] &&
     [ $TRAVIS_REPO_SLUG == $PLUGIN_REPO ]; then
-    openssl aes-256-cbc -K $encrypted_a2b557c750ea_key -iv $encrypted_a2b557c750ea_iv -in ci/travis.id_rsa.enc -out $HOME/.ssh/travis.id_rsa -d
+    openssl aes-256-cbc -K $encrypted_a3de5a85a96e_key -iv $encrypted_a3de5a85a96e_iv -in ci/travis.id_rsa.enc -out $HOME/.ssh/travis.id_rsa -d
   fi
 }
 
