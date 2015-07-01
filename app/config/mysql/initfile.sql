@@ -1,0 +1,2 @@
+CREATE DATABASE kalabox;
+GRANT ALL PRIVILEGES ON *.* TO kalabox@'%';

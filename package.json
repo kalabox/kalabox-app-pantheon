@@ -1,0 +1,35 @@
+{
+  "name": "kalabox-app-pantheon",
+  "description": "Create Pantheon-esque apps on Kalabox.",
+  "keywords": [
+    "docker",
+    "kalabox",
+    "drupal",
+    "wordpress"
+  ],
+  "version": "0.9.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kalabox/kalabox-app-pantheon.git"
+  },
+  "bugs": {
+    "url": "http://github.com/kalabox/kalabox-app-pantheon",
+    "email": "mike@kalamuna.com"
+  },
+  "dependencies": {
+    "kalabox-plugin-dbenv": "https://github.com/kalabox/kalabox-plugin-dbenv/tarball/elton-rocketman",
+    "kalabox-plugin-drush": "https://github.com/kalabox/kalabox-plugin-drush/tarball/elton-rocketman",
+    "kalabox-plugin-git": "https://github.com/kalabox/kalabox-plugin-git/tarball/elton-rocketman",
+    "kalabox-plugin-php": "https://github.com/kalabox/kalabox-plugin-php/tarball/elton-rocketman",
+    "kalabox-plugin-rsync": "https://github.com/kalabox/kalabox-plugin-rsync/tarball/elton-rocketman",
+    "lodash": "^3.7.0"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-bump": "0.0.16",
+    "grunt-contrib-jshint": "~0.10.0",
+    "grunt-jscs": "~0.8.1",
+    "jshint-stylish": "~1.0.0",
+    "matchdep": "^0.3.0"
+  }
+}

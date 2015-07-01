@@ -1,0 +1,49 @@
+{
+  "appName": "my-pantheon-app",
+  "appPlugins": [
+    "kalabox-plugin-dbenv",
+    "kalabox-plugin-drush",
+    "kalabox-plugin-git",
+    "kalabox-plugin-php",
+    "kalabox-plugin-rsync"
+  ],
+  "shareIgnores": [
+    "sites/default/files/*",
+    ".git"
+  ],
+  "pluginConf": {
+    "kalabox-plugin-drush": {
+      "drush-version": "6"
+    },
+    "kalabox-plugin-php": {
+      "php-version": "5.4.40"
+    },
+    "kalabox-plugin-dbenv": {
+      "settings": {
+        "conf": {
+          "pressflow_smart_start": 1
+        }
+      }
+    }
+  },
+  "appComponents": {
+    "appserver": {
+      "image": {
+        "name": "php-appserver",
+        "srcRoot": ":appRoot:"
+      },
+      "proxy": [
+        {
+          "port": "80/tcp",
+          "default": true
+        }
+      ]
+    },
+    "db": {
+      "image": {
+        "name": "mariadb",
+        "srcRoot": ":appRoot:"
+      }
+    }
+  }
+}
