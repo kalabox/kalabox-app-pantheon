@@ -1,2 +1,2 @@
-CREATE DATABASE kalabox;
-GRANT ALL PRIVILEGES ON *.* TO kalabox@'%';
+CREATE DATABASE pantheon;
+GRANT ALL PRIVILEGES ON *.* TO pantheon@'%';

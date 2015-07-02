@@ -9,6 +9,7 @@
   ],
   "shareIgnores": [
     "sites/default/files/*",
+    "files",
     ".git"
   ],
   "pluginConf": {
@@ -16,7 +17,7 @@
       "drush-version": "6"
     },
     "kalabox-plugin-php": {
-      "php-version": "5.4.40"
+      "php-version": "5.3.29"
     },
     "kalabox-plugin-dbenv": {
       "settings": {
@@ -29,7 +30,7 @@
   "appComponents": {
     "appserver": {
       "image": {
-        "name": "pantheon-appserver",
+        "name": "kalabox/pantheon-appserver",
         "srcRoot": ":appRoot:"
       },
       "proxy": [
