@@ -21,7 +21,6 @@ RUN \
   echo "source /root/.phpbrew/bashrc" >> /root/.bashrc && \
   ln -s /.phpbrew /root/.phpbrew && \
   apt-get update -y && \
-  apt-get install -y unzip curl rsync git-core && \
   apt-get clean -y && \
   apt-get autoclean -y && \
   apt-get autoremove -y && \
@@ -41,5 +40,6 @@ CMD ["/root/start.sh"]
 
 EXPOSE 80
 EXPOSE 443
+
 
 ```

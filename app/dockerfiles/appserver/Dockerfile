@@ -1,6 +1,6 @@
 # docker build -t kalabox/pantheon-appserver:mytag .
 
-FROM kalabox/pantheon-nginx:v0.9.0
+FROM kalabox/nginx:v0.9.0
 
 RUN \
   apt-get update && \
@@ -14,7 +14,6 @@ RUN \
   echo "source /root/.phpbrew/bashrc" >> /root/.bashrc && \
   ln -s /.phpbrew /root/.phpbrew && \
   apt-get update -y && \
-  apt-get install -y unzip curl rsync git-core && \
   apt-get clean -y && \
   apt-get autoclean -y && \
   apt-get autoremove -y && \

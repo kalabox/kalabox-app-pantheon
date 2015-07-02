@@ -1,12 +1,6 @@
 {
   "appName": "my-pantheon-app",
-  "appPlugins": [
-    "kalabox-plugin-dbenv",
-    "kalabox-plugin-drush",
-    "kalabox-plugin-git",
-    "kalabox-plugin-php",
-    "kalabox-plugin-rsync"
-  ],
+  "appPlugins": [],
   "shareIgnores": [
     "sites/default/files/*",
     "files",
@@ -30,7 +24,7 @@
   "appComponents": {
     "appserver": {
       "image": {
-        "name": "kalabox/pantheon-appserver",
+        "name": "pantheon-appserver",
         "srcRoot": ":appRoot:"
       },
       "proxy": [
@@ -39,6 +33,12 @@
           "default": true
         }
       ]
+    },
+    "db": {
+      "image": {
+        "name": "mariadb",
+        "srcRoot": ":appRoot:"
+      }
     }
   }
 }
