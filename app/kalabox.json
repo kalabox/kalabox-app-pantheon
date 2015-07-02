@@ -1,7 +1,6 @@
 {
   "appName": "panth",
   "appPlugins": [
-    "kalabox-plugin-php",
     "kalabox-plugin-git",
     "kalabox-plugin-pantheon"
   ],

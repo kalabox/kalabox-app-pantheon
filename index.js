@@ -45,7 +45,6 @@ module.exports = function(kbox) {
   });
 
   // Add an option
-  /*
   kbox.create.add('pantheon', {
     option: {
       name: 'pantheon-grab',
@@ -62,7 +61,6 @@ module.exports = function(kbox) {
       }
     }
   });
-  */
 
   // Add an option
   kbox.create.add('pantheon', {

@@ -81,17 +81,17 @@ module.exports = function(kbox) {
     ];
 
     // Additional environmental variables for redis
-    installEnvs.env.push('CACHE_HOST=' + settings.conf.redis_client_host);
-    installEnvs.env.push('CACHE_PORT=' + settings.conf.redis_client_port);
-    installEnvs.env.push(
+    installEnvs.push('CACHE_HOST=' + settings.conf.redis_client_host);
+    installEnvs.push('CACHE_PORT=' + settings.conf.redis_client_port);
+    installEnvs.push(
       'CACHE_PASSWORD=' + settings.conf.redis_client_password
     );
 
     // Additional environmental variables for solr
-    installEnvs.env.push(
+    installEnvs.push(
       'PANTHEON_INDEX_HOST=' + settings.conf.pantheon_index_host
     );
-    installEnvs.env.push(
+    installEnvs.push(
       'PANTHEON_INDEX_PORT=' + settings.conf.pantheon_index_port
     );
 
@@ -111,7 +111,7 @@ module.exports = function(kbox) {
 
     // pre-engine-create
     kbox.core.events.on('pre-engine-create', function(createOptions, done) {
-      if (!createOptions.name) {
+      if (createOptions.name) {
 
         // Don't add phpversion to db containers
         var split = createOptions.name.split('_');
