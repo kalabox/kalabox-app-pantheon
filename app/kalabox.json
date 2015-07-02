@@ -1,24 +1,25 @@
 {
-  "appName": "my-pantheon-app",
-  "appPlugins": [],
+  "appName": "panth",
+  "appPlugins": [
+    "kalabox-plugin-php",
+    "kalabox-plugin-git",
+    "kalabox-plugin-pantheon-env"
+  ],
   "shareIgnores": [
     "sites/default/files/*",
     "files",
     ".git"
   ],
   "pluginConf": {
-    "kalabox-plugin-drush": {
-      "drush-version": "6"
-    },
     "kalabox-plugin-php": {
       "php-version": "5.3.29"
     },
-    "kalabox-plugin-dbenv": {
-      "settings": {
-        "conf": {
-          "pressflow_smart_start": 1
-        }
-      }
+    "kalabox-plugin-drush": {
+      "drush-version": "6"
+    },
+    "kalabox-plugin-git": {
+      "git-username": "Mike Pirog",
+      "git-email": "mike@kalamuna.com"
     }
   },
   "appComponents": {

@@ -1,10 +1,7 @@
 {
   "name": "replace-me",
   "dependencies": {
-    "kalabox-plugin-dbenv": "https://github.com/kalabox/kalabox-plugin-dbenv/tarball/elton-rocketman",
-    "kalabox-plugin-drush": "https://github.com/kalabox/kalabox-plugin-drush/tarball/elton-rocketman",
     "kalabox-plugin-git": "https://github.com/kalabox/kalabox-plugin-git/tarball/elton-rocketman",
-    "kalabox-plugin-php": "https://github.com/kalabox/kalabox-plugin-php/tarball/elton-rocketman",
-    "kalabox-plugin-rsync": "https://github.com/kalabox/kalabox-plugin-rsync/tarball/elton-rocketman"
+    "kalabox-plugin-php": "https://github.com/kalabox/kalabox-plugin-php/tarball/elton-rocketman"
   }
 }
