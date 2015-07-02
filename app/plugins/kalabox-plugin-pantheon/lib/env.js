@@ -1,12 +1,19 @@
 'use strict';
 
 var crypto = require('crypto');
-var PLUGIN_NAME = 'kalabox-plugin-pantheon-env';
+var PLUGIN_NAME = 'kalabox-plugin-pantheon';
 
 module.exports = function(kbox) {
 
   kbox.whenApp(function(app) {
-    // Set the default pantheon database infos
+
+    // Get kalabox.json stuff
+    var userConf;
+    if (app.config.pluginConf[PLUGIN_NAME]) {
+      userConf = app.config.pluginConf[PLUGIN_NAME];
+    }
+
+    // Pressflow database settings
     var pantheonDatabases = {
       default: {
         default: {
@@ -21,13 +28,13 @@ module.exports = function(kbox) {
       }
     };
 
-    // Construct a hashsalt
+    // Construct a hashsalt for Drupal 8
     var drupalHashSalt = crypto
       .createHash('sha256')
       .update(JSON.stringify(pantheonDatabases))
       .digest('hex');
 
-    // Here are our default settings
+    // Some Defauly settings
     var settings = {
       databases: pantheonDatabases,
       conf: {
@@ -38,9 +45,9 @@ module.exports = function(kbox) {
         pantheon_tier: 'kalabox',
         pantheon_index_host: ['solr', app.domain].join('.'),
         pantheon_index_port: 449,
-        redis_client_host: null,
-        redis_client_port: null,
-        redis_client_password: null,
+        redis_client_host: ['redis', app.domain].join('.'),
+        redis_client_port: 8160,
+        redis_client_password: '',
         file_public_path: 'sites/default/files',
         file_private_path: 'sites/default/files/private',
         file_directory_path: 'site/default/files',
@@ -50,7 +57,8 @@ module.exports = function(kbox) {
         js_gzip_compression: false,
         page_compression: false
       },
-      drupal_hash_salt: drupalHashSalt
+      drupal_hash_salt: drupalHashSalt,
+      config_directory_name: 'config'
     };
 
     // Default environmental variables
@@ -69,8 +77,23 @@ module.exports = function(kbox) {
       'PANTHEON_ENVIRONMENT=kalabox',
       'PANTHEON_INFRASTRUCTURE_ENVIRONMENT=kalabox',
       'PRESSFLOW_SETTINGS=' + JSON.stringify(settings),
-      'BACKDROP_SETTINGS=' + JSON.stringify(settings)
+      'BACKDROP_SETTINGS=' + JSON.stringify(settings),
     ];
+
+    // Additional environmental variables for redis
+    installEnvs.env.push('CACHE_HOST=' + settings.conf.redis_client_host);
+    installEnvs.env.push('CACHE_PORT=' + settings.conf.redis_client_port);
+    installEnvs.env.push(
+      'CACHE_PASSWORD=' + settings.conf.redis_client_password
+    );
+
+    // Additional environmental variables for solr
+    installEnvs.env.push(
+      'PANTHEON_INDEX_HOST=' + settings.conf.pantheon_index_host
+    );
+    installEnvs.env.push(
+      'PANTHEON_INDEX_PORT=' + settings.conf.pantheon_index_port
+    );
 
     // Events
     // pre-install
@@ -86,9 +109,21 @@ module.exports = function(kbox) {
       done();
     });
 
-    // EVENT: pre-engine-create
+    // pre-engine-create
     kbox.core.events.on('pre-engine-create', function(createOptions, done) {
       if (!createOptions.name) {
+
+        // Don't add phpversion to db containers
+        var split = createOptions.name.split('_');
+        var type = (split[2]) ? split[2] : split[1];
+
+        if (userConf.php) {
+          if (type !== 'db') {
+            installEnvs.push('PHP_VERSION=' + userConf.php);
+          }
+        }
+
+        // Inject your default envvars
         if (createOptions.Env) {
           installEnvs.forEach(function(env) {
             createOptions.Env.push(env);
@@ -97,6 +132,7 @@ module.exports = function(kbox) {
         else {
           createOptions.Env = installEnvs;
         }
+
       }
       done();
     });

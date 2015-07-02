@@ -3,7 +3,7 @@
   "appPlugins": [
     "kalabox-plugin-php",
     "kalabox-plugin-git",
-    "kalabox-plugin-pantheon-env"
+    "kalabox-plugin-pantheon"
   ],
   "shareIgnores": [
     "sites/default/files/*",
@@ -11,11 +11,11 @@
     ".git"
   ],
   "pluginConf": {
-    "kalabox-plugin-php": {
-      "php-version": "5.3.29"
-    },
-    "kalabox-plugin-drush": {
-      "drush-version": "6"
+    "kalabox-plugin-pantheon": {
+      "framework": "drupal",
+      "solr": false,
+      "redis": false,
+      "php": "5.3.29"
     },
     "kalabox-plugin-git": {
       "git-username": "Mike Pirog",

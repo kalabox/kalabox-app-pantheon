@@ -1,7 +1,6 @@
 {
   "name": "replace-me",
   "dependencies": {
-    "kalabox-plugin-git": "https://github.com/kalabox/kalabox-plugin-git/tarball/elton-rocketman",
-    "kalabox-plugin-php": "https://github.com/kalabox/kalabox-plugin-php/tarball/elton-rocketman"
+    "kalabox-plugin-git": "https://github.com/kalabox/kalabox-plugin-git/tarball/elton-rocketman"
   }
 }

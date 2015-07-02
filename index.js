@@ -4,24 +4,8 @@ var _ = require('lodash');
 
 module.exports = function(kbox) {
 
-  var pantheonMatrix = {
-    'drupal6': {
-      php: '5.3.29',
-      drush: '5'
-    },
-    'drupal7': {
-      php: '5.3.29',
-      drush: '6'
-    },
-    'wordpress': {
-      php: '5.3.29',
-      drush: '5'
-    },
-    'drupal8': {
-      php: '5.5.24',
-      drush: '7'
-    }
-  };
+  // Get some nice looking conf
+  var phpVersions = require('./conf/php.js')(kbox);
 
   // Declare our app to the world
   kbox.create.add('pantheon', {
@@ -61,32 +45,87 @@ module.exports = function(kbox) {
   });
 
   // Add an option
+  /*
   kbox.create.add('pantheon', {
     option: {
-      name: 'pantheon-type',
+      name: 'pantheon-grab',
       weight: -98,
       inquire: {
         type: 'list',
-        message: 'What kind of Pantheon app',
-        default: 'drupal7',
-        choices: Object.keys(pantheonMatrix)
+        message: 'What do you want to do?',
+        default: 'create',
+        choices: [
+          {name: 'Pull down a pre-existing site from Pantheon', value: 'pull'},
+          {name: 'Create new site from start state', value: 'create'},
+          {name: 'Import site from elsewhere', value: 'import'}
+        ]
+      }
+    }
+  });
+  */
+
+  // Add an option
+  kbox.create.add('pantheon', {
+    option: {
+      name: 'php-version',
+      task: {
+        kind: 'string',
+        description: 'PHP version?',
+      },
+      inquire: {
+        type: 'list',
+        message: 'Php version?',
+        choices: phpVersions
+      },
+      conf: {
+        type: 'plugin',
+        plugin: 'kalabox-plugin-pantheon',
+        key: 'php'
       }
     }
   });
 
-  // Load php things
-  require('./node_modules/kalabox-plugin-php/create.js')(
-    kbox,
-    pantheonMatrix,
-    'pantheon'
-  );
+  // Add an option
+  kbox.create.add('pantheon', {
+    option: {
+      name: 'solr',
+      task: {
+        kind: 'string',
+        description: 'Add solr service?',
+      },
+      inquire: {
+        type: 'confirm',
+        message: 'Use solr?',
+        default: false
+      },
+      conf: {
+        type: 'plugin',
+        plugin: 'kalabox-plugin-pantheon',
+        key: 'solr'
+      }
+    }
+  });
 
-  // Load drush things
-  require('./node_modules/kalabox-plugin-drush/create.js')(
-    kbox,
-    pantheonMatrix,
-    'pantheon'
-  );
+  // Add an option
+  kbox.create.add('pantheon', {
+    option: {
+      name: 'redis',
+      task: {
+        kind: 'string',
+        description: 'Add redis service?',
+      },
+      inquire: {
+        type: 'confirm',
+        message: 'Use redis?',
+        default: false
+      },
+      conf: {
+        type: 'plugin',
+        plugin: 'kalabox-plugin-pantheon',
+        key: 'redis'
+      }
+    }
+  });
 
   // Load git things
   require('./node_modules/kalabox-plugin-git/create.js')(kbox, 'pantheon');
