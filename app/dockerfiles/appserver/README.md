@@ -7,7 +7,7 @@ A container that approximates the appserver used on Pantheon.
 
 # docker build -t kalabox/pantheon-appserver:mytag .
 
-FROM kalabox/pantheon-nginx:v0.9.0
+FROM kalabox/nginx:v0.9.0
 
 RUN \
   apt-get update && \
@@ -40,6 +40,5 @@ CMD ["/root/start.sh"]
 
 EXPOSE 80
 EXPOSE 443
-
 
 ```
