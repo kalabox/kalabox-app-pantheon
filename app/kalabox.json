@@ -39,6 +39,12 @@
         "name": "mariadb",
         "srcRoot": ":appRoot:"
       }
+    },
+    "solr": {
+      "image": {
+        "name": "kalabox/solr:test",
+        "srcRoot": ":appRoot:"
+      }
     }
   }
 }

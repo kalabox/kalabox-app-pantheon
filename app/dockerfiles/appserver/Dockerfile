@@ -13,10 +13,10 @@ RUN \
   phpbrew init && \
   echo "source /root/.phpbrew/bashrc" >> /root/.bashrc && \
   ln -s /.phpbrew /root/.phpbrew && \
-  apt-get update -y && \
-  apt-get clean -y && \
-  apt-get autoclean -y && \
-  apt-get autoremove -y && \
+  apt-get -y update && \
+  apt-get -y clean && \
+  apt-get -y autoclean && \
+  apt-get -y autoremove && \
   rm -rf /var/lib/apt/* && rm -rf && rm -rf /var/lib/cache/* && rm -rf /var/lib/log/* && rm -rf /tmp/*
 
 RUN \
