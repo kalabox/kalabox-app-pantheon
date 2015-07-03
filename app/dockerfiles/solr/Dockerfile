@@ -16,6 +16,9 @@ RUN chmod 755 /start.sh
 # Allow us to edit the config on the outsite
 RUN rm /etc/tomcat6/server.xml
 RUN ln -s /src/config/tomcat/server.xml /etc/tomcat6/server.xml
+RUN ln -s /src/config/tomcat/root.xml /etc/tomcat6/Catalina/localhost/root.xml
+# Hacky way to set a special path
+RUN mv /etc/tomcat6/Catalina/localhost/solr.xml /etc/tomcat6/Catalina/localhost/sites#self#environments#kalabox#index.xml
 
 EXPOSE 449
 CMD ["/bin/bash", "/start.sh"]
