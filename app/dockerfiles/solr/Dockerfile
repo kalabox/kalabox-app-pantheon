@@ -4,7 +4,7 @@ FROM kalabox/debian:stable
 
 RUN \
   apt-get -y update && \
-  apt-get -y install solr-tomcat && \
+  apt-get -y install incron solr-tomcat && \
   apt-get -y clean && \
   apt-get -y autoclean && \
   apt-get -y autoremove && \
@@ -12,23 +12,21 @@ RUN \
 
 COPY ./start.sh /start.sh
 COPY ./index /usr/share/solr/web/index
-RUN chmod 755 /start.sh
 
 # Allow us to edit some config on the outsite
-RUN rm /etc/tomcat6/server.xml
-RUN ln -s /src/config/tomcat/server.xml /etc/tomcat6/server.xml
-
-RUN rm /etc/tomcat6/web.xml
-RUN ln -s /src/config/tomcat/web.xml /etc/tomcat6/web.xml
-
-RUN rm /etc/solr/solr.xml
-RUN ln -s /src/config/solr/solr.xml /etc/solr/solr.xml
-
-RUN rm /usr/share/solr/conf/schema.xml
-RUN ln -s /usr/share/solr/web/index /usr/share/solr/conf/schema.xml
-
-# Hacky way to set a special path
-RUN mv /etc/tomcat6/Catalina/localhost/solr.xml /etc/tomcat6/Catalina/localhost/sites#self#environments#kalabox.xml
+RUN \
+  chmod 755 /start.sh && \
+  rm /etc/tomcat6/server.xml && \
+  ln -s /src/config/tomcat/server.xml /etc/tomcat6/server.xml && \
+  rm /etc/tomcat6/web.xml && \
+  ln -s /src/config/tomcat/web.xml /etc/tomcat6/web.xml && \
+  rm /etc/solr/solr.xml && \
+  ln -s /src/config/solr/solr.xml /etc/solr/solr.xml && \
+  rm /usr/share/solr/conf/schema.xml && \
+  ln -s /usr/share/solr/web/index /usr/share/solr/conf/schema.xml && \
+  mv /etc/tomcat6/Catalina/localhost/solr.xml /etc/tomcat6/Catalina/localhost/sites#self#environments#kalabox.xml && \
+  echo "root" >> /etc/incron.allow && \
+  echo "/usr/share/solr/web/index IN_MODIFY curl http://localhost:449/sites/self/environments/kalabox/admin/cores?action=RELOAD&core=index" >> /var/spool/incron/root
 
 EXPOSE 449
 CMD ["/bin/bash", "/start.sh"]
