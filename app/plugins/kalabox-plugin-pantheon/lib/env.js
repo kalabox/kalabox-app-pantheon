@@ -46,7 +46,7 @@ module.exports = function(kbox) {
         pantheon_index_host: ['solr', app.domain].join('.'),
         pantheon_index_port: 449,
         redis_client_host: ['redis', app.domain].join('.'),
-        redis_client_port: 8160,
+        redis_client_port: 8161,
         redis_client_password: '',
         file_public_path: 'sites/default/files',
         file_private_path: 'sites/default/files/private',
