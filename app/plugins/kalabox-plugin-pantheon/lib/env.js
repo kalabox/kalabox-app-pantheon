@@ -137,6 +137,31 @@ module.exports = function(kbox) {
       done();
     });
 
+    // pre-uninstall
+    kbox.core.events.on('pre-uninstall', function(app, done) {
+      var cmd = [
+        'rm',
+        '-rf',
+        '/certs/'
+      ];
+
+      // Image name
+      var image = 'kalabox/debian:stable';
+
+      // Build create options
+      var createOpts = {};
+
+      // Build start options
+      var startOpts = kbox.util.docker.StartOpts()
+        .bind(app.rootBind, '/src')
+        .volumeFrom(app.dataContainerName)
+        .json();
+
+      // Clean up certs
+      kbox.engine.run(image, cmd, createOpts, startOpts, done);
+
+    });
+
   });
 
 };
