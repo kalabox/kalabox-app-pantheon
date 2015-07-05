@@ -45,6 +45,12 @@
         "name": "pantheon-solr",
         "srcRoot": ":appRoot:"
       }
+    },
+    "redis": {
+      "image": {
+        "name": "pantheon-redis",
+        "srcRoot": ":appRoot:"
+      }
     }
   }
 }
