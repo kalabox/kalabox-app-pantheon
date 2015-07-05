@@ -1,5 +1,15 @@
 #!/bin/sh
 
+# Set up our certs
+# @todo: lots of clean up to do here
+openssl genrsa -out /certs/binding.key 2048 && \
+openssl req -new -x509 -key /certs/binding.key -out /certs/binding.crt -days 365 -subj "/C=US/ST=California/L=Oakland/O=Kalabox/OU=KB/CN=solr.${APPDOMAIN}" && \
+cat /certs/binding.crt /certs/binding.key > /certs/binding.pem && \
+mkdir /usr/share/ca-certificates/solr.${APPDOMAIN} && \
+cp /certs/binding.crt /usr/share/ca-certificates/solr.${APPDOMAIN}/binding.crt && \
+echo "solr.${APPDOMAIN}/binding.crt" >> /etc/ca-certificates.conf && \
+update-ca-certificates --fresh
+
 # Move in our custom config files if they exist
 # Use our custom www.conf pool for fpm
 if [ -f "/src/config/php/www.conf" ]; then

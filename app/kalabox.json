@@ -42,7 +42,7 @@
     },
     "solr": {
       "image": {
-        "name": "kalabox/solr:test",
+        "name": "pantheon-solr",
         "srcRoot": ":appRoot:"
       }
     }

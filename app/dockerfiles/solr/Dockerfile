@@ -4,7 +4,7 @@ FROM kalabox/debian:stable
 
 RUN \
   apt-get -y update && \
-  apt-get -y install incron tomcat7 tomcat7-admin && \
+  apt-get -y install incron tomcat7 libtcnative-1 tomcat7-admin && \
   cd /tmp && curl -L "https://archive.apache.org/dist/lucene/solr/3.6.2/apache-solr-3.6.2.tgz" | tar -zvx && \
   mv /tmp/apache-solr-3.6.2/example/solr /usr/share/solr && \
   unzip /tmp/apache-solr-3.6.2/example/webapps/solr.war -d /usr/share/solr/web && \
@@ -32,7 +32,7 @@ RUN \
   ln -s /usr/share/solr/web/index /usr/share/solr/conf/schema.xml && \
   ln -s /src/config/tomcat/index.xml /etc/tomcat7/Catalina/localhost/sites#self#environments#kalabox.xml && \
   echo "root" >> /etc/incron.allow && \
-  echo "/usr/share/solr/web/index IN_MODIFY curl http://localhost:449/sites/self/environments/kalabox/admin/cores?action=RELOAD&core=index" >> /var/spool/incron/root
+  echo "/usr/share/solr/web/index IN_MODIFY curl -k https://localhost:449/sites/self/environments/kalabox/admin/cores?action=RELOAD&core=index" > /var/spool/incron/root
 
 EXPOSE 449
 CMD ["/bin/bash", "/start.sh"]
