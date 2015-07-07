@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Set up our certs
+# Set up our solr certs
 # @todo: lots of clean up to do here
 if [ ! -f "/certs/binding.pem" ]; then
   openssl genrsa -out /certs/binding.key 2048 && \
@@ -10,6 +10,14 @@ if [ ! -f "/certs/binding.pem" ]; then
   cp /certs/binding.crt /usr/share/ca-certificates/solr.${APPDOMAIN}/binding.crt && \
   echo "solr.${APPDOMAIN}/binding.crt" >> /etc/ca-certificates.conf && \
   update-ca-certificates --fresh
+fi
+
+# Set up our appserver certs
+# @todo: lots of clean up to do here
+if [ ! -f "/certs/appserver.pem" ]; then
+  openssl genrsa -out /certs/appserver.key 2048 && \
+  openssl req -new -x509 -key /certs/appserver.key -out /certs/appserver.crt -days 365 -subj "/C=US/ST=California/L=Oakland/O=Kalabox/OU=KB/CN=${APPDOMAIN}" && \
+  cat /certs/appserver.crt /certs/appserver.key > /certs/appserver.pem
 fi
 
 # Move in our custom config files if they exist

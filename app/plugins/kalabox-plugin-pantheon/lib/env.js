@@ -106,6 +106,27 @@ module.exports = function(kbox) {
       else {
         component.installOptions.Env = installEnvs;
       }
+      // Share our certs
+      component.opts = {
+        Binds: ['/certs:/srv/certs:rw']
+      }
+      done();
+    });
+
+    // pre-start
+    kbox.core.events.on('pre-start-component', function(component, done) {
+
+      // Cert bind
+      var certs =  '/certs:/srv/certs:rw';
+
+      // Add cert bind
+      if (component.opts.Binds) {
+        component.opts.Binds.push(certs);
+      }
+      else {
+        component.opts.Binds = [certs];
+      }
+
       done();
     });
 
