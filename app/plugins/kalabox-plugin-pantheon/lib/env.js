@@ -106,10 +106,6 @@ module.exports = function(kbox) {
       else {
         component.installOptions.Env = installEnvs;
       }
-      // Share our certs
-      component.opts = {
-        Binds: ['/certs:/srv/certs:rw']
-      }
       done();
     });
 
