@@ -14,7 +14,8 @@
       "framework": "drupal",
       "solr": false,
       "redis": false,
-      "php": "5.3.29"
+      "php": "5.3.29",
+      "drush-version": "drush7"
     },
     "kalabox-plugin-git": {
       "git-username": "Mike Pirog",
