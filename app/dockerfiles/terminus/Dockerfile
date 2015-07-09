@@ -40,8 +40,7 @@ RUN \
   chmod +x /usr/local/bin/kdrush && \
   chmod +x /usr/local/bin/kwp && \
   mkdir -p /root/.ssh && mkdir -p /usr/share/drush/commands && \
-  ln -s /src/config/drush /root/.drush && \
-  ln -s /src/config/terminus /root/.terminus
+  ln -s /src/config/drush
 
 # Install some extra goodies
 RUN \
