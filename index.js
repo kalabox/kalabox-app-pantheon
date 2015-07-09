@@ -8,6 +8,9 @@ var pantheon = new Client();
 
 module.exports = function(kbox) {
 
+  // Load some boxmods
+  var events = kbox.core.events;
+
   // Get some nice looking conf
   var phpVersions = require('./conf/php.js')(kbox);
 
@@ -33,11 +36,42 @@ module.exports = function(kbox) {
     _.map(products, function(val, key) {
       choices.push({
         name: val.attributes.longname,
-        value: val.attributes
+        value: key
       });
     });
     return _.sortBy(choices, 'name');
   };
+
+  // Events
+  // pre-create-instantiate
+  // Add some other important things to our kalabox.json before
+  // creating it
+  events.on('pre-create-instantiate', function(kalaboxJson, done) {
+    // Grab our current pantheon config
+    var pantheonConfig = kalaboxJson.pluginConf['kalabox-plugin-pantheon'];
+
+    // Add some UUID stuff if we are pulling
+    if (pantheonConfig.action === 'pull') {
+      var site = pantheon.sites[pantheonConfig.uuid].information;
+      pantheonConfig.framework = site.framework;
+      pantheonConfig.upstream = site.upstream;
+      delete pantheonConfig.product;
+    }
+
+    // Or product stuff if we are creating from start state
+    if (pantheonConfig.action === 'create') {
+      var product = pantheon.products[pantheonConfig.product].attributes;
+      pantheonConfig.framework = product.framework;
+      pantheonConfig.upstream = product.upstream;
+      delete pantheonConfig.uuid;
+    }
+
+    // Rebuild json
+    kalaboxJson.pluginConf['kalabox-plugin-pantheon'] = pantheonConfig;
+
+    // Go home Sam
+    done();
+  });
 
   // Declare our app to the world
   kbox.create.add('pantheon', {
@@ -88,29 +122,33 @@ module.exports = function(kbox) {
   kbox.create.add('pantheon', {
     option: {
       name: 'action',
-        weight: -95,
-        inquire: {
-          type: 'list',
-          message: 'What do you want to do?',
-          default: 'pull',
-          choices: [
-            {name: 'Pull a pre-existing site from Pantheon', value: 'pull'},
-            {name: 'Create new site from start state', value: 'create'}
-          ]
-        }
+      weight: -95,
+      inquire: {
+        type: 'list',
+        message: 'What do you want to do?',
+        default: 'pull',
+        choices: [
+          {name: 'Pull a pre-existing site from Pantheon', value: 'pull'},
+          {name: 'Create new site from start state', value: 'create'}
+        ]
       },
       conf: {
         type: 'plugin',
         plugin: 'kalabox-plugin-pantheon',
-        key: 'type'
+        key: 'action'
       }
-   });
+    }
+  });
 
   // Add an option
   kbox.create.add('pantheon', {
     option: {
-      name: 'site',
+      name: 'uuid',
       weight: -90,
+      task: {
+        kind: 'string',
+        description: 'Pantheon site uuid.',
+      },
       inquire: {
         type: 'list',
         message: 'Which site?',
@@ -138,7 +176,7 @@ module.exports = function(kbox) {
       conf: {
         type: 'plugin',
         plugin: 'kalabox-plugin-pantheon',
-        key: 'site'
+        key: 'uuid'
       }
     }
   });
@@ -146,7 +184,7 @@ module.exports = function(kbox) {
   // Add an option
   kbox.create.add('pantheon', {
     option: {
-      name: 'start',
+      name: 'product',
       weight: -90,
       inquire: {
         type: 'list',
@@ -174,12 +212,12 @@ module.exports = function(kbox) {
       conf: {
         type: 'plugin',
         plugin: 'kalabox-plugin-pantheon',
-        key: 'site'
+        key: 'product'
       }
     }
   });
 
-    // Add an option
+  // Add an option
   kbox.create.add('pantheon', {
     option: {
       name: 'name',
