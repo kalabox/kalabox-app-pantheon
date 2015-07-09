@@ -8,6 +8,23 @@ Promise.longStackTraces();
 var util = require('util');
 
 /*
+ * @todo: @pirog - I'm not touching this one! :)
+ */
+var path2Bind4U = function(path) {
+  var bind = path;
+  if (process.platform === 'win32') {
+    bind = path
+      .replace(/\\/g, '/')
+      .replace('C:/', 'c:/')
+      .replace('c:/', '/c/');
+  }
+  else if (process.platform === 'linux')  {
+    bind = path.replace('/home', '/Users');
+  }
+  return bind;
+};
+
+/*
  * Constructor.
  */
 function Client(image, kbox) {
