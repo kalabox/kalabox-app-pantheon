@@ -14,7 +14,8 @@
     "kalabox-plugin-pantheon": {
       "action": "pull",
       "drush-version": "7",
-      "framework": "drupal",
+      "env": "",
+      "framework": "",
       "php": "5.3.29",
       "product": "",
       "uuid": "",
