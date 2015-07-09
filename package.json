@@ -17,8 +17,11 @@
     "email": "mike@kalamuna.com"
   },
   "dependencies": {
+    "bluebird": "^2.9.32",
     "kalabox-plugin-git": "https://github.com/kalabox/kalabox-plugin-git/tarball/elton-rocketman",
-    "lodash": "^3.9.3"
+    "kalabox-plugin-rsync": "https://github.com/kalabox/kalabox-plugin-rsync/tarball/elton-rocketman",
+    "lodash": "^3.9.3",
+    "restler": "^3.3.0"
   },
   "devDependencies": {
     "grunt": "^0.4.5",

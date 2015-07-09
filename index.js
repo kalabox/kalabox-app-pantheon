@@ -1,11 +1,43 @@
+#!/usr/bin/env node
+
 'use strict';
 
 var _ = require('lodash');
+var Client = require('./lib/client.js');
+var pantheon = new Client();
 
 module.exports = function(kbox) {
 
   // Get some nice looking conf
   var phpVersions = require('./conf/php.js')(kbox);
+
+  /*
+   * Parse our sites from terminus into a choices array
+   */
+  var parseSites = function(sites) {
+    var choices = [];
+    _.map(sites, function(val, key) {
+      choices.push({
+        name: val.information.name,
+        value: key
+      });
+    });
+    return _.sortBy(choices, 'name');
+  };
+
+  /*
+   * Parse our products from terminus into a choices array
+   */
+  var parseProducts = function(products) {
+    var choices = [];
+    _.map(products, function(val, key) {
+      choices.push({
+        name: val.attributes.longname,
+        value: val.attributes
+      });
+    });
+    return _.sortBy(choices, 'name');
+  };
 
   // Declare our app to the world
   kbox.create.add('pantheon', {
@@ -19,15 +51,146 @@ module.exports = function(kbox) {
   // Add an option
   kbox.create.add('pantheon', {
     option: {
-      name: 'name',
+      name: 'email',
       weight: -99,
+      task: {
+        kind: 'string',
+        description: 'Pantheon dashboard email.',
+      },
+      inquire: {
+        type: 'input',
+        message: 'Pantheon dashboard email',
+        validate: function(value) {
+          // @todo some actual validation here
+          return true;
+        }
+      }
+    }
+  });
+
+  // Add an option
+  kbox.create.add('pantheon', {
+    option: {
+      name: 'password',
+      weight: -98,
+      task: {
+        kind: 'string',
+        description: 'Pantheon dashboard password.',
+      },
+      inquire: {
+        type: 'password',
+        message: 'Pantheon dashboard password'
+      }
+    }
+  });
+
+  // Add an option
+  kbox.create.add('pantheon', {
+    option: {
+      name: 'action',
+        weight: -95,
+        inquire: {
+          type: 'list',
+          message: 'What do you want to do?',
+          default: 'pull',
+          choices: [
+            {name: 'Pull a pre-existing site from Pantheon', value: 'pull'},
+            {name: 'Create new site from start state', value: 'create'}
+          ]
+        }
+      },
+      conf: {
+        type: 'plugin',
+        plugin: 'kalabox-plugin-pantheon',
+        key: 'type'
+      }
+   });
+
+  // Add an option
+  kbox.create.add('pantheon', {
+    option: {
+      name: 'site',
+      weight: -90,
+      inquire: {
+        type: 'list',
+        message: 'Which site?',
+        choices: function(answers) {
+
+          // Make this async cause we need to hit the terminus
+          var done = this.async();
+
+          // Login to the pantheon
+          pantheon.login(answers.email, answers.password)
+          .then(function(session) {
+
+            // grab our sites
+            return pantheon.getSites(session)
+            .then(function(sites) {
+              done(parseSites(sites));
+            });
+          });
+        },
+        when: function(answers) {
+          // @todo some actual validation here
+          return (answers.action === 'pull');
+        }
+      },
+      conf: {
+        type: 'plugin',
+        plugin: 'kalabox-plugin-pantheon',
+        key: 'site'
+      }
+    }
+  });
+
+  // Add an option
+  kbox.create.add('pantheon', {
+    option: {
+      name: 'start',
+      weight: -90,
+      inquire: {
+        type: 'list',
+        message: 'Which start state?',
+        choices: function(answers) {
+
+          // Make this async cause we need to hit the terminus
+          var done = this.async();
+
+          // Login to the pantheon
+          pantheon.login(answers.email, answers.password)
+          .then(function(session) {
+
+            // grab our sites
+            return pantheon.getProducts(session)
+            .then(function(products) {
+              done(parseProducts(products));
+            });
+          });
+        },
+        when: function(answers) {
+          return (answers.action === 'create');
+        }
+      },
+      conf: {
+        type: 'plugin',
+        plugin: 'kalabox-plugin-pantheon',
+        key: 'site'
+      }
+    }
+  });
+
+    // Add an option
+  kbox.create.add('pantheon', {
+    option: {
+      name: 'name',
+      weight: -80,
       task: {
         kind: 'string',
         description: 'The name of your app.',
       },
       inquire: {
         type: 'input',
-        message: 'What will this app be called',
+        message: 'What will you call this monster you have created',
         validate: function(value) {
           // @todo some actual validation here
           return true;
@@ -40,24 +203,6 @@ module.exports = function(kbox) {
       conf: {
         type: 'global',
         key: 'appName'
-      }
-    }
-  });
-
-  // Add an option
-  kbox.create.add('pantheon', {
-    option: {
-      name: 'pantheon-grab',
-      weight: -98,
-      inquire: {
-        type: 'list',
-        message: 'What do you want to do?',
-        default: 'create',
-        choices: [
-          {name: 'Pull down a pre-existing site from Pantheon', value: 'pull'},
-          {name: 'Create new site from start state', value: 'create'},
-          {name: 'Import site from elsewhere', value: 'import'}
-        ]
       }
     }
   });
@@ -82,51 +227,6 @@ module.exports = function(kbox) {
       }
     }
   });
-
-  // Add an option
-  kbox.create.add('pantheon', {
-    option: {
-      name: 'solr',
-      task: {
-        kind: 'string',
-        description: 'Add solr service?',
-      },
-      inquire: {
-        type: 'confirm',
-        message: 'Use solr?',
-        default: false
-      },
-      conf: {
-        type: 'plugin',
-        plugin: 'kalabox-plugin-pantheon',
-        key: 'solr'
-      }
-    }
-  });
-
-  // Add an option
-  kbox.create.add('pantheon', {
-    option: {
-      name: 'redis',
-      task: {
-        kind: 'string',
-        description: 'Add redis service?',
-      },
-      inquire: {
-        type: 'confirm',
-        message: 'Use redis?',
-        default: false
-      },
-      conf: {
-        type: 'plugin',
-        plugin: 'kalabox-plugin-pantheon',
-        key: 'redis'
-      }
-    }
-  });
-
-  // Load git things
-  require('./node_modules/kalabox-plugin-git/create.js')(kbox, 'pantheon');
 
   // Task to create kalabox apps
   kbox.tasks.add(function(task) {

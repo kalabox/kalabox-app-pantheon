@@ -2,6 +2,7 @@
   "name": "replace-me",
   "dependencies": {
     "kalabox-plugin-git": "https://github.com/kalabox/kalabox-plugin-git/tarball/elton-rocketman",
+    "kalabox-plugin-rsync": "https://github.com/kalabox/kalabox-plugin-rsync/tarball/elton-rocketman",
     "lodash": "^3.9.3"
   }
 }

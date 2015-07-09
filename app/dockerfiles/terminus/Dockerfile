@@ -4,7 +4,7 @@ FROM kalabox/pantheon-appserver:v0.9.0
 # Install all the CLI magic
 RUN \
   apt-get -y update && \
-  apt-get install -y mysql-client postgresql-client-common sqlite && \
+  apt-get install -y mysql-client postgresql-client-common sqlite php5-curl && \
   curl -sS https://getcomposer.org/installer | php && \
   mv composer.phar /usr/local/bin/composer && \
   ln -s /usr/local/bin/composer /usr/bin/composer && \
