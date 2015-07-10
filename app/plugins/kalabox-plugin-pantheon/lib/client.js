@@ -5,6 +5,7 @@
 // Intrinsic modules.
 var crypto = require('crypto');
 var util = require('util');
+var path = require('path');
 
 // Npm modulez
 var _ = require('lodash');
@@ -49,11 +50,11 @@ Client.prototype.__request = function(cmd, args, options) {
   /* jshint ignore:end */
 
   // Get provider.
-  return kbox.engine.provider()
+  return this.kbox.engine.provider()
   // Create app.
   .then(function(provider) {
     // Build start options
-    var home = kbox.core.deps.lookup('globalConfig').home;
+    var home = this.kbox.core.deps.lookup('globalConfig').home;
     var startOpts = this.kbox.util.docker.StartOpts()
       .bind(path.join(home, '.terminus'), '/root/.terminus')
       .json();
@@ -62,7 +63,7 @@ Client.prototype.__request = function(cmd, args, options) {
     return this.kbox.engine.use(this.image, createOpts, startOpts, function(container) {
       return self.kbox.engine.queryData(container.id, query);
     });
-  }
+  });
 };
 
 /*
