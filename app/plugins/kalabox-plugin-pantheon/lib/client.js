@@ -82,5 +82,54 @@ Client.prototype.getConnectionMode = function(site, env) {
 
 };
 
+/*
+ * Set connection mode
+ * terminus site connection-mode --site="$PANTHEON_SITE" --env="$PANTHEON_ENV" --set=git
+ */
+Client.prototype.setConnectionMode = function(site, env) {
+
+  // @todo: can we use something like optimist to do better
+  // options parsing?
+  return this.__request(
+    ['site'],
+    ['connection-mode'],
+    ['--json', '--site=' + site, '--env=' + env, '--set=git']
+  );
+
+};
+
+/*
+ * Get site uuid
+ * terminus site info --site="$PANTHEON_SITE" --field=id
+ */
+Client.prototype.getUUID = function(site) {
+
+  // @todo: can we use something like optimist to do better
+  // options parsing?
+  return this.__request(
+    ['site'],
+    ['info'],
+    ['--json', '--site=' + site, '--field=id']
+  );
+
+};
+
+/*
+ * Get site aliases
+ * terminus sites aliases
+ */
+Client.prototype.getSiteAliases = function() {
+
+  // @todo: can we use something like optimist to do better
+  // options parsing?
+  return this.__request(
+    ['sites'],
+    ['aliases'],
+    ['--json']
+  );
+
+};
+
+
 // Return constructor as the module object.
 module.exports = Client;
