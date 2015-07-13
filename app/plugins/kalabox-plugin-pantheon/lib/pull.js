@@ -110,16 +110,21 @@ module.exports = function(kbox) {
           var payload = [
             'gunzip',
             '-df',
-            dbFile,
-            '&&',
-            'mysql',
-            '-u',
-            'pantheon',
-            'pantheon',
-            '<',
-             dbFile.replace('.gz', '')
+            dbFile
           ];
-          return engine.query(dbID, payload);
+          return engine.query(dbID, payload)
+            .then(function() {
+              var payload = [
+                'cat',
+                dbFile.replace('.gz', ''),
+                '|',
+                'mysql',
+                '-u',
+                'pantheon',
+                'pantheon'
+              ];
+              return engine.query(dbID, payload);
+            });
         })
         .then(function() {
           // @todo: would be great to get terminus to be able to
