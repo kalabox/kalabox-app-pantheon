@@ -2,6 +2,7 @@
   "appName": "panth",
   "appPlugins": [
     "kalabox-plugin-git",
+    "kalabox-plugin-rsync",
     "kalabox-plugin-pantheon"
   ],
   "shareIgnores": [
@@ -11,15 +12,15 @@
   ],
   "pluginConf": {
     "kalabox-plugin-pantheon": {
-      "framework": "drupal",
-      "solr": false,
-      "redis": false,
+      "action": "pull",
+      "drush-version": "7",
+      "env": "",
+      "framework": "",
       "php": "5.3.29",
-      "drush-version": "7"
-    },
-    "kalabox-plugin-git": {
-      "git-username": "Mike Pirog",
-      "git-email": "mike@kalamuna.com"
+      "product": "",
+      "site": "",
+      "uuid": "",
+      "upstream": ""
     }
   },
   "appComponents": {

@@ -1,7 +1,9 @@
 {
   "name": "replace-me",
   "dependencies": {
+    "bluebird": "^2.9.32",
     "kalabox-plugin-git": "https://github.com/kalabox/kalabox-plugin-git/tarball/elton-rocketman",
+    "kalabox-plugin-rsync": "https://github.com/kalabox/kalabox-plugin-rsync/tarball/elton-rocketman",
     "lodash": "^3.9.3"
   }
 }

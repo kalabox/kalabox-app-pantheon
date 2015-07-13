@@ -4,7 +4,7 @@ FROM kalabox/pantheon-appserver:v0.9.0
 # Install all the CLI magic
 RUN \
   apt-get -y update && \
-  apt-get install -y mysql-client postgresql-client-common sqlite && \
+  apt-get install -y mysql-client postgresql-client-common sqlite php5-curl && \
   curl -sS https://getcomposer.org/installer | php && \
   mv composer.phar /usr/local/bin/composer && \
   ln -s /usr/local/bin/composer /usr/bin/composer && \
@@ -40,8 +40,7 @@ RUN \
   chmod +x /usr/local/bin/kdrush && \
   chmod +x /usr/local/bin/kwp && \
   mkdir -p /root/.ssh && mkdir -p /usr/share/drush/commands && \
-  ln -s /src/config/drush /root/.drush && \
-  ln -s /src/config/terminus /root/.terminus
+  ln -s /src/config/drush /root/.drush
 
 # Install some extra goodies
 RUN \

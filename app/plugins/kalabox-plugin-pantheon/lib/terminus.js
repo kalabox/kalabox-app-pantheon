@@ -73,6 +73,7 @@ module.exports = function(kbox) {
       // Build start options.
       var startOpts = kbox.util.docker.StartOpts()
         .bind(app.config.homeBind, '/ssh')
+        .bind(path.join(app.config.homeBind, '.terminus'), '/root/.terminus')
         .bind(app.rootBind, '/src')
         .json();
 
