@@ -15,19 +15,26 @@ Promise.longStackTraces();
 /*
  * Constructor.
  */
-function Client(image, kbox) {
+function Client(kbox, app) {
 
-  this.image = image;
+  this.app = app;
   this.kbox = kbox;
 
 }
 
 /*
+ * WE DEFINITELY NEED TO EITHER RETRIEVE AND VALIDATE A SESSION BEFORE WE
+ * ACTALLY DO STUFF OR LOGIN
+ *
+ * @todo @todo @todo @todo @todo @todo @todo @todo @todo @todo @todo @todo
+ */
+
+/*
  * Return the metric record's ID, or create one if it doesn't have one.
  */
-Client.prototype.__buildQuery = function(cmd, args, options) {
+Client.prototype.__buildQuery = function(image, cmd, args, options) {
 
-  cmd.unshift('terminus');
+  cmd.unshift(image);
   return cmd.concat(args).concat(options);
 
 };
@@ -35,14 +42,17 @@ Client.prototype.__buildQuery = function(cmd, args, options) {
 /*
  * Send and handle a REST request.
  */
-Client.prototype.__request = function(cmd, args, options) {
+Client.prototype.__request = function(image, cmd, args, options) {
 
   // Save for later.
   var self = this;
 
-  // Build create options.
+  var globalConfig = this.kbox.core.deps.get('globalConfig');
   var hashMe = crypto.createHash('sha1').digest('hex');
+  // Build create options.
   var createOpts = this.kbox.util.docker.CreateOpts(hashMe)
+    .workingDir('/' + globalConfig.codeDir)
+    .volumeFrom(this.app.dataContainerName)
     .json();
   /* jshint ignore:start */
   //jscs:disable
@@ -51,20 +61,26 @@ Client.prototype.__request = function(cmd, args, options) {
 
   // Get provider.
   return this.kbox.engine.provider()
-  // Create app.
   .then(function(provider) {
+
     // Build start options
     var home = this.kbox.core.deps.lookup('globalConfig').home;
     var startOpts = this.kbox.util.docker.StartOpts()
       .bind(path.join(home, '.terminus'), '/root/.terminus')
+      .bind(this.app.config.homeBind, '/ssh')
+      .bind(this.app.rootBind, '/src')
       .json();
 
     var query = self.__buildQuery(cmd, args, options);
-    return this.kbox.engine.use(this.image, createOpts, startOpts, function(container) {
+    return this.kbox.engine.use(image, createOpts, startOpts, function(container) {
       return self.kbox.engine.queryData(container.id, query);
     });
   });
 };
+
+/*
+ * TERMINUS COMMANDS
+ */
 
 /*
  * Get connection mode
@@ -75,6 +91,7 @@ Client.prototype.getConnectionMode = function(site, env) {
   // @todo: can we use something like optimist to do better
   // options parsing?
   return this.__request(
+    'terminus',
     ['site'],
     ['connection-mode'],
     ['--json', '--site=' + site, '--env=' + env]
@@ -91,6 +108,7 @@ Client.prototype.setConnectionMode = function(site, env) {
   // @todo: can we use something like optimist to do better
   // options parsing?
   return this.__request(
+    'terminus',
     ['site'],
     ['connection-mode'],
     ['--json', '--site=' + site, '--env=' + env, '--set=git']
@@ -107,6 +125,7 @@ Client.prototype.getUUID = function(site) {
   // @todo: can we use something like optimist to do better
   // options parsing?
   return this.__request(
+    'terminus',
     ['site'],
     ['info'],
     ['--json', '--site=' + site, '--field=id']
@@ -122,13 +141,46 @@ Client.prototype.getSiteAliases = function() {
 
   // @todo: can we use something like optimist to do better
   // options parsing?
-  return this.__request(
-    ['sites'],
-    ['aliases'],
-    ['--json']
-  );
+  return this.__request('terminus', ['sites'], ['aliases'], ['--json']);
 
 };
+
+/*
+ * GIT COMMANDS
+ */
+
+/*
+ * Clone a repo
+ * git clone "$REPO" ./
+ */
+Client.prototype.cloneCode = function(repo) {
+
+  // @todo: can we use something like optimist to do better
+  // options parsing?
+  return this.__request('git', ['clone'], [repo, './'], []);
+
+};
+
+/*
+ * Pull a repo
+ * git pull origin $BRANCH
+ */
+Client.prototype.pullCode = function(remote, branch) {
+
+  // @todo: can we use something like optimist to do better
+  // options parsing?
+  if (remote === undefined) {
+    remote = 'origin';
+  }
+  if (branch === undefined) {
+    branch = 'master';
+  }
+
+  //
+  return this.__request('git', ['pull'], [remote, branch], []);
+
+};
+
 
 
 // Return constructor as the module object.

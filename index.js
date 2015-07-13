@@ -8,6 +8,8 @@ var pantheon = new Client();
 module.exports = function(kbox) {
 
   // Load our events
+  // @todo: need a better way to load this so it is
+  // just for pantheon apps
   require('./lib/events.js')(kbox, pantheon);
 
   // Declare our app to the world
