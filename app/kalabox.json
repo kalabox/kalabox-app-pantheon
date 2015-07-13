@@ -43,7 +43,7 @@
     },
     "db": {
       "image": {
-        "name": "mariadb",
+        "name": "pantheon-mariadb",
         "srcRoot": ":appRoot:"
       }
     },
