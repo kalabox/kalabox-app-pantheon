@@ -48,9 +48,10 @@ Client.prototype.__request = function(image, cmd, args, options) {
   var self = this;
 
   var globalConfig = this.kbox.core.deps.get('globalConfig');
-  var hashMe = crypto.createHash('sha1').digest('hex');
+  // @todo: get this to actually be UUID
+  var id = crypto.randomBytes(4).toString('hex');
   // Build create options.
-  var createOpts = this.kbox.util.docker.CreateOpts(hashMe)
+  var createOpts = this.kbox.util.docker.CreateOpts('kalabox_terminus')
     .workingDir('/' + globalConfig.codeDir)
     .volumeFrom(this.app.dataContainerName)
     .json();
@@ -64,15 +65,15 @@ Client.prototype.__request = function(image, cmd, args, options) {
   .then(function(provider) {
 
     // Build start options
-    var home = this.kbox.core.deps.lookup('globalConfig').home;
-    var startOpts = this.kbox.util.docker.StartOpts()
+    var home = self.kbox.core.deps.lookup('globalConfig').home;
+    var startOpts = self.kbox.util.docker.StartOpts()
       .bind(path.join(home, '.terminus'), '/root/.terminus')
-      .bind(this.app.config.homeBind, '/ssh')
-      .bind(this.app.rootBind, '/src')
+      .bind(self.app.config.homeBind, '/ssh')
+      .bind(self.app.rootBind, '/src')
       .json();
 
-    var query = self.__buildQuery(cmd, args, options);
-    return this.kbox.engine.use(image, createOpts, startOpts, function(container) {
+    var query = self.__buildQuery(image, cmd, args, options);
+    return self.kbox.engine.use(image, createOpts, startOpts, function(container) {
       return self.kbox.engine.queryData(container.id, query);
     });
   });
