@@ -4,7 +4,10 @@
 var url = require('url');
 var fs = require('fs');
 var path = require('path');
+
+// NPM modules
 var Promise = require('bluebird');
+var _ = require('lodash');
 
 // "Constants"
 var PLUGIN_NAME = 'kalabox-plugin-pantheon';
@@ -69,22 +72,98 @@ module.exports = function(kbox) {
             pathname: ['~', 'repository.git'].join('/')
           };
           repo = url.format(build);
+          // @todo: check for code dir before we decide to pull or clone
           return git.cmd(['clone', repo, './'], []);
         });
+    };
+
+    /*
+     * Pull down our sites database
+     */
+    var pullDB = function(site, env) {
+      // Get the cid of this apps database
+      // @todo: this looks gross
+      var dbID = _.result(_.find(app.components, function(cmp) {
+        console.log(cmp);
+        return cmp.name === 'db';
+      }), 'containerId');
+
+      // Set this later to store the location to the DB file
+      var dbFile = null;
+
+      // @todo: put this in dot notation
+      var defaults = {
+        PublishAllPorts: true,
+        Binds: [app.rootBind + ':/src:rw']
+      };
+      // Start up the DB
+      return engine.start(dbID, defaults)
+      // Grab the DB
+        .then(function() {
+          return terminus.getDB(site, env);
+        })
+        .then(function(data) {
+          var downloadSplit = data.split('Downloaded');
+          dbFile = downloadSplit[1].trim();
+          // Perform a container run.
+          // gunzip < database.sql.gz | mysql -uUSER -pPASSWORD DATABASENAME
+          var payload = [
+            'gunzip',
+            '-df',
+            dbFile,
+            '&&',
+            'mysql',
+            '-u',
+            'pantheon',
+            'pantheon',
+            '<',
+             dbFile.replace('.gz', '')
+          ];
+          return engine.query(dbID, payload);
+        })
+        .then(function() {
+          // @todo: would be great to get terminus to be able to
+          // overwrite files so we dont have to do this
+          return terminus.removeDB(dbFile);
+        })
+        .then(function() {
+          //return Promise.delay(1000 * 600);
+        })
+        // Stop the DB
+        .then(function() {
+          return engine.stop(dbID);
+        });
+    };
+
+    /*
+     * Pull down our sites database
+     */
+    var pullFiles = function(site, env) {
+
     };
 
     // Events
     // Install the terminus container for our things and also
     // pull down a site or create a new site
-    events.on('post-start', function(app, done) {
+    events.on('post-install', function(app, done) {
+      // Make sure we install the terminus container for this app
       var opts = {
         name: 'terminus',
         srcRoot: path.resolve(__dirname, '..', '..', '..'),
       };
+      // Our pantheon config for later on
+      var pantheonConf = app.config.pluginConf['kalabox-plugin-pantheon'];
+
+      // Install the terminus container and then do install things
       return engine.build(opts)
         .then(function() {
-          var pantheonConf = app.config.pluginConf['kalabox-plugin-pantheon'];
+          return terminus.getSiteAliases();
+        })
+        .then(function() {
           return pullCode(pantheonConf.site, pantheonConf.env);
+        })
+        .then(function() {
+          return pullDB(pantheonConf.site, pantheonConf.env);
         })
         .nodeify(done);
     });

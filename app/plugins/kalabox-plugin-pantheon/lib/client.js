@@ -32,9 +32,8 @@ function Client(kbox, app) {
 /*
  * Return the metric record's ID, or create one if it doesn't have one.
  */
-Client.prototype.__buildQuery = function(image, cmd, args, options) {
+Client.prototype.__buildQuery = function(cmd, args, options) {
 
-  cmd.unshift(image);
   return cmd.concat(args).concat(options);
 
 };
@@ -42,7 +41,7 @@ Client.prototype.__buildQuery = function(image, cmd, args, options) {
 /*
  * Send and handle a REST request.
  */
-Client.prototype.__request = function(image, cmd, args, options) {
+Client.prototype.__request = function(cmd, args, options) {
 
   // Save for later.
   var self = this;
@@ -51,6 +50,7 @@ Client.prototype.__request = function(image, cmd, args, options) {
   // @todo: get this to actually be UUID
   var id = crypto.randomBytes(4).toString('hex');
   // Build create options.
+  // @todo: use random id for the name so we can launch many
   var createOpts = this.kbox.util.docker.CreateOpts('kalabox_terminus')
     .workingDir('/' + globalConfig.codeDir)
     .volumeFrom(this.app.dataContainerName)
@@ -72,8 +72,8 @@ Client.prototype.__request = function(image, cmd, args, options) {
       .bind(self.app.rootBind, '/src')
       .json();
 
-    var query = self.__buildQuery(image, cmd, args, options);
-    return self.kbox.engine.use(image, createOpts, startOpts, function(container) {
+    var query = self.__buildQuery(cmd, args, options);
+    return self.kbox.engine.use('terminus', createOpts, startOpts, function(container) {
       return self.kbox.engine.queryData(container.id, query);
     });
   });
@@ -92,9 +92,8 @@ Client.prototype.getConnectionMode = function(site, env) {
   // @todo: can we use something like optimist to do better
   // options parsing?
   return this.__request(
-    'terminus',
-    ['site'],
-    ['connection-mode'],
+    ['terminus'],
+    ['site', 'connection-mode'],
     ['--json', '--site=' + site, '--env=' + env]
   );
 
@@ -109,9 +108,8 @@ Client.prototype.setConnectionMode = function(site, env) {
   // @todo: can we use something like optimist to do better
   // options parsing?
   return this.__request(
-    'terminus',
-    ['site'],
-    ['connection-mode'],
+    ['terminus'],
+    ['site', 'connection-mode'],
     ['--json', '--site=' + site, '--env=' + env, '--set=git']
   );
 
@@ -126,9 +124,8 @@ Client.prototype.getUUID = function(site) {
   // @todo: can we use something like optimist to do better
   // options parsing?
   return this.__request(
-    'terminus',
-    ['site'],
-    ['info'],
+    ['terminus'],
+    ['site', 'info'],
     ['--json', '--site=' + site, '--field=id']
   );
 
@@ -142,46 +139,46 @@ Client.prototype.getSiteAliases = function() {
 
   // @todo: can we use something like optimist to do better
   // options parsing?
-  return this.__request('terminus', ['sites'], ['aliases'], ['--json']);
+  return this.__request(['terminus'], ['sites', 'aliases'], ['--json']);
 
 };
 
 /*
- * GIT COMMANDS
+ * Get latest DB backup and save it in /other
+ * terminus site backup get --element=database --site=<site>
+ * --env=<env> --to-directory=$HOME/Desktop/ --latest
  */
-
-/*
- * Clone a repo
- * git clone "$REPO" ./
- */
-Client.prototype.cloneCode = function(repo) {
+Client.prototype.getDB = function(site, env) {
 
   // @todo: can we use something like optimist to do better
   // options parsing?
-  return this.__request('git', ['clone'], [repo, './'], []);
-
+  // @todo: we need to generate a random
+  return this.__request(
+    ['terminus'],
+    ['site', 'backup', 'get'],
+    [
+      '--json',
+      '--element=database',
+      '--site=' + site,
+      '--env=' + env,
+      '--to-directory=/src/config/terminus',
+      '--latest'
+    ]);
 };
 
+
 /*
- * Pull a repo
- * git pull origin $BRANCH
+ * Get latest DB backup and save it in /other
+ * terminus site backup get --element=database --site=<site>
+ * --env=<env> --to-directory=$HOME/Desktop/ --latest
  */
-Client.prototype.pullCode = function(remote, branch) {
+Client.prototype.removeDB = function(db) {
 
   // @todo: can we use something like optimist to do better
   // options parsing?
-  if (remote === undefined) {
-    remote = 'origin';
-  }
-  if (branch === undefined) {
-    branch = 'master';
-  }
-
-  //
-  return this.__request('git', ['pull'], [remote, branch], []);
-
+  // @todo: we need to generate a random
+  return this.__request(['rm'], [db], ['-f']);
 };
-
 
 
 // Return constructor as the module object.
