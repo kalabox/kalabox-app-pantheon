@@ -106,33 +106,18 @@ module.exports = function(kbox) {
           var downloadSplit = data.split('Downloaded');
           dbFile = downloadSplit[1].trim();
           // Perform a container run.
-          // gunzip < database.sql.gz | mysql -uUSER -pPASSWORD DATABASENAME
           var payload = [
-            'gunzip',
-            '-df',
+            'import-mysql',
             dbFile
           ];
-          return engine.query(dbID, payload)
-            .then(function() {
-              var payload = [
-                'cat',
-                dbFile.replace('.gz', ''),
-                '|',
-                'mysql',
-                '-u',
-                'pantheon',
-                'pantheon'
-              ];
-              return engine.query(dbID, payload);
-            });
+          return engine.queryData(dbID, payload);
         })
-        .then(function() {
+        .then(function(data) {
+          // @todo: use real logger
+          console.log(data);
           // @todo: would be great to get terminus to be able to
           // overwrite files so we dont have to do this
-          return terminus.removeDB(dbFile);
-        })
-        .then(function() {
-          //return Promise.delay(1000 * 600);
+          //return terminus.removeDB(dbFile);
         })
         // Stop the DB
         .then(function() {
