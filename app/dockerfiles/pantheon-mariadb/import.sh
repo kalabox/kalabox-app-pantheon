@@ -9,4 +9,4 @@ gunzip -df ${SQL_ARCHIVE}
 SUFFIX=".gz"
 SQL_DUMP=${SQL_ARCHIVE%$SUFFIX}
 echo "Importing ${SQL_DUMP}"
-mysql -u pantheon pantheon < /src/config/terminus/playbox_dev_2015-07-13T22-16-24_UTC_database.sql
+mysql -u pantheon pantheon < ${SQL_DUMP}
