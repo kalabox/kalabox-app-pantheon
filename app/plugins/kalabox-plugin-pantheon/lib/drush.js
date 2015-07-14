@@ -1,8 +1,11 @@
 'use strict';
 
-// Modules
+// Intrinsic modules.
+var crypto = require('crypto');
+var util = require('util');
 var path = require('path');
-var fs = require('fs');
+
+// Npm modulez
 var _ = require('lodash');
 
 // "Constants"
@@ -70,7 +73,8 @@ module.exports = function(kbox) {
       var image = 'terminus';
 
       // Build create options.
-      var createOpts = kbox.util.docker.CreateOpts()
+      var id = crypto.randomBytes(4).toString('hex');
+      var createOpts = kbox.util.docker.CreateOpts('kalabox_drush_' + id)
         .workingDir(workingDir)
         .env('DRUSH_VERSION', drushVersion)
         .volumeFrom(app.dataContainerName)
