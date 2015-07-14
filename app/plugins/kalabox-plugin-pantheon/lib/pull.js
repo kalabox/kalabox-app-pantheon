@@ -146,18 +146,13 @@ module.exports = function(kbox) {
         // errr PULL THAT CODE!
         .then(function() {
           // @todo: lots of cleanup here
+          // /kbox rsync -rlvz --size-only --ipv4 --progress -e 'ssh -p 2222'
           var envSite = [env, siteid].join('.');
           var fileBox = envSite + '@appserver.' + envSite + '.drush.in:files/';
-          var fileMount = 'sites/default/files/';
-          return rsync.cmd([
-            '-rlvz',
-            '--size-only',
-            '--ipv4',
-            '--progress',
-            '-e \'ssh -p 2222\'',
-            fileBox,
-            fileMount
-          ]);
+          var fileMount = 'sites/default/files';
+          var opts = '-rlvz --size-only --ipv4 --progress -e \'ssh -p 2222\'';
+
+          return rsync.cmd([opts, fileBox, fileMount], true);
         });
     };
 
