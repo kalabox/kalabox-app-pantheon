@@ -149,10 +149,15 @@ module.exports = function(kbox) {
           var envSite = [env, siteid].join('.');
           var fileBox = envSite + '@appserver.' + envSite + '.drush.in:file/';
           var fileMount = 'sites/default/files/';
-          return rsync.cmd(
-            ['-rlvz --size-only --ipv4 --progress -e \'ssh -p 2222\''],
-            [fileBox, fileMount]
-          );
+          return rsync.cmd([
+            '-rlvz',
+            '--size-only',
+            '--ipv4',
+            '--progress',
+            '-e \'ssh -p 2222\'',
+            fileBox,
+            fileMount
+          ]);
         });
     };
 
