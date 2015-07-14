@@ -16,11 +16,16 @@ module.exports = function(kbox) {
 
   kbox.whenApp(function(app) {
 
-    // Grab the clients
+    // Grab the terminus client
     var Client = require('./client.js');
     var terminus = new Client(kbox, app);
+    // Grab the git client
     var Git = require('../../../node_modules/kalabox-plugin-git/lib/git.js');
     var git = new Git(kbox, app);
+    // Grab the rsync client
+    var Rsync =
+      require('../../../node_modules/kalabox-plugin-rsync/lib/rsync.js');
+    var rsync = new Rsync(kbox, app);
 
     // Grab some kalabox modules
     var events = kbox.core.events;
@@ -129,7 +134,26 @@ module.exports = function(kbox) {
      * Pull down our sites database
      */
     var pullFiles = function(site, env) {
-
+      // the pantheon site UUID
+      var siteid = null;
+      // Get our UUID
+      // @todo: cache this
+      return terminus.getUUID(site)
+        .then(function(uuid) {
+          siteid = uuid.trim();
+        })
+        // Generate our code repo URL and CUT THAT MEAT!
+        // errr PULL THAT CODE!
+        .then(function() {
+          // @todo: lots of cleanup here
+          var envSite = [env, siteid].join('.');
+          var fileBox = envSite + '@appserver.' + envSite + '.drush.in:file/';
+          var fileMount = 'sites/default/files/';
+          return rsync.cmd(
+            ['-rlvz --size-only --ipv4 --progress -e \'ssh -p 2222\''],
+            [fileBox, fileMount]
+          );
+        });
     };
 
     // Events
@@ -154,6 +178,9 @@ module.exports = function(kbox) {
         })
         .then(function() {
           return pullDB(pantheonConf.site, pantheonConf.env);
+        })
+        .then(function() {
+          return pullFiles(pantheonConf.site, pantheonConf.env);
         })
         .nodeify(done);
     });
