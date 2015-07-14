@@ -147,7 +147,7 @@ module.exports = function(kbox) {
         .then(function() {
           // @todo: lots of cleanup here
           var envSite = [env, siteid].join('.');
-          var fileBox = envSite + '@appserver.' + envSite + '.drush.in:file/';
+          var fileBox = envSite + '@appserver.' + envSite + '.drush.in:files/';
           var fileMount = 'sites/default/files/';
           return rsync.cmd([
             '-rlvz',
