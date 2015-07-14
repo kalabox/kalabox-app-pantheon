@@ -65,10 +65,10 @@ Client.prototype.__request = function(cmd, args, options) {
   .then(function(provider) {
 
     // Build start options
-    var home = self.kbox.core.deps.lookup('globalConfig').home;
+    var homeBind = self.app.config.homeBind;
     var startOpts = self.kbox.util.docker.StartOpts()
-      .bind(path.join(home, '.terminus'), '/root/.terminus')
-      .bind(self.app.config.homeBind, '/ssh')
+      .bind(path.join(homeBind, '.terminus'), '/root/.terminus')
+      .bind(homeBind, '/ssh')
       .bind(self.app.rootBind, '/src')
       .json();
 
