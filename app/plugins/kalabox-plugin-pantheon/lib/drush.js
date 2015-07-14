@@ -67,7 +67,7 @@ module.exports = function(kbox) {
       // Get drush version.
       var drushVersion = (opts['drush-version'] === 'backdrush') ?
         'backdrush' :
-        'drush' + opts['drush-version'];
+        'drush6';
 
       // Image name.
       var image = 'terminus';
@@ -156,6 +156,7 @@ module.exports = function(kbox) {
         var opts = getOpts(this.options);
         var cmd = this.payload;
         cmd.unshift('@dev');
+        cmd.push(' --strict=0');
         runDrushCMD(cmd, opts, done);
       };
     });
