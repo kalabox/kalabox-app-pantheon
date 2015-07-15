@@ -17,14 +17,15 @@ module.exports = function(kbox) {
   kbox.whenApp(function(app) {
 
     // Grab the terminus client
-    var Client = require('./client.js');
-    var terminus = new Client(kbox, app);
-    // Grab the git client
-    var Git = require('../../../node_modules/kalabox-plugin-git/lib/git.js');
+    var Terminus = require('./terminus.js');
+    var terminus = new Terminus(kbox, app);
+
+    // Grab delegated helpers
+    var pathToRoot = path.resolve(__dirname, '..', '..', '..');
+    var pathToNode = path.join(pathToRoot, 'node_modules');
+    var Git = require(pathToRoot + '/kalabox-plugin-git/lib/git.js');
     var git = new Git(kbox, app);
-    // Grab the rsync client
-    var Rsync =
-      require('../../../node_modules/kalabox-plugin-rsync/lib/rsync.js');
+    var Rsync = require(pathToRoot + '/kalabox-plugin-rsync/lib/rsync.js');
     var rsync = new Rsync(kbox, app);
 
     // Grab some kalabox modules
