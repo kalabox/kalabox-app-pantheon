@@ -12,7 +12,6 @@ RUN \
   git clone --depth 1 --branch 6.6.0 https://github.com/drush-ops/drush.git /usr/local/src/drush6 && \
   ln -s /usr/local/src/drush5/drush /usr/bin/drush5 && \
   ln -s /usr/local/src/drush6/drush /usr/bin/drush6 && \
-  cd /usr/local/src/drush7 && composer install --no-dev && \
   curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
   chmod +x wp-cli.phar && mv wp-cli.phar /usr/local/bin/wp && \
   curl https://github.com/pantheon-systems/cli/releases/download/0.5.5/terminus.phar -L -o /usr/local/bin/terminus && \
