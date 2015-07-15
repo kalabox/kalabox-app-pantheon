@@ -10,11 +10,6 @@ var PLUGIN_NAME = 'kalabox-plugin-pantheon';
 
 module.exports = function(kbox) {
 
-  var globalConfig = kbox.core.deps.get('globalConfig');
-  var events = kbox.core.events;
-  var engine = kbox.engine;
-  var Promise = kbox.Promise;
-
   kbox.whenApp(function(app) {
 
     // Grab the needed clients
@@ -23,7 +18,7 @@ module.exports = function(kbox) {
     var pathToRoot = path.resolve(__dirname, '..', '..', '..');
     var pathToNode = path.join(pathToRoot, 'node_modules');
     var Drush = require(pathToNode + '/kalabox-plugin-drush/lib/drush.js');
-    var drush = new Drush(kbox, app, 'terminus');
+    var drush = new Drush(kbox, app, 'terminus', PLUGIN_NAME);
 
     // Tasks
     // kbox terminus COMMAND
