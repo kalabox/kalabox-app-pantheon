@@ -10,10 +10,8 @@ RUN \
   ln -s /usr/local/bin/composer /usr/bin/composer && \
   git clone --depth 1 --branch 5.11.0 https://github.com/drush-ops/drush.git /usr/local/src/drush5 && \
   git clone --depth 1 --branch 6.6.0 https://github.com/drush-ops/drush.git /usr/local/src/drush6 && \
-  git clone --depth 1 --branch 7.0.0-rc2 https://github.com/drush-ops/drush.git /usr/local/src/drush7 && \
   ln -s /usr/local/src/drush5/drush /usr/bin/drush5 && \
   ln -s /usr/local/src/drush6/drush /usr/bin/drush6 && \
-  ln -s /usr/local/src/drush7/drush /usr/bin/drush7 && \
   cd /usr/local/src/drush7 && composer install --no-dev && \
   curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
   chmod +x wp-cli.phar && mv wp-cli.phar /usr/local/bin/wp && \
@@ -32,7 +30,7 @@ COPY ssh-config /root/.ssh/config
 
 # Set default env
 ENV PHP_VERSION 5.3.29
-ENV DRUSH_VERSION drush7
+ENV DRUSH_VERSION drush6
 
 # Set up and link our roots for persistence
 RUN \

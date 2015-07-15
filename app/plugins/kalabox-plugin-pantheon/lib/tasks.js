@@ -52,6 +52,7 @@ module.exports = function(kbox) {
         var opts = drush.getOpts(this.options);
         var cmd = this.payload;
         cmd.unshift('@dev');
+        cmd.push(' --strict=0');
         drush.cmd(cmd, opts, done);
       };
     });
