@@ -168,7 +168,6 @@ module.exports = function(kbox) {
       };
       // Our pantheon config for later on
       var pantheonConf = app.config.pluginConf['kalabox-plugin-pantheon'];
-
       // Install the terminus container and then do install things
       return engine.build(opts)
         .then(function() {

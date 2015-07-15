@@ -1,6 +1,9 @@
 'use strict';
 
+// Intrinsic modules
 var crypto = require('crypto');
+
+// Constants
 var PLUGIN_NAME = 'kalabox-plugin-pantheon';
 
 module.exports = function(kbox) {

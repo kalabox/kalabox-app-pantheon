@@ -3,7 +3,6 @@
 'use strict';
 
 // Intrinsic modules.
-var crypto = require('crypto');
 var util = require('util');
 var path = require('path');
 
@@ -50,11 +49,10 @@ Terminus.prototype.__request = function(cmd, args, options) {
   var self = this;
 
   var globalConfig = this.kbox.core.deps.get('globalConfig');
-  // @todo: get this to actually be UUID
-  var id = crypto.randomBytes(4).toString('hex');
+
   // Build create options.
-  // @todo: use random id for the name so we can launch many
-  var createOpts = this.kbox.util.docker.CreateOpts('kalabox_terminus')
+  var id = this.kbox.util.docker.containerName.createTemp();
+  var createOpts = this.kbox.util.docker.CreateOpts('kalabox_' + id.name)
     .workingDir('/' + globalConfig.codeDir)
     .volumeFrom(this.app.dataContainerName)
     .json();
