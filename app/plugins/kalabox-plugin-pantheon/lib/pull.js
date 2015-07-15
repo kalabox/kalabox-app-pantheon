@@ -23,9 +23,9 @@ module.exports = function(kbox) {
     // Grab delegated helpers
     var pathToRoot = path.resolve(__dirname, '..', '..', '..');
     var pathToNode = path.join(pathToRoot, 'node_modules');
-    var Git = require(pathToRoot + '/kalabox-plugin-git/lib/git.js');
+    var Git = require(pathToNode + '/kalabox-plugin-git/lib/git.js');
     var git = new Git(kbox, app);
-    var Rsync = require(pathToRoot + '/kalabox-plugin-rsync/lib/rsync.js');
+    var Rsync = require(pathToNode + '/kalabox-plugin-rsync/lib/rsync.js');
     var rsync = new Rsync(kbox, app);
 
     // Grab some kalabox modules
