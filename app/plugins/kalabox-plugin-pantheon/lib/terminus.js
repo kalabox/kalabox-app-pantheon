@@ -14,6 +14,12 @@ Promise.longStackTraces();
 // "Constants"
 var PLUGIN_NAME = 'kalabox-plugin-pantheon';
 
+// Terminus node client
+// for some things it is better to use the node client because we dont have
+// to worry about an error we need to handle killing the whole damn thing
+var Client = require('./client.js');
+var pantheon = new Client();
+
 /*
  * Constructor.
  */
@@ -51,8 +57,9 @@ Terminus.prototype.__request = function(cmd, args, options) {
   var globalConfig = this.kbox.core.deps.get('globalConfig');
 
   // Build create options.
-  var id = this.kbox.util.docker.containerName.createTemp();
-  var createOpts = this.kbox.util.docker.CreateOpts('kalabox_' + id.name)
+  var idObj = this.kbox.util.docker.containerName.createTemp();
+  var id = this.kbox.util.docker.containerName.format(idObj);
+  var createOpts = this.kbox.util.docker.CreateOpts(id)
     .workingDir('/' + globalConfig.codeDir)
     .volumeFrom(this.app.dataContainerName)
     .json();
@@ -220,7 +227,7 @@ Terminus.prototype.getSiteAliases = function() {
  * terminus site backup get --element=database --site=<site>
  * --env=<env> --to-directory=$HOME/Desktop/ --latest
  */
-Terminus.prototype.getDB = function(site, env) {
+Terminus.prototype.downloadDBBackup = function(site, env) {
 
   // @todo: can we use something like optimist to do better
   // options parsing?
@@ -234,10 +241,51 @@ Terminus.prototype.getDB = function(site, env) {
       '--site=' + site,
       '--env=' + env,
       '--to-directory=/src/config/terminus',
-      '--latest'
+      '--latest',
+      '--nocache'
     ]);
 };
 
+/*
+ * Get latest DB backup and save it in /other
+ * terminus site backup create --element=database --site=<site>
+ * --env=<env>
+ */
+Terminus.prototype.createDBBackup = function(site, env) {
+
+  // @todo: can we use something like optimist to do better
+  // options parsing?
+  // @todo: we need to generate a random
+  return this.__request(
+    ['terminus'],
+    ['site', 'backup', 'create'],
+    [
+      '--json',
+      '--element=database',
+      '--site=' + site,
+      '--env=' + env
+    ]);
+};
+
+/*
+ * Get json of all DB backups
+ * terminus site backup list --site=<site>
+ * --env=<env>
+ */
+Terminus.prototype.hasDBBackup = function(uuid, env) {
+
+  return pantheon.getBackups(uuid, env)
+    .then(function(backups) {
+      var keyString = _.keys(backups).join('');
+      console.log(keyString);
+      if (_.includes(keyString), 'backup_database') {
+        return Promise.resolve(true);
+      }
+      else {
+        return Promise.resolve(false);
+      }
+    });
+};
 
 // Return constructor as the module object.
 module.exports = Terminus;

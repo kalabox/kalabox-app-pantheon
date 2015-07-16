@@ -106,7 +106,18 @@ module.exports = function(kbox) {
       return engine.start(dbID, defaults)
       // Grab the DB
         .then(function() {
-          return terminus.getDB(site, env);
+          return terminus.getUUID(site);
+        })
+        .then(function(uuid) {
+          return terminus.hasDBBackup(uuid.trim(), env);
+        })
+        .then(function(hasBackup) {
+          if (!hasBackup) {
+            return terminus.createDBBackup(site, env);
+          }
+        })
+        .then(function() {
+          return terminus.downloadDBBackup(site, env);
         })
         .then(function(data) {
           var downloadSplit = data.split('Downloaded');
@@ -168,6 +179,7 @@ module.exports = function(kbox) {
       };
       // Our pantheon config for later on
       var pantheonConf = app.config.pluginConf['kalabox-plugin-pantheon'];
+      console.log(app);
       // Install the terminus container and then do install things
       return engine.build(opts)
         .then(function() {

@@ -45,6 +45,7 @@ function Client(id, address) {
 
   // Das Kindacache
   this.sites = undefined;
+  this.backups = undefined;
   this.products = undefined;
   this.session = this.__getSession();
 
@@ -342,6 +343,43 @@ Client.prototype.getProducts = function() {
   .then(function(products) {
     self.products = products;
     return self.products;
+  });
+
+};
+
+/*
+ * Get full list of our backups
+ * sites/1b377733-0fa4-4453-b9f5-c43477274010/environments/dev/backups/catalog/
+ */
+Client.prototype.getBackups = function(uuid, env) {
+
+  // Just grab the cached sites if we already have
+  // made a request this process
+  if (this.backups !== undefined) {
+    return Promise.resolve(this.backups);
+  }
+
+  // Session up here because we need session.user_id
+  var session = this.__getSession();
+  // Save for later
+  var self = this;
+
+  // Grab our headers to auth with the endpoint
+  var data = {
+    headers: this.__getSessionHeaders()
+  };
+
+  // Send REST request.
+  return this.__request(
+    'get',
+    ['sites', uuid, 'environments', env, 'backups', 'catalog'],
+    data
+  )
+
+  // Validate response and return ID.
+  .then(function(backups) {
+    self.backups = backups;
+    return self.backups;
   });
 
 };

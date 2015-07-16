@@ -1,10 +1,12 @@
 {
-  "name": "replace-me",
+  "name": "solr",
   "dependencies": {
     "bluebird": "^2.9.32",
+    "fs-extra": "^0.18.2",
     "kalabox-plugin-drush": "https://github.com/kalabox/kalabox-plugin-drush/tarball/elton-rocketman",
     "kalabox-plugin-git": "https://github.com/kalabox/kalabox-plugin-git/tarball/elton-rocketman",
     "kalabox-plugin-rsync": "https://github.com/kalabox/kalabox-plugin-rsync/tarball/elton-rocketman",
-    "lodash": "^3.9.3"
+    "lodash": "^3.9.3",
+    "restler": "^3.3.0"
   }
 }

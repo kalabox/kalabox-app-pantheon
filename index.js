@@ -2,7 +2,7 @@
 
 'use strict';
 
-var Client = require('./lib/client.js');
+var Client = require('./app/plugins/kalabox-plugin-pantheon/lib/client.js');
 var pantheon = new Client();
 
 module.exports = function(kbox) {
