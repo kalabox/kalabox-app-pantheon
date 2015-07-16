@@ -278,12 +278,7 @@ Terminus.prototype.hasDBBackup = function(uuid, env) {
     .then(function(backups) {
       var keyString = _.keys(backups).join('');
       console.log(keyString);
-      if (_.includes(keyString), 'backup_database') {
-        return Promise.resolve(true);
-      }
-      else {
-        return Promise.resolve(false);
-      }
+      return Promise.resolve(_.includes(keyString, 'backup_database'));
     });
 };
 
