@@ -350,6 +350,7 @@ Client.prototype.getProducts = function() {
 /*
  * Get full list of our backups
  * sites/1b377733-0fa4-4453-b9f5-c43477274010/environments/dev/backups/catalog/
+ * https://dashboard.getpantheon.com/api/sites/2de15cd7-4ee1-4023-9186-9aeaa9ff4905/bindings
  */
 Client.prototype.getBackups = function(uuid, env) {
 

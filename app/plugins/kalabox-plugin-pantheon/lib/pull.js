@@ -52,7 +52,6 @@ module.exports = function(kbox) {
             // @todo: actually test this part
             return terminus.setConnectionMode(site, env)
               .then(function(data) {
-                // this is going to balk because same CID
                 pullCode(site, env);
               });
           }
@@ -179,20 +178,34 @@ module.exports = function(kbox) {
       };
       // Our pantheon config for later on
       var pantheonConf = app.config.pluginConf['kalabox-plugin-pantheon'];
-      console.log(app);
-      // Install the terminus container and then do install things
+      // @todo: fs.existsSync is not recommended and pending deprecation
+      var firstTime = !fs.existsSync(app.config.codeRoot);
+      // Install the terminus container and then do install things if
+      // this is the first time
       return engine.build(opts)
         .then(function() {
           return terminus.getSiteAliases();
         })
         .then(function() {
-          return pullCode(pantheonConf.site, pantheonConf.env);
+          if (firstTime) {
+            if (pantheonConf.action === 'create') {
+              var repo = pantheonConf.upstream.url;
+              return git.cmd(['clone', repo, './'], []);
+            }
+            else {
+              return pullCode(pantheonConf.site, pantheonConf.env);
+            }
+          }
         })
         .then(function() {
-          return pullDB(pantheonConf.site, pantheonConf.env);
+          if (firstTime && pantheonConf.action === 'pull') {
+            return pullDB(pantheonConf.site, pantheonConf.env);
+          }
         })
         .then(function() {
-          return pullFiles(pantheonConf.site, pantheonConf.env);
+          if (firstTime && pantheonConf.action === 'pull') {
+            return pullFiles(pantheonConf.site, pantheonConf.env);
+          }
         })
         .nodeify(done);
     });
