@@ -3,6 +3,7 @@
   "dependencies": {
     "bluebird": "^2.9.32",
     "fs-extra": "^0.18.2",
+    "inquirer": "^0.9.0",
     "kalabox-plugin-drush": "https://github.com/kalabox/kalabox-plugin-drush/tarball/elton-rocketman",
     "kalabox-plugin-git": "https://github.com/kalabox/kalabox-plugin-git/tarball/elton-rocketman",
     "kalabox-plugin-rsync": "https://github.com/kalabox/kalabox-plugin-rsync/tarball/elton-rocketman",

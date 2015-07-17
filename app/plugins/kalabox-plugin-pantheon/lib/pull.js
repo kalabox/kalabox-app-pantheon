@@ -32,10 +32,13 @@ module.exports = function(kbox) {
     var events = kbox.core.events;
     var engine = kbox.engine;
 
+    // Nobody expects the Spanish Inquisition!
+    var inquirer = require('inquirer');
+
     /*
      * Pull down our sites code
      */
-    var pullCode = function(site, env) {
+    var pullCode = function(site, env, type) {
 
       // the pantheon site UUID
       var siteid = null;
@@ -77,8 +80,12 @@ module.exports = function(kbox) {
             pathname: ['~', 'repository.git'].join('/')
           };
           repo = url.format(build);
-          // @todo: check for code dir before we decide to pull or clone
-          return git.cmd(['clone', repo, './'], []);
+          if (type === 'clone') {
+            return git.cmd(['clone', repo, './'], []);
+          }
+          else {
+            return git.cmd(['pull', 'origin', 'master'], []);
+          }
         });
     };
 
@@ -89,7 +96,6 @@ module.exports = function(kbox) {
       // Get the cid of this apps database
       // @todo: this looks gross
       var dbID = _.result(_.find(app.components, function(cmp) {
-        console.log(cmp);
         return cmp.name === 'db';
       }), 'containerId');
 
@@ -193,7 +199,7 @@ module.exports = function(kbox) {
               return git.cmd(['clone', repo, './'], []);
             }
             else {
-              return pullCode(pantheonConf.site, pantheonConf.env);
+              return pullCode(pantheonConf.site, pantheonConf.env, 'clone');
             }
           }
         })
@@ -210,5 +216,92 @@ module.exports = function(kbox) {
         .nodeify(done);
     });
 
+    // kbox appname pull COMMAND
+    kbox.tasks.add(function(task) {
+
+      var pantheonConf = app.config.pluginConf['kalabox-plugin-pantheon'];
+      // @todo: notions of this for start states?
+      // no files/db options, just a git pull?
+      task.path = [app.name, 'pull'];
+      task.description = 'Pull down new code and optionally data and files.';
+      task.kind = 'delegate';
+
+      // Only want these options for pull sites
+      if (pantheonConf.action === 'pull') {
+        task.options.push({
+          name: 'database',
+          kind: 'boolean',
+          description: 'Import latest database backup.'
+        });
+        task.options.push({
+          name: 'files',
+          kind: 'boolean',
+          description: 'Import latest files.'
+        });
+      }
+
+      task.func = function(done) {
+
+        // Only need questions on pull sites
+        if (pantheonConf.action === 'pull') {
+          // Grab the CLI options that are available
+          var options = this.options;
+          var questions = [
+            {
+              type: 'confirm',
+              name: 'database',
+              message: 'Also refresh from latest database backup?',
+            },
+            {
+              type: 'confirm',
+              name: 'files',
+              message: 'Also grab latest files?',
+            },
+          ];
+
+          // Filter out interactive questions based on passed in options
+          questions = _.filter(questions, function(question) {
+
+            var option = options[question.name];
+
+            if (question.filter) {
+              options[question.name] = question.filter(options[question.name]);
+            }
+
+            if (option === false || option === undefined) {
+              return true;
+            }
+
+            else {
+              return !_.includes(Object.keys(options), question.name);
+            }
+          });
+
+          // Launch the inquiry
+          inquirer.prompt(questions, function(answers) {
+            var choices = _.merge({}, options, answers);
+            return terminus.getSiteAliases()
+            .then(function() {
+              return pullCode(pantheonConf.site, pantheonConf.env, 'pull');
+            })
+            .then(function() {
+              if (choices.database) {
+                return pullDB(pantheonConf.site, pantheonConf.env);
+              }
+            })
+            .then(function() {
+              if (choices.files) {
+                return pullFiles(pantheonConf.site, pantheonConf.env);
+              }
+            })
+            .nodeify(done);
+          });
+        }
+        // Just straight refresh the code if its a start state
+        else {
+          return git.cmd(['pull', 'origin', 'master'], []).nodeify(done);
+        }
+      };
+    });
   });
 };
