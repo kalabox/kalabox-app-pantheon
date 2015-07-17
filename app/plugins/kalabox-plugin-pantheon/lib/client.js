@@ -123,6 +123,7 @@ Client.prototype.__getSession = function() {
     // File is empty :()
     if (session === null) {
       session = undefined;
+      return session;
     }
     else {
       this.__setSession(session);
@@ -130,6 +131,7 @@ Client.prototype.__getSession = function() {
   }
   else {
     session = undefined;
+    return session;
   }
 
   // Validate session hasn't expired yet
