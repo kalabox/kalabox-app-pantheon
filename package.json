@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "bluebird": "^2.9.32",
-    "kalabox-plugin-git": "https://github.com/kalabox/kalabox-plugin-git/tarball/elton-rocketman",
+    "kalabox-plugin-git": "^0.9.0",
     "lodash": "^3.9.3",
     "restler": "^3.3.0"
   },
