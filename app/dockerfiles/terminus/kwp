@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# Use our custom php.ini
+if [ -f "/src/config/php/php.ini" ]; then
+  rm ${HOME}/.phpbrew/php/php-${PHP_VERSION}/etc/php.ini
+  cp /src/config/php/php.ini ${HOME}/.phpbrew/php/php-${PHP_VERSION}/etc/php.ini
+fi
+
+# We need to do this for SSH add now as well
+eval `ssh-agent -s` > /dev/null
+ssh-add /ssh/.ssh/id_rsa > /dev/null
+
+source /root/.phpbrew/bashrc > /dev/null
+phpbrew -d switch ${PHP_VERSION} > /dev/null
+
+wp "$@"

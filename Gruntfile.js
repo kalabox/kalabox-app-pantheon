@@ -13,9 +13,9 @@ module.exports = function(grunt) {
     files: {
       js: {
         src: [
-          '*.js',
-          'lib/*.js',
-          'provider/*.js'
+          'conf/*.js',
+          'app/plugins/**/*.js',
+          'lib/*.js'
         ]
       }
     },
@@ -41,10 +41,10 @@ module.exports = function(grunt) {
         jshintrc: '.jshintrc',
         reporter: require('jshint-stylish')
       },
-      all: ['Gruntfile.js', '<%= files.js.src %>']
+      all: ['Gruntfile.js', '<%= files.js.src %>', 'index.js']
     },
     jscs: {
-      src: ['Gruntfile.js', '<%= files.js.src %>'],
+      src: ['Gruntfile.js', '<%= files.js.src %>', 'index.js'],
       options: {
         config: '.jscsrc'
       }

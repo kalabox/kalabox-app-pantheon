@@ -1,47 +1,61 @@
 {
-  "appName": "my-pantheon-app",
+  "appName": "panth",
   "appPlugins": [
-    "kalabox-plugin-dbenv",
-    "kalabox-plugin-drush",
     "kalabox-plugin-git",
-    "kalabox-plugin-php",
-    "kalabox-plugin-rsync"
+    "kalabox-plugin-rsync",
+    "kalabox-plugin-pantheon"
   ],
   "shareIgnores": [
     "sites/default/files/*",
+    "files",
     ".git"
   ],
   "pluginConf": {
-    "kalabox-plugin-drush": {
-      "drush-version": "6"
-    },
-    "kalabox-plugin-php": {
-      "php-version": "5.4.40"
-    },
-    "kalabox-plugin-dbenv": {
-      "settings": {
-        "conf": {
-          "pressflow_smart_start": 1
-        }
-      }
+    "kalabox-plugin-pantheon": {
+      "action": "pull",
+      "drush-version": "6",
+      "env": "",
+      "framework": "",
+      "php": "5.3.29",
+      "product": "",
+      "site": "",
+      "uuid": "",
+      "upstream": ""
     }
   },
   "appComponents": {
     "appserver": {
       "image": {
-        "name": "php-appserver",
+        "name": "pantheon-appserver",
         "srcRoot": ":appRoot:"
       },
       "proxy": [
         {
           "port": "80/tcp",
           "default": true
+        },
+        {
+          "port": "443/tcp",
+          "default": true,
+          "secure": true
         }
       ]
     },
     "db": {
       "image": {
-        "name": "mariadb",
+        "name": "pantheon-mariadb",
+        "srcRoot": ":appRoot:"
+      }
+    },
+    "solr": {
+      "image": {
+        "name": "pantheon-solr",
+        "srcRoot": ":appRoot:"
+      }
+    },
+    "redis": {
+      "image": {
+        "name": "pantheon-redis",
         "srcRoot": ":appRoot:"
       }
     }

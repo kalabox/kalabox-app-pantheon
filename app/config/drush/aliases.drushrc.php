@@ -12,11 +12,11 @@ $aliases['dev'] = array(
           'default' =>
             array (
               'driver' => 'mysql',
-              'username' => 'kalabox',
+              'username' => 'pantheon',
               'password' => '',
               'port' => 3306,
               'host' => 'drupal.kbox',
-              'database' => 'kalabox',
+              'database' => 'pantheon',
             ),
         ),
     ),
