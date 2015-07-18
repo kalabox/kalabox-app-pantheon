@@ -31,7 +31,7 @@ var PANTHEON_API = {
 /*
  * Cache constants
  */
-var HOMEKEY = (this.platform === 'win32') ? 'USERPROFILE' : 'HOME';
+var HOMEKEY = (process.platform === 'win32') ? 'USERPROFILE' : 'HOME';
 var CACHEDIR = path.join(process.env[HOMEKEY], '.terminus', 'cache');
 var SESSIONFILE = path.join(CACHEDIR, 'session');
 

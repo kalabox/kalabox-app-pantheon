@@ -78,7 +78,7 @@ Terminus.prototype.__request = function(cmd, args, options) {
     // Build start options
     var homeBind = self.app.config.homeBind;
     var startOpts = self.kbox.util.docker.StartOpts()
-      .bind(path.join(homeBind, '.terminus'), '/root/.terminus')
+      .bind(homeBind, '/terminus')
       .bind(homeBind, '/ssh')
       .bind(self.app.rootBind, '/src')
       .json();
@@ -154,7 +154,7 @@ Terminus.prototype.cmd = function(cmd, opts, done) {
   // Build start options.
   var startOpts = this.kbox.util.docker.StartOpts()
     .bind(this.app.config.homeBind, '/ssh')
-    .bind(path.join(this.app.config.homeBind, '.terminus'), '/root/.terminus')
+    .bind(this.app.config.homeBind, '/terminus')
     .bind(this.app.rootBind, '/src')
     .json();
 
@@ -206,8 +206,11 @@ Terminus.prototype.getUUID = function(site) {
   // We run this a lot so lets cache per run and do a lookup before we
   // make a request
   if (this.uuid !== undefined) {
-    return this.uuid;
+    return Promise.resolve(this.uuid);
   }
+
+  // More of this sort of thing
+  var self = this;
 
   // Make a request
   return this.__request(
@@ -216,8 +219,8 @@ Terminus.prototype.getUUID = function(site) {
     ['--json', '--site=' + site, '--field=id']
   )
   .then(function(uuid) {
-    this.uuid = uuid.trim();
-    return Promise.resolve(this.uuid);
+    self.uuid = uuid.trim();
+    return Promise.resolve(self.uuid);
   });
 
 };
