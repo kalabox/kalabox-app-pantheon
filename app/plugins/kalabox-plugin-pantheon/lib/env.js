@@ -182,6 +182,48 @@ module.exports = function(kbox) {
 
     });
 
+    // Updates kalabox aliases when app is started.
+    // This allows for both kbox drush to be used
+    // and local drush to be used via: drush @<appname> status
+    kbox.core.events.on('post-start-component', function(component, done) {
+      // Only run on the db container
+      if (component.name !== 'db') {
+        done();
+      }
+      else {
+
+        kbox.engine.inspect(component.containerId)
+        .then(function(data) {
+          var key = '3306/tcp';
+          if (data && data.NetworkSettings.Ports[key]) {
+            var port = data.NetworkSettings.Ports[key][0].HostPort;
+            var cmd = [
+              'sed',
+              '-i',
+              's/\'host\'.*/\'host\' => \'' + app.domain + '\',/g',
+              '/src/config/drush/aliases.drushrc.php'
+            ];
+
+            // Image name
+            var image = 'kalabox/debian:stable';
+
+            // Build create options
+            var createOpts = {};
+
+            // Build start options
+            var startOpts = kbox.util.docker.StartOpts()
+              .bind(app.rootBind, '/src')
+              .json();
+
+            return kbox.engine.run(image, cmd, createOpts, startOpts);
+
+          }
+        })
+        .nodeify(done);
+
+      }
+    });
+
   });
 
 };
