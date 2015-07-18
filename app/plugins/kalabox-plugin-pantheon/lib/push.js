@@ -169,7 +169,7 @@ module.exports = function(kbox) {
       task.description = 'Push up new code and optionally data and files.';
       task.kind = 'delegate';
       // Only want these options for pull sites
-      if (pantheonConf.action === 'push') {
+      if (pantheonConf.action === 'pull') {
         task.options.push({
           name: 'message',
           kind: 'string',
