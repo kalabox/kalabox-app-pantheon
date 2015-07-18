@@ -206,7 +206,7 @@ Terminus.prototype.getUUID = function(site) {
   // We run this a lot so lets cache per run and do a lookup before we
   // make a request
   if (this.uuid !== undefined) {
-    return this.uuid;
+    return Promise.resolve(this.uuid);
   }
 
   // More of this sort of thing
