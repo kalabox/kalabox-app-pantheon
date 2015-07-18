@@ -25,9 +25,12 @@ var pantheon = new Client();
  */
 function Terminus(kbox, app) {
 
+  // Kbox things
   this.app = app;
   this.kbox = kbox;
 
+  // @todo: more caching?
+  this.uuid = undefined;
 }
 
 /*
@@ -200,13 +203,22 @@ Terminus.prototype.setConnectionMode = function(site, env) {
  */
 Terminus.prototype.getUUID = function(site) {
 
-  // @todo: can we use something like optimist to do better
-  // options parsing?
+  // We run this a lot so lets cache per run and do a lookup before we
+  // make a request
+  if (this.uuid !== undefined) {
+    return this.uuid;
+  }
+
+  // Make a request
   return this.__request(
     ['terminus'],
     ['site', 'info'],
     ['--json', '--site=' + site, '--field=id']
-  );
+  )
+  .then(function(uuid) {
+    this.uuid = uuid.trim();
+    return Promise.resolve(this.uuid);
+  });
 
 };
 
@@ -255,7 +267,6 @@ Terminus.prototype.createDBBackup = function(site, env) {
 
   // @todo: can we use something like optimist to do better
   // options parsing?
-  // @todo: we need to generate a random
   return this.__request(
     ['terminus'],
     ['site', 'backup', 'create'],
@@ -281,6 +292,17 @@ Terminus.prototype.hasDBBackup = function(uuid, env) {
       return Promise.resolve(_.includes(keyString, 'backup_database'));
     });
 };
+
+/*
+ * Get json of all DB backups
+ * terminus site backup list --site=<site>
+ * --env=<env>
+ */
+Terminus.prototype.getBindings = function(uuid) {
+
+  return pantheon.getBindings(uuid);
+};
+
 
 // Return constructor as the module object.
 module.exports = Terminus;
