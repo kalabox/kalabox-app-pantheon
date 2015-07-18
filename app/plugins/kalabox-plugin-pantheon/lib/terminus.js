@@ -78,7 +78,7 @@ Terminus.prototype.__request = function(cmd, args, options) {
     // Build start options
     var homeBind = self.app.config.homeBind;
     var startOpts = self.kbox.util.docker.StartOpts()
-      .bind(path.join(homeBind, '.terminus'), '/root/.terminus')
+      .bind(homeBind, '/root')
       .bind(homeBind, '/ssh')
       .bind(self.app.rootBind, '/src')
       .json();
