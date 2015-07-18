@@ -209,6 +209,9 @@ Terminus.prototype.getUUID = function(site) {
     return this.uuid;
   }
 
+  // More of this sort of thing
+  var self = this;
+
   // Make a request
   return this.__request(
     ['terminus'],
@@ -216,8 +219,8 @@ Terminus.prototype.getUUID = function(site) {
     ['--json', '--site=' + site, '--field=id']
   )
   .then(function(uuid) {
-    this.uuid = uuid.trim();
-    return Promise.resolve(this.uuid);
+    self.uuid = uuid.trim();
+    return Promise.resolve(self.uuid);
   });
 
 };
