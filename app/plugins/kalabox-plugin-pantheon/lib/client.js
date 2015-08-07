@@ -112,11 +112,19 @@ Client.prototype.__getSessionCache = function() {
 
   var self = this;
 
-  var data = null;
+  var data;
 
   // Try to load contents of file cache.
   try {
     data = fs.readFileSync(SESSIONFILE, 'utf8');
+    /*
+     * This is to handle a special case where the file cache's contents
+     * are set to the string 'null'. It should be handled as if the file
+     * does not exist or is empty.
+     */
+    if (data === 'null' || data === 'null\n') {
+      data = undefined;
+    }
   } catch (err) {
     if (err.code !== 'ENOENT') {
       throw err;
@@ -128,6 +136,8 @@ Client.prototype.__getSessionCache = function() {
     var session = JSON.parse(data);
     self.__setSession(session);
     return session;
+  } else {
+    return undefined;
   }
 
 };
