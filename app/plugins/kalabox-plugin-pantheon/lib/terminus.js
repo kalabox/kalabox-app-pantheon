@@ -166,6 +166,22 @@ Terminus.prototype.cmd = function(cmd, opts, done) {
 };
 
 /*
+ * Wake the site
+ * terminus site wake --site="$PANTHEON_SITE" --env="$PANTHEON_ENV"
+ */
+Terminus.prototype.wakeSite = function(site, env) {
+
+  // @todo: can we use something like optimist to do better
+  // options parsing?
+  return this.__request(
+    ['terminus'],
+    ['site', 'wake'],
+    ['--site=' + site, '--env=' + env]
+  );
+
+};
+
+/*
  * Get connection mode
  * terminus site connection-mode --site="$PANTHEON_SITE" --env="$PANTHEON_ENV")
  */
