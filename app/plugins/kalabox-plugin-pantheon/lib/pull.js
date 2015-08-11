@@ -79,7 +79,7 @@ module.exports = function(kbox) {
                 _.startsWith(parts[0]), 'Warning:') {
                 // Case where a warning is provided, such as newer version
                 // being available etc...
-                sideid = parts[1];
+                siteid = parts[1];
               } else {
                 // Unexpected condition.
                 throw new Error('Unexpected terminus UUID: [' + uuid + ']');
