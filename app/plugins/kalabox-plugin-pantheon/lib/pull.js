@@ -62,29 +62,9 @@ module.exports = function(kbox) {
         // Grab the sites UUID from teh machinename
         .then(function() {
           return terminus.getUUID(site)
-            .then(function(uuid) {
-              /*
-               * bcauldwell: Sometimes terminus won't just return a UUID,
-               * sometimes it can be a warning about a newer version of
-               * terminus and then the UUID separated by a comma.
-               */
-              // Split uuid by commas and clean up parts with a trim.
-              var parts = _.map(uuid.split(','), function(part) {
-                return part.trim();
-              });
-              if (parts.length === 1) {
-                // Default case where just uuid is returned.
-                siteid = parts[0];
-              } else if (parts.length === 2 &&
-                _.startsWith(parts[0]), 'Warning:') {
-                // Case where a warning is provided, such as newer version
-                // being available etc...
-                siteid = parts[1];
-              } else {
-                // Unexpected condition.
-                throw new Error('Unexpected terminus UUID: [' + uuid + ']');
-              }
-            });
+          .then(function(uuid) {
+            siteid = uuid.trim();
+          });
         })
         // Generate our code repo URL and CUT THAT MEAT!
         // errr PULL THAT CODE!
