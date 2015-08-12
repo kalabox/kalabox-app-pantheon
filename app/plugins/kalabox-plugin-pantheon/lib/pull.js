@@ -62,9 +62,9 @@ module.exports = function(kbox) {
         // Grab the sites UUID from teh machinename
         .then(function() {
           return terminus.getUUID(site)
-            .then(function(uuid) {
-              siteid = uuid.trim();
-            });
+          .then(function(uuid) {
+            siteid = uuid.trim();
+          });
         })
         // Generate our code repo URL and CUT THAT MEAT!
         // errr PULL THAT CODE!

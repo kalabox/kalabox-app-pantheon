@@ -219,8 +219,30 @@ Terminus.prototype.getUUID = function(site) {
     ['--json', '--site=' + site, '--field=id']
   )
   .then(function(uuid) {
-    self.uuid = uuid.trim();
-    return Promise.resolve(self.uuid);
+    /*
+     * bcauldwell: Sometimes terminus won't just return a UUID,
+     * sometimes it can be a warning about a newer version of
+     * terminus and then the UUID separated by a comma.
+     */
+    // Split uuid by commas and clean up parts with a trim.
+    var parts = _.map(uuid.split(','), function(part) {
+      return part.trim();
+    });
+    if (parts.length === 1) {
+      // Default case where just uuid is returned.
+      return parts[0];
+    } else if (parts.length === 2 &&
+      _.startsWith(parts[0]), 'Warning:') {
+      // Case where a warning is provided, such as newer version
+      // being available etc...
+      return parts[1];
+    } else {
+      // Unexpected condition.
+      throw new Error('Unexpected terminus UUID: [' + uuid + ']');
+    }
+  })
+  .tap(function(uuid) {
+    self.uuid = uuid;
   });
 
 };
