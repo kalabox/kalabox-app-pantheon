@@ -14,8 +14,6 @@ RUN \
   ln -s /usr/local/src/drush6/drush /usr/bin/drush6 && \
   curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
   chmod +x wp-cli.phar && mv wp-cli.phar /usr/local/bin/wp && \
-  curl https://github.com/pantheon-systems/cli/releases/download/0.5.5/terminus.phar -L -o /usr/local/bin/terminus && \
-  chmod +x /usr/local/bin/terminus && \
   apt-get -y clean && \
   apt-get -y autoclean && \
   apt-get -y autoremove && \
@@ -23,6 +21,7 @@ RUN \
 
 # Set up our kalabox specific stuff
 COPY kdrush /usr/local/bin/kdrush
+COPY terminus.phar /usr/local/bin/terminus
 COPY kterminus /usr/local/bin/kterminus
 COPY kwp /usr/local/bin/kwp
 COPY ssh-config /root/.ssh/config
@@ -33,6 +32,7 @@ ENV DRUSH_VERSION drush6
 
 # Set up and link our roots for persistence
 RUN \
+  chmod +x /usr/local/bin/terminus && \
   chmod +x /usr/local/bin/kterminus && \
   chmod +x /usr/local/bin/kdrush && \
   chmod +x /usr/local/bin/kwp && \
