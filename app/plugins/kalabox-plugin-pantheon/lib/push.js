@@ -59,6 +59,10 @@ module.exports = function(kbox) {
               });
           }
         })
+        // Wake the site
+        .then(function() {
+          return terminus.wakeSite(site, env);
+        })
         // Generate our code repo URL and CUT THAT MEAT!
         // errr PULL THAT CODE!
         .then(function() {
