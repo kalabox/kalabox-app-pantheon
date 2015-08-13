@@ -192,7 +192,7 @@ Terminus.prototype.getConnectionMode = function(site, env) {
   return this.__request(
     ['terminus'],
     ['site', 'connection-mode'],
-    ['--json', '--site=' + site, '--env=' + env]
+    ['--json', '--site=' + site, '--env=' + env, '--nocache']
   );
 
 };
