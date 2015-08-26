@@ -1,6 +1,6 @@
 # docker build -t kalabox/pantheon-appserver:mytag .
 
-FROM kalabox/nginx:v0.9.0
+FROM kalabox/nginx:v0.10.0
 
 RUN \
   apt-get -y update && \
