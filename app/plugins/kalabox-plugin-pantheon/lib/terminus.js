@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 'use strict';
 
 // Intrinsic modules.
@@ -14,7 +12,7 @@ Promise.longStackTraces();
 // "Constants"
 var PLUGIN_NAME = 'kalabox-plugin-pantheon';
 
-// Terminus node client
+// Terminus node clients
 // for some things it is better to use the node client because we dont have
 // to worry about an error we need to handle killing the whole damn thing
 var Client = require('./client.js');
@@ -31,17 +29,18 @@ function Terminus(kbox, app) {
 
   // @todo: more caching?
   this.uuid = undefined;
+
 }
 
 /*
- * WE DEFINITELY NEED TO EITHER RETRIEVE AND VALIDATE A SESSION BEFORE WE
+ * WE DEFINITELY NEED TO EITHER RETRIEVE OR VALIDATE A SESSION BEFORE WE
  * ACTALLY DO STUFF OR LOGIN
  *
  * @todo @todo @todo @todo @todo @todo @todo @todo @todo @todo @todo @todo
  */
 
 /*
- * Return the metric record's ID, or create one if it doesn't have one.
+ * Builds a query for use in a terminus container
  */
 Terminus.prototype.__buildQuery = function(cmd, args, options) {
 
@@ -50,22 +49,53 @@ Terminus.prototype.__buildQuery = function(cmd, args, options) {
 };
 
 /*
- * Send and handle a REST request.
+ * Returns default terminus container start options
+ */
+Terminus.prototype.__getStartOpts = function() {
+
+  // Grab the path of the home dir inside the VM
+  var homeBind = this.app.config.homeBind;
+  return this.kbox.util.docker.StartOpts()
+    .bind(homeBind, '/terminus')
+    .bind(homeBind, '/ssh')
+    .bind(this.app.rootBind, '/src')
+    .json();
+
+};
+
+/*
+ * Returns default terminus container create options
+ */
+Terminus.prototype.__getCreateOpts = function() {
+
+  // Grab some deps
+  var idObj = this.kbox.util.docker.containerName.createTemp();
+  var id = this.kbox.util.docker.containerName.format(idObj);
+  var globalConfig = this.kbox.core.deps.lookup('globalConfig');
+
+  // Build create options
+  return this.kbox.util.docker.CreateOpts(id)
+    .workingDir('/' + globalConfig.codeDir)
+    .volumeFrom(this.app.dataContainerName)
+    .json();
+
+};
+
+/*
+ * Send a request to a terminus container
  */
 Terminus.prototype.__request = function(cmd, args, options) {
 
   // Save for later.
   var self = this;
 
+  // Grab the global config
   var globalConfig = this.kbox.core.deps.get('globalConfig');
 
-  // Build create options.
-  var idObj = this.kbox.util.docker.containerName.createTemp();
-  var id = this.kbox.util.docker.containerName.format(idObj);
-  var createOpts = this.kbox.util.docker.CreateOpts(id)
-    .workingDir('/' + globalConfig.codeDir)
-    .volumeFrom(this.app.dataContainerName)
-    .json();
+  // Get create options.
+  var createOpts = this.__getCreateOpts();
+
+  // We need a special entry for this request
   /* jshint ignore:start */
   //jscs:disable
   createOpts.Entrypoint = ["/bin/sh", "-c"];
@@ -75,14 +105,10 @@ Terminus.prototype.__request = function(cmd, args, options) {
   return this.kbox.engine.provider()
   .then(function(provider) {
 
-    // Build start options
-    var homeBind = self.app.config.homeBind;
-    var startOpts = self.kbox.util.docker.StartOpts()
-      .bind(homeBind, '/terminus')
-      .bind(homeBind, '/ssh')
-      .bind(self.app.rootBind, '/src')
-      .json();
+    // Get start options
+    var startOpts = self.__getStartOpts();
 
+    // Start a terminus container and run a terminus command against it
     var query = self.__buildQuery(cmd, args, options);
     return self.kbox.engine.use('terminus', createOpts, startOpts, function(container) {
       return self.kbox.engine.queryData(container.id, query);
@@ -98,26 +124,32 @@ Terminus.prototype.__request = function(cmd, args, options) {
  * Gets plugin conf from the appconfig or from CLI arg
  **/
 Terminus.prototype.getOpts = function(options) {
+
   // Grab our options from config
   var defaults = this.app.config.pluginConf[PLUGIN_NAME];
+
   // Override any config coming in on the CLI
   _.each(Object.keys(defaults), function(key) {
     if (_.has(options, key) && options[key]) {
       defaults[key] = options[key];
     }
   });
+
   return defaults;
 };
-
 
 /*
  * Run an interactive terminus command
  */
 Terminus.prototype.cmd = function(cmd, opts, done) {
 
+  // Get engine, promise and global config
   var engine = this.kbox.engine;
   var Promise = this.kbox.Promise;
   var globalConfig = this.kbox.core.deps.lookup('globalConfig');
+
+  // Get create options.
+  var createOpts = this.__getCreateOpts();
 
   // Run the terminus command in the correct directory in the container if the
   // user is somewhere inside the code directory on the host side.
@@ -130,11 +162,7 @@ Terminus.prototype.cmd = function(cmd, opts, done) {
   // Get code root.
   var codeRoot = this.app.config.codeRoot;
 
-  // Get the branch of current working directory.
-  // Run the terminus command in the correct directory in the container if the
-  // user is somewhere inside the code directory on the host side.
-  // @todo: consider if this is better in the actual engine.run command
-  // vs here.
+  // Build correct WD
   var workingDirExtra = '';
   if (_.startsWith(cwd, codeRoot)) {
     workingDirExtra = cwd.replace(codeRoot, '');
@@ -142,21 +170,14 @@ Terminus.prototype.cmd = function(cmd, opts, done) {
   var codeDir = globalConfig.codeDir;
   var workingDir = '/' + codeDir + workingDirExtra;
 
+  // Override working directory
+  createOpts.WorkingDir = workingDir;
+
+  // Get start options.
+  var startOpts = this.__getStartOpts();
+
   // Image name.
   var image = 'terminus';
-
-  // Build create options.
-  var createOpts = this.kbox.util.docker.CreateOpts()
-    .workingDir(workingDir)
-    .volumeFrom(this.app.dataContainerName)
-    .json();
-
-  // Build start options.
-  var startOpts = this.kbox.util.docker.StartOpts()
-    .bind(this.app.config.homeBind, '/ssh')
-    .bind(this.app.config.homeBind, '/terminus')
-    .bind(this.app.rootBind, '/src')
-    .json();
 
   // Perform a container run.
   return engine.run(image, cmd, createOpts, startOpts)
@@ -167,12 +188,11 @@ Terminus.prototype.cmd = function(cmd, opts, done) {
 
 /*
  * Wake the site
+ *
  * terminus site wake --site="$PANTHEON_SITE" --env="$PANTHEON_ENV"
  */
 Terminus.prototype.wakeSite = function(site, env) {
 
-  // @todo: can we use something like optimist to do better
-  // options parsing?
   return this.__request(
     ['terminus'],
     ['site', 'wake'],
@@ -183,28 +203,26 @@ Terminus.prototype.wakeSite = function(site, env) {
 
 /*
  * Get connection mode
+ *
  * terminus site connection-mode --site="$PANTHEON_SITE" --env="$PANTHEON_ENV")
  */
 Terminus.prototype.getConnectionMode = function(site, env) {
 
-  // @todo: can we use something like optimist to do better
-  // options parsing?
   return this.__request(
     ['terminus'],
     ['site', 'connection-mode'],
-    ['--json', '--site=' + site, '--env=' + env, '--nocache']
+    ['--json', '--site=' + site, '--env=' + env]
   );
 
 };
 
 /*
  * Set connection mode
+ *
  * terminus site connection-mode --site="$PANTHEON_SITE" --env="$PANTHEON_ENV" --set=git
  */
 Terminus.prototype.setConnectionMode = function(site, env) {
 
-  // @todo: can we use something like optimist to do better
-  // options parsing?
   return this.__request(
     ['terminus'],
     ['site', 'connection-mode'],
@@ -215,6 +233,7 @@ Terminus.prototype.setConnectionMode = function(site, env) {
 
 /*
  * Get site uuid
+ *
  * terminus site info --site="$PANTHEON_SITE" --field=id
  */
 Terminus.prototype.getUUID = function(site) {
@@ -235,79 +254,52 @@ Terminus.prototype.getUUID = function(site) {
     ['--json', '--site=' + site, '--field=id']
   )
   .then(function(uuid) {
-    /*
-     * bcauldwell: Sometimes terminus won't just return a UUID,
-     * sometimes it can be a warning about a newer version of
-     * terminus and then the UUID separated by a comma.
-     */
-    // Split uuid by commas and clean up parts with a trim.
-    var parts = _.map(uuid.split(','), function(part) {
-      return part.trim();
-    });
-    if (parts.length === 1) {
-      // Default case where just uuid is returned.
-      return parts[0];
-    } else if (parts.length === 2 &&
-      _.startsWith(parts[0]), 'Warning:') {
-      // Case where a warning is provided, such as newer version
-      // being available etc...
-      return parts[1];
-    } else {
-      // Unexpected condition.
-      throw new Error('Unexpected terminus UUID: [' + uuid + ']');
-    }
-  })
-  .tap(function(uuid) {
     self.uuid = uuid;
+    return Promise.resolve(self.uuid);
   });
 
 };
 
 /*
  * Get site aliases
- * terminus sites aliases
+ *
+ * terminus sites aliases --json
  */
 Terminus.prototype.getSiteAliases = function() {
 
-  // @todo: can we use something like optimist to do better
-  // options parsing?
   return this.__request(['terminus'], ['sites', 'aliases'], ['--json']);
 
 };
 
 /*
  * Get latest DB backup and save it in /other
- * terminus site backup get --element=database --site=<site>
- * --env=<env> --to-directory=$HOME/Desktop/ --latest
+ *
+ * terminus site backups get
+ * --element=database --site=<site> --env=<env> --to-directory=$HOME/Desktop/ --latest
  */
 Terminus.prototype.downloadDBBackup = function(site, env) {
 
-  // @todo: can we use something like optimist to do better
-  // options parsing?
-  // @todo: we need to generate a random
   return this.__request(
     ['terminus'],
-    ['site', 'backup', 'get'],
+    ['site', 'backups', 'get'],
     [
       '--json',
       '--element=database',
       '--site=' + site,
       '--env=' + env,
       '--to-directory=/src/config/terminus',
-      '--latest',
-      '--nocache'
+      '--latest'
     ]);
 };
 
 /*
  * Get latest DB backup and save it in /other
- * terminus site backup create --element=database --site=<site>
- * --env=<env>
+ *
+ * terminus site backup create
+ * --element=database --site=<site> --env=<env>
  */
 Terminus.prototype.createDBBackup = function(site, env) {
 
-  // @todo: can we use something like optimist to do better
-  // options parsing?
   return this.__request(
     ['terminus'],
     ['site', 'backup', 'create'],
@@ -320,9 +312,7 @@ Terminus.prototype.createDBBackup = function(site, env) {
 };
 
 /*
- * Get json of all DB backups
- * terminus site backup list --site=<site>
- * --env=<env>
+ * Checks to see if there is a DB backup available
  */
 Terminus.prototype.hasDBBackup = function(uuid, env) {
 
@@ -335,15 +325,14 @@ Terminus.prototype.hasDBBackup = function(uuid, env) {
 };
 
 /*
- * Get json of all DB backups
- * terminus site backup list --site=<site>
- * --env=<env>
+ * Get binding info for a site UUID
+ *
+ * https://dashboard.getpantheon.com/api/sites/UUID/bindings
  */
 Terminus.prototype.getBindings = function(uuid) {
 
   return pantheon.getBindings(uuid);
 };
-
 
 // Return constructor as the module object.
 module.exports = Terminus;

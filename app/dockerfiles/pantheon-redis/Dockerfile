@@ -1,6 +1,6 @@
 # docker build -t kalabox/pantheon-redis .
 
-FROM kalabox/hipache:v0.9.0
+FROM kalabox/hipache:v0.10.0
 
 RUN \
   apt-get -y clean && \
