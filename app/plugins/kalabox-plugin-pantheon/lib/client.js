@@ -119,10 +119,10 @@ Client.prototype.__getSessionCache = function() {
     data = fs.readFileSync(SESSIONFILE, 'utf8');
     /*
      * This is to handle a special case where the file cache's contents
-     * are set to the string 'null'. It should be handled as if the file
-     * does not exist or is empty.
+     * are set to the string 'null' or are empty/newline. It should be handled
+     * as if the file does not exist or is empty.
      */
-    if (data === 'null' || data === 'null\n') {
+    if (data === 'null' || data === 'null\n' || data === '' || data === '\n') {
       data = undefined;
     }
   } catch (err) {
@@ -167,8 +167,7 @@ Client.prototype.__getSession = function() {
   }
 
   if (!session) {
-    // @pirog bcauldwell: Should this maybe throw an error instead?
-    console.log('You need to login first.');
+    // @todo something that makes more sense?
   }
 
   return session;
