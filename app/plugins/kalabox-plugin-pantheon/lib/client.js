@@ -106,50 +106,70 @@ Client.prototype.__setSession = function(session) {
 };
 
 /*
+ * Helper function for reading file cache.
+ */
+Client.prototype.__getSessionCache = function() {
+
+  var self = this;
+
+  var data;
+
+  // Try to load contents of file cache.
+  try {
+    data = fs.readFileSync(SESSIONFILE, 'utf8');
+    /*
+     * This is to handle a special case where the file cache's contents
+     * are set to the string 'null' or are empty/newline. It should be handled
+     * as if the file does not exist or is empty.
+     */
+    if (data === 'null' || data === 'null\n' || data === '' || data === '\n') {
+      data = undefined;
+    }
+  } catch (err) {
+    if (err.code !== 'ENOENT') {
+      throw err;
+    }
+  }
+
+  // If file cache was loaded, parse the contents and set the session.
+  if (data) {
+    var session = JSON.parse(data);
+    self.__setSession(session);
+    return session;
+  } else {
+    return undefined;
+  }
+
+};
+
+/*
  * Make sure we have a session token
  */
 Client.prototype.__getSession = function() {
 
-  // YOU WERE BORN WITH NOTHING!
-  var session = {};
+  var self = this;
 
-  // Grab the session if we already have it in run cache
-  if (this.session !== undefined) {
-    session = this.session;
-  }
-  // Try to grab from filecache
-  else if (fs.existsSync(SESSIONFILE))  {
-    session = JSON.parse(fs.readFileSync(SESSIONFILE, 'utf8'));
-    // File is empty :()
-    if (session === null) {
-      session = undefined;
-      return session;
-    }
-    else {
-      this.__setSession(session);
-    }
-  }
-  else {
-    session = undefined;
-    return session;
-  }
+  // Get this instance's cached session.
+  var session = self.session || self.__getSessionCache();
 
-  // Validate session hasn't expired yet
-  if (Date.now() - session.session_expire_time < 0) {
-    // invalidate cache
-    this.session = undefined;
-    session = undefined;
-    // Destroy cached session file
+  /*
+   * Date.now uses miliseconds, while session_expire_time seems to use
+   * seconds, so converting them to match is needed. So here I'm just
+   * multiplying session_expire_time by 1000 to be in miliseconds.
+   */
+  if (session && Date.now() > (session.session_expire_time * 1000)) {
+
+    // Reset session.
+    session = self.session = undefined;
+    // Delete file cache.
     fs.unlinkSync(SESSIONFILE);
+
   }
 
-  // Return whatever it is we are returning
-  if (session === undefined) {
-    // @todo: better debugging/logging
-    console.log('You need to login first.');
+  if (!session) {
+    // @todo something that makes more sense?
   }
 
-  // Return what we have left
   return session;
 
 };
