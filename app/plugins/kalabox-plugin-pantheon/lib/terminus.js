@@ -302,7 +302,7 @@ Terminus.prototype.createDBBackup = function(site, env) {
 
   return this.__request(
     ['terminus'],
-    ['site', 'backup', 'create'],
+    ['site', 'backups', 'create'],
     [
       '--json',
       '--element=database',
