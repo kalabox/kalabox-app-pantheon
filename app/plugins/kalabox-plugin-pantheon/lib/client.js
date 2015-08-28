@@ -47,7 +47,7 @@ function Client(id, address) {
   this.sites = undefined;
   this.backups = undefined;
   this.products = undefined;
-  this.session = this.__getSession();
+  this.session = this.getSession();
   this.profile = undefined;
 
   // The address argument is also optional.
@@ -159,7 +159,7 @@ Client.prototype.__resetSession = function() {
 /*
  * Make sure we have a session token
  */
-Client.prototype.__getSession = function() {
+Client.prototype.getSession = function() {
 
   var self = this;
 
@@ -194,7 +194,7 @@ Client.prototype.__getSession = function() {
  */
 Client.prototype.__getSessionHeaders = function() {
   // Try to grab our session
-  var session = this.__getSession();
+  var session = this.getSession();
   // Reutrn the header object
   return {
     'Content-Type': 'application/json',
@@ -259,7 +259,7 @@ Client.prototype.login = function(email, password) {
 
   // Grab the session if we already have it and the session is for the same
   // user who just tried to login
-  this.session = this.__getSession();
+  this.session = this.getSession();
   if (this.session !== undefined && email === this.session.email) {
     return Promise.resolve(this.session);
   }
@@ -317,7 +317,7 @@ Client.prototype.getSites = function() {
   }
 
   // Session up here because we need session.user_id
-  var session = this.__getSession();
+  var session = this.getSession();
   // Save for later
   var self = this;
 
@@ -483,7 +483,7 @@ Client.prototype.getProfile = function() {
   }
 
   // Session up here because we need session.user_id
-  var session = this.__getSession();
+  var session = this.getSession();
   // Save for later
   var self = this;
 
@@ -515,7 +515,7 @@ Client.prototype.getProfile = function() {
 Client.prototype.getSSHKeys = function() {
 
   // Session up here because we need session.user_id
-  var session = this.__getSession();
+  var session = this.getSession();
   // Save for later
   var self = this;
 
@@ -547,7 +547,7 @@ Client.prototype.getSSHKeys = function() {
 Client.prototype.postSSHKey = function(sshKey) {
 
   // Session up here because we need session.user_id
-  var session = this.__getSession();
+  var session = this.getSession();
   // Save for later
   var self = this;
 

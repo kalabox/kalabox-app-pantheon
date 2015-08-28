@@ -6,6 +6,12 @@ var crypto = require('crypto');
 // NPM modules
 var _ = require('lodash');
 
+// Terminus node client
+// for some things it is better to use the node client because we dont have
+// to worry about an error we need to handle killing the whole damn thing
+var Client = require('./client.js');
+var pantheon = new Client();
+
 // Constants
 var PLUGIN_NAME = 'kalabox-plugin-pantheon';
 
@@ -53,6 +59,21 @@ module.exports = function(kbox) {
       }
 
       return start;
+
+    };
+
+    /*
+     * Function to take starting options and add more options to it
+     * without adding in dups
+     */
+    var getGitInfo = function() {
+
+      var session = pantheon.getSession();
+
+      return {
+        email: session.email,
+        name: session.name
+      };
 
     };
 
@@ -218,6 +239,11 @@ module.exports = function(kbox) {
       // All containers need the correct SSH path
       var sshEnvVar = ['SSH_KEY=pantheon.kalabox.id_rsa'];
       createOptions = addPush(createOptions, sshEnvVar);
+
+      // All containers need the correct git user/email info
+      var gitInfo = getGitInfo();
+      var gitEnvVar = ['GITUSER=' + gitInfo.name, 'GITEMAIL=' + gitInfo.email];
+      createOptions = addPush(createOptions, gitEnvVar);
 
       done();
 

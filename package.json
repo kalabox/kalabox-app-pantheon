@@ -18,7 +18,6 @@
   },
   "dependencies": {
     "bluebird": "^2.9.32",
-    "kalabox-plugin-git": "https://github.com/kalabox/kalabox-plugin-git/tarball/master",
     "lodash": "^3.9.3",
     "restler": "^3.3.0",
     "ssh-fingerprint": "0.0.1",
