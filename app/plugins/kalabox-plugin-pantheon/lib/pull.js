@@ -133,6 +133,8 @@ module.exports = function(kbox) {
           return terminus.hasDBBackup(uuid.trim(), env);
         })
         .then(function(hasBackup) {
+          // @todo: might want to always create a new backup?
+          // @todo: maybe if latest backup is old?
           if (!hasBackup) {
             return terminus.createDBBackup(site, env);
           }
