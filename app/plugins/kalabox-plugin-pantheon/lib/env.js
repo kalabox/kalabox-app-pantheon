@@ -114,6 +114,7 @@ module.exports = function(kbox) {
 
       // Default environmental variables
       var installEnv = [
+        'SSH_KEY=pantheon.kalabox.id_rsa',
         'FRAMEWORK=' + framework,
         'DOCROOT=/',
         'FILEMOUNT=' + frameworkSpec[framework].fileMount,

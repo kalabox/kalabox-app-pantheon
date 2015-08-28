@@ -48,6 +48,7 @@ function Client(id, address) {
   this.backups = undefined;
   this.products = undefined;
   this.session = this.__getSession();
+  this.profile = undefined;
 
   // The address argument is also optional.
   if (address) {
@@ -91,14 +92,17 @@ Client.prototype.__setSession = function(session) {
       session: session.session,
       session_expire_time: expires,
       user_uuid: uid,
-      email: session.email
+      email: session.email,
+      name: session.name
     };
 
     // Save a cache locally so we can share among terminus clients
     fs.mkdirpSync(CACHEDIR);
     var writableSession = JSON.stringify(this.session);
     fs.writeFileSync(SESSIONFILE, writableSession);
+
   }
+
   else {
     // @todo: fail?
   }
@@ -111,7 +115,6 @@ Client.prototype.__setSession = function(session) {
 Client.prototype.__getSessionCache = function() {
 
   var self = this;
-
   var data;
 
   // Try to load contents of file cache.
@@ -143,6 +146,17 @@ Client.prototype.__getSessionCache = function() {
 };
 
 /*
+ * Reset the session
+ */
+Client.prototype.__resetSession = function() {
+
+  // Delete file cache.
+  fs.unlinkSync(SESSIONFILE);
+  return undefined;
+
+};
+
+/*
  * Make sure we have a session token
  */
 Client.prototype.__getSession = function() {
@@ -158,16 +172,16 @@ Client.prototype.__getSession = function() {
    * multiplying session_expire_time by 1000 to be in miliseconds.
    */
   if (session && Date.now() > (session.session_expire_time * 1000)) {
+    session = self.session = self.__resetSession();
+  }
 
-    // Reset session.
-    session = self.session = undefined;
-    // Delete file cache.
-    fs.unlinkSync(SESSIONFILE);
-
+  // Kill session if it doesn't have the full name on it so we can get it
+  if (session && session.name === undefined) {
+    session = self.session = self.__resetSession();
   }
 
   if (!session) {
-    // @todo something that makes more sense?
+    // COMPLAIN THAT YOU NEED TO LOGIN OR SOMETHING
   }
 
   return session;
@@ -189,7 +203,7 @@ Client.prototype.__getSessionHeaders = function() {
 };
 
 /*
- * Construct a new URL, possibly lightsaber as well
+ * Construct a new URL, possibly a lightsaber as well
  */
 Client.prototype.__url = function(parts) {
   parts.unshift('api');
@@ -221,11 +235,12 @@ Client.prototype.__request = function(verb, pathname, data) {
       })
       .on('error', reject);
     })
-    // Give request a 10 second timeout.
-    .timeout(10 * 1000)
+    // Give request a twenty second timeout.
+    .timeout(20 * 1000)
     // Wrap errors for more information.
     .catch(function(err) {
       var dataString = typeof data === 'object' ? JSON.stringify(data) : data;
+      // @todo: retry on fail
       throw new Error(err,
         'Error during REST request. url=%s, data=%s.',
         [verb, url].join(':'),
@@ -238,7 +253,7 @@ Client.prototype.__request = function(verb, pathname, data) {
 };
 
 /*
- * Get full list of all metrics records.
+ * Login to pantheon
  */
 Client.prototype.login = function(email, password) {
 
@@ -264,11 +279,28 @@ Client.prototype.login = function(email, password) {
 
   // Validate response and return ID.
   .then(function(response) {
-    // @todo: validate response
-    // Set our session and return
+
+   // @todo: validate response
+
+    // Set the email and placeholder name
     response.email = email;
+    response.name = '';
+
+    // Set the session once here so we can run the profile disco request
     self.session = self.__setSession(response);
-    return self.session;
+
+    // Set the fullname
+    return self.getProfile()
+      .then(function(profile) {
+        self.session.name = profile.full_name;
+      })
+      .then(function() {
+        // Set session again with additional info
+        // @todo: this might be redundant
+        self.session = self.__setSession(self.session);
+        return self.session;
+      });
+
   });
 
 };
@@ -306,18 +338,16 @@ Client.prototype.getSites = function() {
 };
 
 /*
- * Get full list of sites
+ * Get full list of environments
  */
 Client.prototype.getEnvironments = function(uuid) {
 
-  // Just grab the cached sites if we already have
+  // Just grab the cached envs if we already have
   // made a request this process
   if (this.sites[uuid].information.envs !== undefined) {
     return Promise.resolve(this.sites[uuid].information.envs);
   }
 
-  // Session up here because we need session.user_id
-  var session = this.__getSession();
   // Save for later
   var self = this;
 
@@ -348,8 +378,6 @@ Client.prototype.getProducts = function() {
     return Promise.resolve(this.products);
   }
 
-  // Session up here because we need session.user_id
-  var session = this.__getSession();
   // Save for later
   var self = this;
 
@@ -371,18 +399,17 @@ Client.prototype.getProducts = function() {
 
 /*
  * Get full list of our backups
+ *
  * sites/1b377733-0fa4-4453-b9f5-c43477274010/environments/dev/backups/catalog/
  */
 Client.prototype.getBackups = function(uuid, env) {
 
-  // Just grab the cached sites if we already have
+  // Just grab the cached backups if we already have
   // made a request this process
   if (this.backups !== undefined) {
     return Promise.resolve(this.backups);
   }
 
-  // Session up here because we need session.user_id
-  var session = this.__getSession();
   // Save for later
   var self = this;
 
@@ -408,18 +435,17 @@ Client.prototype.getBackups = function(uuid, env) {
 
 /*
  * Get full list of our sites bindings
+ *
  * sites/1b377733-0fa4-4453-b9f5-c43477274010/environments/dev/backups/catalog/
  */
 Client.prototype.getBindings = function(uuid) {
 
-  // Just grab the cached sites if we already have
+  // Just grab the cached backups if we already have
   // made a request this process
-  //if (this.backups !== undefined) {
-  //  return Promise.resolve(this.backups);
-  //}
+  if (this.backups !== undefined) {
+    return Promise.resolve(this.backups);
+  }
 
-  // Session up here because we need session.user_id
-  var session = this.__getSession();
   // Save for later
   var self = this;
 
@@ -438,6 +464,112 @@ Client.prototype.getBindings = function(uuid) {
   // Validate response and return ID.
   .then(function(bindings) {
     return bindings;
+  });
+
+};
+
+/*
+ * Get users profile
+ *
+ * https://dashboard.getpantheon.com/api/users/UUID/profile
+ *
+ */
+Client.prototype.getProfile = function() {
+
+  // Just grab the cached profile if we already have
+  // made a request this process
+  if (this.profile !== undefined) {
+    return Promise.resolve(this.profile);
+  }
+
+  // Session up here because we need session.user_id
+  var session = this.__getSession();
+  // Save for later
+  var self = this;
+
+  // Grab our headers to auth with the endpoint
+  var data = {
+    headers: this.__getSessionHeaders()
+  };
+
+  // Send REST request.
+  return this.__request(
+    'get',
+    ['users', session.user_uuid, 'profile'],
+    data
+  )
+
+  // Validate response and return ID.
+  .then(function(profile) {
+    return profile;
+  });
+
+};
+
+/*
+ * Get users ssh keys
+ *
+ * GET https://dashboard.getpantheon.com/api/users/UUID/keys
+ *
+ */
+Client.prototype.getSSHKeys = function() {
+
+  // Session up here because we need session.user_id
+  var session = this.__getSession();
+  // Save for later
+  var self = this;
+
+  // Grab our headers to auth with the endpoint
+  var data = {
+    headers: this.__getSessionHeaders()
+  };
+
+  // Send REST request.
+  return this.__request(
+    'get',
+    ['users', session.user_uuid, 'keys'],
+    data
+  )
+
+  // Validate response and return ID.
+  .then(function(keys) {
+    return keys;
+  });
+
+};
+
+/*
+ * Post users ssh keys
+ *
+ * POST https://dashboard.getpantheon.com/api/users/UUID/keys
+ *
+ */
+Client.prototype.postSSHKey = function(sshKey) {
+
+  // Session up here because we need session.user_id
+  var session = this.__getSession();
+  // Save for later
+  var self = this;
+
+  // Grab our headers to auth with the endpoint
+  var data = {
+    headers: this.__getSessionHeaders(),
+    data: JSON.stringify(sshKey),
+    query: {
+      validate: true
+    }
+  };
+
+  // Send REST request.
+  return this.__request(
+    'post',
+    ['users', session.user_uuid, 'keys'],
+    data
+  )
+
+  // Validate response and return ID.
+  .then(function(keys) {
+    return keys;
   });
 
 };
