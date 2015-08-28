@@ -7,9 +7,9 @@ if [ -f "/src/config/php/php.ini" ]; then
 fi
 
 # We need to do this for SSH add now as well
-if [ -f "/ssh/.ssh/{$SSH_KEY}" ]; then
+if [ -f "/ssh/.ssh/${SSH_KEY}" ]; then
   eval `ssh-agent -s` > /dev/null
-  ssh-add /ssh/.ssh/${$SSH_KEY} > /dev/null
+  ssh-add /ssh/.ssh/${SSH_KEY} > /dev/null
 fi
 
 source /root/.phpbrew/bashrc > /dev/null
