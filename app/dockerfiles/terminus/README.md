@@ -6,7 +6,7 @@ Add commands to run terminus, drush and wp-cli
 ```
 
 # docker build -t kalabox/terminus .
-FROM kalabox/pantheon-appserver:v0.9.0
+FROM kalabox/pantheon-appserver:v0.10.0
 
 # Install all the CLI magic
 RUN \

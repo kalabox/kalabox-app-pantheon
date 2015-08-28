@@ -1,14 +1,17 @@
 #!/bin/bash
 
-# Use our custom php.ini
-if [ -f "/src/config/php/php.ini" ]; then
+# Use our custom terminus php.ini We want to use a custom ini here so we can
+# set error reporting so that notices are not reported to stderr
+if [ -f "/src/config/terminus/php.ini" ]; then
   rm ${HOME}/.phpbrew/php/php-${PHP_VERSION}/etc/php.ini
-  cp /src/config/php/php.ini ${HOME}/.phpbrew/php/php-${PHP_VERSION}/etc/php.ini
+  cp /src/config/terminus/php.ini ${HOME}/.phpbrew/php/php-${PHP_VERSION}/etc/php.ini
 fi
 
 # We need to do this for SSH add now as well
-eval `ssh-agent -s` > /dev/null
-ssh-add /ssh/.ssh/id_rsa > /dev/null
+if [ -f "/ssh/.ssh/${SSH_KEY}" ]; then
+  eval `ssh-agent -s` > /dev/null
+  ssh-add /ssh/.ssh/${SSH_KEY} > /dev/null
+fi
 
 source /root/.phpbrew/bashrc > /dev/null
 phpbrew -d switch ${PHP_VERSION} > /dev/null

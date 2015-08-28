@@ -133,6 +133,8 @@ module.exports = function(kbox) {
           return terminus.hasDBBackup(uuid.trim(), env);
         })
         .then(function(hasBackup) {
+          // @todo: might want to always create a new backup?
+          // @todo: maybe if latest backup is old?
           if (!hasBackup) {
             return terminus.createDBBackup(site, env);
           }
@@ -178,7 +180,7 @@ module.exports = function(kbox) {
           // /kbox rsync -rlvz --size-only --ipv4 --progress -e 'ssh -p 2222'
           var envSite = [env, siteid].join('.');
           var fileBox = envSite + '@appserver.' + envSite + '.drush.in:files/';
-          var fileMount = 'sites/default/files';
+          var fileMount = '/media';
           var opts = '-rlvz --size-only --ipv4 --progress -e \'ssh -p 2222\'';
 
           return rsync.cmd([opts, fileBox, fileMount], true);
@@ -206,13 +208,7 @@ module.exports = function(kbox) {
         })
         .then(function() {
           if (firstTime) {
-            if (pantheonConf.action === 'create') {
-              var repo = pantheonConf.upstream.url;
-              return git.cmd(['clone', repo, './'], []);
-            }
-            else {
-              return pullCode(pantheonConf.site, pantheonConf.env, 'clone');
-            }
+            return pullCode(pantheonConf.site, pantheonConf.env, 'clone');
           }
         })
         .then(function() {
@@ -254,65 +250,59 @@ module.exports = function(kbox) {
 
       task.func = function(done) {
 
-        // Only need questions on pull sites
-        if (pantheonConf.action === 'pull') {
-          // Grab the CLI options that are available
-          var options = this.options;
-          var questions = [
-            {
-              type: 'confirm',
-              name: 'database',
-              message: 'Also refresh from latest database backup?',
-            },
-            {
-              type: 'confirm',
-              name: 'files',
-              message: 'Also grab latest files?',
-            },
-          ];
+        // Grab the CLI options that are available
+        var options = this.options;
+        var questions = [
+          {
+            type: 'confirm',
+            name: 'database',
+            message: 'Also refresh from latest database backup?',
+          },
+          {
+            type: 'confirm',
+            name: 'files',
+            message: 'Also grab latest files?',
+          },
+        ];
 
-          // Filter out interactive questions based on passed in options
-          questions = _.filter(questions, function(question) {
+        // Filter out interactive questions based on passed in options
+        questions = _.filter(questions, function(question) {
 
-            var option = options[question.name];
+          var option = options[question.name];
 
-            if (question.filter) {
-              options[question.name] = question.filter(options[question.name]);
+          if (question.filter) {
+            options[question.name] = question.filter(options[question.name]);
+          }
+
+          if (option === false || option === undefined) {
+            return true;
+          }
+
+          else {
+            return !_.includes(Object.keys(options), question.name);
+          }
+        });
+
+        // Launch the inquiry
+        inquirer.prompt(questions, function(answers) {
+          var choices = _.merge({}, options, answers);
+          return terminus.getSiteAliases()
+          .then(function() {
+            return pullCode(pantheonConf.site, pantheonConf.env, 'pull');
+          })
+          .then(function() {
+            if (choices.database) {
+              return pullDB(pantheonConf.site, pantheonConf.env);
             }
-
-            if (option === false || option === undefined) {
-              return true;
+          })
+          .then(function() {
+            if (choices.files) {
+              return pullFiles(pantheonConf.site, pantheonConf.env);
             }
+          })
+          .nodeify(done);
+        });
 
-            else {
-              return !_.includes(Object.keys(options), question.name);
-            }
-          });
-
-          // Launch the inquiry
-          inquirer.prompt(questions, function(answers) {
-            var choices = _.merge({}, options, answers);
-            return terminus.getSiteAliases()
-            .then(function() {
-              return pullCode(pantheonConf.site, pantheonConf.env, 'pull');
-            })
-            .then(function() {
-              if (choices.database) {
-                return pullDB(pantheonConf.site, pantheonConf.env);
-              }
-            })
-            .then(function() {
-              if (choices.files) {
-                return pullFiles(pantheonConf.site, pantheonConf.env);
-              }
-            })
-            .nodeify(done);
-          });
-        }
-        // Just straight refresh the code if its a start state
-        else {
-          return git.cmd(['pull', 'origin', 'master'], []).nodeify(done);
-        }
       };
     });
   });

@@ -1,6 +1,6 @@
 # docker build -t kalabox/pantheon-appserver:mytag .
 
-FROM kalabox/nginx:v0.9.0
+FROM kalabox/nginx:v0.10.0
 
 RUN \
   apt-get -y update && \
@@ -25,6 +25,7 @@ RUN \
   rm /root/start.sh
 
 ENV PHP_VERSION 5.3.29
+ENV FRAMEWORK drupal
 
 COPY start.sh /root/start.sh
 RUN chmod +x /root/start.sh

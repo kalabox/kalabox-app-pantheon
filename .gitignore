@@ -21,3 +21,4 @@ built
 *.tar
 *.id_rsa
 string
+pantheon.aliases.drushrc.php

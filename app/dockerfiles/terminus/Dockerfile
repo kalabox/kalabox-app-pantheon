@@ -1,5 +1,5 @@
 # docker build -t kalabox/terminus .
-FROM kalabox/pantheon-appserver:v0.9.0
+FROM kalabox/pantheon-appserver:v0.10.0
 
 # Install all the CLI magic
 RUN \
@@ -14,7 +14,7 @@ RUN \
   ln -s /usr/local/src/drush6/drush /usr/bin/drush6 && \
   curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
   chmod +x wp-cli.phar && mv wp-cli.phar /usr/local/bin/wp && \
-  curl https://github.com/pantheon-systems/cli/releases/download/0.5.3/terminus.phar -L -o /usr/local/bin/terminus && \
+  curl https://github.com/pantheon-systems/cli/releases/download/0.7.1/terminus.phar -L -o /usr/local/bin/terminus && \
   chmod +x /usr/local/bin/terminus && \
   apt-get -y clean && \
   apt-get -y autoclean && \
@@ -30,6 +30,7 @@ COPY ssh-config /root/.ssh/config
 # Set default env
 ENV PHP_VERSION 5.3.29
 ENV DRUSH_VERSION drush6
+ENV SSH_KEY id_rsa
 
 # Set up and link our roots for persistence
 RUN \

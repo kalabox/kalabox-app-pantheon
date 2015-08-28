@@ -20,6 +20,13 @@ if [ ! -f "/certs/appserver.pem" ]; then
   cat /certs/appserver.crt /certs/appserver.key > /certs/appserver.pem
 fi
 
+# Use the correct site.conf for the framework
+# /src/config/nginx/site.conf /etc/nginx/sites-enabled/default
+if [ -f "/src/config/nginx/${FRAMEWORK}.conf" ]; then
+  rm /etc/nginx/sites-enabled/default
+  cp /src/config/nginx/${FRAMEWORK}.conf /etc/nginx/sites-enabled/default
+fi
+
 # Move in our custom config files if they exist
 # Use our custom www.conf pool for fpm
 if [ -f "/src/config/php/www.conf" ]; then
