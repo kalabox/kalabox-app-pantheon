@@ -25,6 +25,7 @@ RUN \
   rm /root/start.sh
 
 ENV PHP_VERSION 5.3.29
+ENV FRAMEWORK drupal
 
 COPY start.sh /root/start.sh
 RUN chmod +x /root/start.sh
