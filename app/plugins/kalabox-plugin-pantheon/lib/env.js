@@ -79,11 +79,12 @@ module.exports = function(kbox) {
         }
       };
 
+      var getHash = function(u) {
+        return crypto.createHash('sha256').update(u).digest('hex');
+      };
+
       // Construct a hashsalt for Drupal 8
-      var drupalHashSalt = crypto
-        .createHash('sha256')
-        .update(JSON.stringify(pantheonDatabases))
-        .digest('hex');
+      var drupalHashSalt = getHash(JSON.stringify(pantheonDatabases));
 
       // Some Default settings
       var settings = {
@@ -116,7 +117,7 @@ module.exports = function(kbox) {
       var installEnv = [
         'FRAMEWORK=' + framework,
         'DOCROOT=/',
-        'FILEMOUNT=' + frameworkSpec[framework].fileMount,
+        'FILEMOUNT=' + frameworkSpec[framework].filemount,
         'DRUPAL_HASH_SALT=' + settings.drupal_hash_salt,
         'DB_HOST=' + app.domain,
         'DB_PORT=3306',
@@ -138,6 +139,21 @@ module.exports = function(kbox) {
       // We also need to inject backdrop settings if appropriate
       if (framework === 'backdrop') {
         installEnv.push('BACKDROP_SETTINGS=' + JSON.stringify(settings));
+      }
+
+      // We also need to inject wp settings if appropriate
+      if (framework === 'wordpress') {
+        var wpSalt = [
+          'AUTH_KEY=' + drupalHashSalt,
+          'SECURE_AUTH_KEY=' + getHash(app.name),
+          'LOGGED_IN_KEY=' + getHash(app.domain),
+          'AUTH_SALT=' + getHash(app.name + app.domain),
+          'SECURE_AUTH_SALT=' + getHash(app.domain + app.name),
+          'LOGGED_IN_SALT=' + getHash(app.name + app.name),
+          'NONCE_SALT=' + getHash(app.domain + app.domain),
+        ];
+
+        installEnv = installEnv.concat(wpSalt);
       }
 
       return installEnv;
