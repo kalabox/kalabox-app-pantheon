@@ -17,7 +17,7 @@ var PLUGIN_NAME = 'kalabox-plugin-pantheon';
 
 module.exports = function(kbox) {
 
-  kbox.whenApp(function(app) {
+  kbox.ifApp(function(app) {
 
     // Framework specific stuff
     // @todo: eventually we will grab the php version directly via terminus

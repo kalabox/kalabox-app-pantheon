@@ -14,7 +14,7 @@ var PLUGIN_NAME = 'kalabox-plugin-pantheon';
 
 module.exports = function(kbox) {
 
-  kbox.whenApp(function(app) {
+  kbox.ifApp(function(app) {
 
     // Grab the terminus client
     var Terminus = require('./terminus.js');
