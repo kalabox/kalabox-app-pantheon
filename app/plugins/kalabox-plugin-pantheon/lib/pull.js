@@ -178,7 +178,7 @@ module.exports = function(kbox) {
           // /kbox rsync -rlvz --size-only --ipv4 --progress -e 'ssh -p 2222'
           var envSite = [env, siteid].join('.');
           var fileBox = envSite + '@appserver.' + envSite + '.drush.in:files/';
-          var fileMount = 'sites/default/files';
+          var fileMount = '/media';
           var opts = '-rlvz --size-only --ipv4 --progress -e \'ssh -p 2222\'';
 
           return rsync.cmd([opts, fileBox, fileMount], true);
