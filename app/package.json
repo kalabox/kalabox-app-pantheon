@@ -4,9 +4,9 @@
     "bluebird": "^2.9.32",
     "fs-extra": "^0.18.2",
     "inquirer": "^0.9.0",
-    "kalabox-plugin-drush": "https://github.com/kalabox/kalabox-plugin-drush/tarball/master",
-    "kalabox-plugin-git": "https://github.com/kalabox/kalabox-plugin-git/tarball/master",
-    "kalabox-plugin-rsync": "https://github.com/kalabox/kalabox-plugin-rsync/tarball/master",
+    "kalabox-plugin-drush": "^0.9.0",
+    "kalabox-plugin-git": "^0.9.0",
+    "kalabox-plugin-rsync": "^0.9.0",
     "lodash": "^3.9.3",
     "restler": "^3.3.0"
   }
