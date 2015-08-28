@@ -154,7 +154,7 @@ module.exports = function(kbox) {
           // @todo: lots of cleanup here
           var envSite = [env, siteid].join('.');
           var fileBox = envSite + '@appserver.' + envSite + '.drush.in:files/';
-          var fileMount = 'sites/default/files/* --temp-dir=/tmp/';
+          var fileMount = '/media/* --temp-dir=/tmp/';
           var opts = '-rlvz --size-only --ipv4 --progress -e \'ssh -p 2222\'';
 
           return rsync.cmd([opts, fileMount, fileBox], true);
@@ -172,96 +172,87 @@ module.exports = function(kbox) {
       task.path = [app.name, 'push'];
       task.description = 'Push up new code and optionally data and files.';
       task.kind = 'delegate';
-      // Only want these options for pull sites
-      if (pantheonConf.action === 'pull') {
-        task.options.push({
-          name: 'message',
-          kind: 'string',
-          description: 'Tell us about your change'
-        });
-        task.options.push({
-          name: 'database',
-          kind: 'boolean',
-          description: 'Push local database up.'
-        });
-        task.options.push({
-          name: 'files',
-          kind: 'boolean',
-          description: 'Push local files up.'
-        });
-      }
+      task.options.push({
+        name: 'message',
+        kind: 'string',
+        description: 'Tell us about your change'
+      });
+      task.options.push({
+        name: 'database',
+        kind: 'boolean',
+        description: 'Push local database up.'
+      });
+      task.options.push({
+        name: 'files',
+        kind: 'boolean',
+        description: 'Push local files up.'
+      });
 
       task.func = function(done) {
 
-        // Only need questions on pull sites
-        if (pantheonConf.action === 'pull') {
-          // Grab the CLI options that are available
-          var options = this.options;
-          var questions = [
-            {
-              type: 'input',
-              name: 'message',
-              message: 'Tell us about these changes.',
-              default: 'Best changes ever!'
-            },
-            {
-              type: 'confirm',
-              name: 'database',
-              message: 'Also push up your local database?',
-            },
-            {
-              type: 'confirm',
-              name: 'files',
-              message: 'Also push up your local files directory?',
-            },
-          ];
+        // Grab the CLI options that are available
+        var options = this.options;
+        var questions = [
+          {
+            type: 'input',
+            name: 'message',
+            message: 'Tell us about these changes.',
+            default: 'Best changes ever!'
+          },
+          {
+            type: 'confirm',
+            name: 'database',
+            message: 'Also push up your local database?',
+          },
+          {
+            type: 'confirm',
+            name: 'files',
+            message: 'Also push up your local files directory?',
+          },
+        ];
 
-          // Filter out interactive questions based on passed in options
-          questions = _.filter(questions, function(question) {
+        // Filter out interactive questions based on passed in options
+        questions = _.filter(questions, function(question) {
 
-            var option = options[question.name];
+          var option = options[question.name];
 
-            if (question.filter) {
-              options[question.name] = question.filter(options[question.name]);
+          if (question.filter) {
+            options[question.name] = question.filter(options[question.name]);
+          }
+
+          if (option === false || option === undefined) {
+            return true;
+          }
+
+          else {
+            return !_.includes(Object.keys(options), question.name);
+          }
+        });
+
+        // Launch the inquiry
+        inquirer.prompt(questions, function(answers) {
+          var choices = _.merge({}, options, answers);
+          return terminus.getSiteAliases()
+          .then(function() {
+            return pushCode(
+              pantheonConf.site,
+              pantheonConf.env,
+              choices.message
+            );
+          })
+          .then(function() {
+            if (choices.database) {
+              return pushDB(pantheonConf.site, pantheonConf.env);
             }
-
-            if (option === false || option === undefined) {
-              return true;
+          })
+          .then(function() {
+            if (choices.files) {
+              return pushFiles(pantheonConf.site, pantheonConf.env);
             }
+          })
+          .nodeify(done);
+        });
 
-            else {
-              return !_.includes(Object.keys(options), question.name);
-            }
-          });
-
-          // Launch the inquiry
-          inquirer.prompt(questions, function(answers) {
-            var choices = _.merge({}, options, answers);
-            return terminus.getSiteAliases()
-            .then(function() {
-              return pushCode(
-                pantheonConf.site,
-                pantheonConf.env,
-                choices.message
-              );
-            })
-            .then(function() {
-              if (choices.database) {
-                return pushDB(pantheonConf.site, pantheonConf.env);
-              }
-            })
-            .then(function() {
-              if (choices.files) {
-                return pushFiles(pantheonConf.site, pantheonConf.env);
-              }
-            })
-            .nodeify(done);
-          });
-        }
-        // Just straight refresh the code if its a start state
-        else {
-          console.log('This feature is not currently supported.');
-        }
       };
     });
   });
