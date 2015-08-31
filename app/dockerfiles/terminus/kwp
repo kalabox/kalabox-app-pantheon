@@ -9,7 +9,13 @@ fi
 # We need to do this for SSH add now as well
 if [ -f "/ssh/.ssh/${SSH_KEY}" ]; then
   eval `ssh-agent -s` > /dev/null
-  ssh-add /ssh/.ssh/${SSH_KEY} > /dev/null
+  # By default ssh-add reports to stderr which in some circumstances can
+  # cause kbox to error. We are going to pipe STDERR to /dev/null for now
+  # for two main reasons
+  #   1. If kbox actually gets to this point this is very unlikely to fail
+  #   2. If it does fail its going to get reported downstream in an obvious way
+  # I realize this is somewhat sacrilegious but im ok with that
+  ssh-add /ssh/.ssh/${SSH_KEY} 2> /dev/null
 fi
 
 source /root/.phpbrew/bashrc > /dev/null
