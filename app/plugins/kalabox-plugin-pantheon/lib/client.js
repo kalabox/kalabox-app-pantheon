@@ -176,9 +176,26 @@ Client.prototype.getSession = function() {
   }
 
   // Kill session if it doesn't have the full name on it so we can get it
+  //
+  // @todo: this causes an issue when you are already logged in but dont have
+  // a "name" set yet.
+  //
+  // kbox will destroy your session and prompt you to login again via `terminus
+  // auth login` which you can do. This sets the session correctly but without
+  // the name so the next kbox command you run it destroys the session and you
+  // are back where you started.
+  //
+  // Going to comment this out for now and suggest we do better login handling
+  // on the kbox side. aka when a login expires kbox, not terminus, prompts
+  // reauth.
+  //
+  // see: https://github.com/kalabox/kalabox/issues/432
+  //
+  /*
   if (session && session.name === undefined) {
     session = self.session = self.__resetSession();
   }
+  */
 
   if (!session) {
     // COMPLAIN THAT YOU NEED TO LOGIN OR SOMETHING
@@ -357,7 +374,7 @@ Client.prototype.getEnvironments = function(uuid) {
   };
 
   // Send REST request.
-  return this.__request('get', ['sites', uuid, 'environments'], data)
+  return this.__request('get', ['sites', uuid.trim(), 'environments'], data)
 
   // @todo: Validate response and return ID.
   .then(function(envs) {
@@ -421,7 +438,7 @@ Client.prototype.getBackups = function(uuid, env) {
   // Send REST request.
   return this.__request(
     'get',
-    ['sites', uuid, 'environments', env, 'backups', 'catalog'],
+    ['sites', uuid.trim(), 'environments', env.trim(), 'backups', 'catalog'],
     data
   )
 
@@ -442,8 +459,8 @@ Client.prototype.getBindings = function(uuid) {
 
   // Just grab the cached backups if we already have
   // made a request this process
-  if (this.backups !== undefined) {
-    return Promise.resolve(this.backups);
+  if (this.bindings !== undefined) {
+    return Promise.resolve(this.bindings);
   }
 
   // Save for later
@@ -457,7 +474,7 @@ Client.prototype.getBindings = function(uuid) {
   // Send REST request.
   return this.__request(
     'get',
-    ['sites', uuid, 'bindings'],
+    ['sites', uuid.trim(), 'bindings'],
     data
   )
 
