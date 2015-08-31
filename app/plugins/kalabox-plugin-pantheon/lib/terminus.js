@@ -194,7 +194,7 @@ Terminus.prototype.cmd = function(cmd, opts, done) {
 Terminus.prototype.wakeSite = function(site, env) {
 
   return this.__request(
-    ['terminus'],
+    ['kterminus'],
     ['site', 'wake'],
     ['--site=' + site, '--env=' + env]
   );
@@ -209,7 +209,7 @@ Terminus.prototype.wakeSite = function(site, env) {
 Terminus.prototype.getConnectionMode = function(site, env) {
 
   return this.__request(
-    ['terminus'],
+    ['kterminus'],
     ['site', 'connection-mode'],
     ['--json', '--site=' + site, '--env=' + env]
   );
@@ -224,7 +224,7 @@ Terminus.prototype.getConnectionMode = function(site, env) {
 Terminus.prototype.setConnectionMode = function(site, env) {
 
   return this.__request(
-    ['terminus'],
+    ['kterminus'],
     ['site', 'connection-mode'],
     ['--json', '--site=' + site, '--env=' + env, '--set=git']
   );
@@ -249,7 +249,7 @@ Terminus.prototype.getUUID = function(site) {
 
   // Make a request
   return this.__request(
-    ['terminus'],
+    ['kterminus'],
     ['site', 'info'],
     ['--json', '--site=' + site, '--field=id']
   )
@@ -267,7 +267,7 @@ Terminus.prototype.getUUID = function(site) {
  */
 Terminus.prototype.getSiteAliases = function() {
 
-  return this.__request(['terminus'], ['sites', 'aliases'], ['--json']);
+  return this.__request(['kterminus'], ['sites', 'aliases'], ['--json']);
 
 };
 
@@ -280,7 +280,7 @@ Terminus.prototype.getSiteAliases = function() {
 Terminus.prototype.downloadDBBackup = function(site, env) {
 
   return this.__request(
-    ['terminus'],
+    ['kterminus'],
     ['site', 'backups', 'get'],
     [
       '--json',
@@ -301,7 +301,7 @@ Terminus.prototype.downloadDBBackup = function(site, env) {
 Terminus.prototype.createDBBackup = function(site, env) {
 
   return this.__request(
-    ['terminus'],
+    ['kterminus'],
     ['site', 'backups', 'create'],
     [
       '--json',
