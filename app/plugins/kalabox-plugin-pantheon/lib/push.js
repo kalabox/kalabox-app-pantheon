@@ -96,7 +96,11 @@ module.exports = function(kbox) {
         .then(function(status) {
           wasRunning = status;
           if (!wasRunning) {
-            return engine.start(dbID, defaults);
+            return engine.start(dbID, defaults)
+            // Wait a bit to get the DB going before we do the next thing
+            // @todo: Have a way to check that the DB container is
+            // actually ready?
+            .delay(5000);
           }
         })
         .then(function() {
@@ -195,7 +199,7 @@ module.exports = function(kbox) {
         var questions = [
           {
             type: 'input',
-            name: 'message',
+            name: 'm',
             message: 'Tell us about these changes.',
             default: 'Best changes ever!'
           },
