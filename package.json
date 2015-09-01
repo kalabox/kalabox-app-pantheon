@@ -27,6 +27,8 @@
     "grunt-contrib-jshint": "~0.10.0",
     "grunt-jscs": "~0.8.1",
     "jshint-stylish": "~1.0.0",
+    "ssh-fingerprint": "0.0.1",
+    "ssh-keygen": "^0.2.1",
     "matchdep": "^0.3.0"
   }
 }
