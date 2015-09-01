@@ -15,6 +15,9 @@ var util = require('util');
 var _ = require('lodash');
 var Promise = require('bluebird');
 var rest = require('restler');
+var fingerprint = require('ssh-fingerprint');
+var keygen = require('ssh-keygen');
+var inquirer = require('inquirer');
 
 // Stack me
 Promise.longStackTraces();
@@ -29,7 +32,7 @@ var PANTHEON_API = {
 };
 
 /*
- * Cache constants
+ * CONSTANTS
  */
 var HOMEKEY = (process.platform === 'win32') ? 'USERPROFILE' : 'HOME';
 var CACHEDIR = path.join(process.env[HOMEKEY], '.terminus', 'cache');
@@ -47,7 +50,7 @@ function Client(id, address) {
   this.sites = undefined;
   this.backups = undefined;
   this.products = undefined;
-  this.session = this.getSession();
+  this.session = undefined;
   this.profile = undefined;
 
   // The address argument is also optional.
@@ -112,7 +115,7 @@ Client.prototype.__setSession = function(session) {
 /*
  * Helper function for reading file cache.
  */
-Client.prototype.__getSessionCache = function() {
+Client.prototype.getSessionCache = function() {
 
   var self = this;
   var data;
@@ -137,7 +140,6 @@ Client.prototype.__getSessionCache = function() {
   // If file cache was loaded, parse the contents and set the session.
   if (data) {
     var session = JSON.parse(data);
-    self.__setSession(session);
     return session;
   } else {
     return undefined;
@@ -159,12 +161,12 @@ Client.prototype.__resetSession = function() {
 /*
  * Make sure we have a session token
  */
-Client.prototype.getSession = function() {
+Client.prototype.getSession = function(email) {
 
   var self = this;
 
   // Get this instance's cached session.
-  var session = self.session || self.__getSessionCache();
+  var session = self.session || self.getSessionCache();
 
   /*
    * Date.now uses miliseconds, while session_expire_time seems to use
@@ -176,32 +178,58 @@ Client.prototype.getSession = function() {
   }
 
   // Kill session if it doesn't have the full name on it so we can get it
-  //
-  // @todo: this causes an issue when you are already logged in but dont have
-  // a "name" set yet.
-  //
-  // kbox will destroy your session and prompt you to login again via `terminus
-  // auth login` which you can do. This sets the session correctly but without
-  // the name so the next kbox command you run it destroys the session and you
-  // are back where you started.
-  //
-  // Going to comment this out for now and suggest we do better login handling
-  // on the kbox side. aka when a login expires kbox, not terminus, prompts
-  // reauth.
-  //
-  // see: https://github.com/kalabox/kalabox/issues/432
-  //
-  /*
   if (session && session.name === undefined) {
     session = self.session = self.__resetSession();
   }
-  */
 
-  if (!session) {
-    // COMPLAIN THAT YOU NEED TO LOGIN OR SOMETHING
+  // At this point if session is defined we are good to go!
+  if (session) {
+    self.__setSession(session);
+    return Promise.resolve(session);
   }
 
-  return session;
+  // Otherwise we need to prompt the user to reauth
+  else if (!session) {
+
+    // Build a basic prompt for pantheon auth
+    var questions = [
+      {
+        name: 'password',
+        type: 'password',
+        message: 'Pantheon dashboard password'
+      }
+    ];
+
+    /*
+     * Helper method to promisigy fs.exists
+     */
+    var askIt = function(questions) {
+      return new Promise(function(answers) {
+        inquirer.prompt(questions, answers);
+      });
+    };
+
+    // Run the prompt and return the password
+    return askIt(questions)
+
+    // Get my answers
+    .then(function(answers) {
+
+      // If no email try to grab from session cache
+      // @todo: eventually we want this to grab a specific user session file
+      if (!email) {
+        var session = self.getSessionCache();
+        email = session.email;
+      }
+
+      // Login
+      return self.__login(email, answers.password);
+
+    })
+
+    .nodeify(Promise.resolve(session));
+
+  }
 
 };
 
@@ -209,14 +237,14 @@ Client.prototype.getSession = function() {
  * Build headers with our pantheon session so we can do
  * protected stuff
  */
-Client.prototype.__getSessionHeaders = function() {
-  // Try to grab our session
-  var session = this.getSession();
+Client.prototype.__getSessionHeaders = function(session) {
+
   // Reutrn the header object
   return {
     'Content-Type': 'application/json',
     'Cookie': 'X-Pantheon-Session=' + session.session
   };
+
 };
 
 /*
@@ -270,16 +298,11 @@ Client.prototype.__request = function(verb, pathname, data) {
 };
 
 /*
- * Login to pantheon
+ * Auth with pantheon
  */
-Client.prototype.login = function(email, password) {
+Client.prototype.__auth = function(email, password) {
 
-  // Grab the session if we already have it and the session is for the same
-  // user who just tried to login
-  this.session = this.getSession();
-  if (this.session !== undefined && email === this.session.email) {
-    return Promise.resolve(this.session);
-  }
+  // @todo: Should we worried about caching here at all?
 
   // Save this for later
   var self = this;
@@ -292,7 +315,7 @@ Client.prototype.login = function(email, password) {
   };
 
   // Send REST request.
-  return this.__request('postJson', ['authorize'], data)
+  return self.__request('postJson', ['authorize'], data)
 
   // Validate response and return ID.
   .then(function(response) {
@@ -323,6 +346,125 @@ Client.prototype.login = function(email, password) {
 };
 
 /*
+ * login with pantheon
+ * this is different from auth in that it does needed kalabox things as well
+ * like grab some extra info and handle ssh keys
+ */
+Client.prototype.__login = function(email, password) {
+
+  var platformIsWindows = process.platform === 'win32';
+  var envKey = platformIsWindows ? 'USERPROFILE' : 'HOME';
+
+  // "CONSTANTS"
+  var SSH_DIR = path.join(process.env[envKey], '.ssh');
+  var PRIVATE_KEY_PATH = path.join(SSH_DIR, 'pantheon.kalabox.id_rsa');
+  var PUBLIC_KEY_PATH = path.join(SSH_DIR, 'pantheon.kalabox.id_rsa.pub');
+
+  /*
+   * Load our pantheon public key and return it and a non-coloned
+   * fingerprint
+   */
+  var loadPubKey = function() {
+    var data = fs.readFileSync(PUBLIC_KEY_PATH, 'utf-8');
+    return {
+      data: data,
+      print: fingerprint(data).replace(/:/g, '')
+    };
+  };
+
+  /*
+   * Helper method to promisigy fs.exists
+   */
+  var existsAsync = function(path) {
+    return new Promise(function(resolve) {
+      fs.exists(path, resolve);
+    });
+  };
+
+  // Some things to use later
+  var self = this;
+
+  // Login to the pantheon, set up SSH keys if needed
+  // and pull a list of sites
+  // @todo: ERROR HANDLING
+  // @todo: better debug logging
+  // @toto: AFRICA
+  return self.__auth(email, password)
+
+  // We've got a session!
+  .then(function(session) {
+
+    // Now check to see whether we have a pantheon SSH key already
+    // @todo: we shouldnt assume that because a private key exists that a
+    // public one does as well
+    return existsAsync(PRIVATE_KEY_PATH);
+
+  })
+
+  // Generate a new SSH key if eneded
+  .then(function(exists) {
+    if (!exists) {
+
+      // Set Path environmental variable if we are on windows.
+      // We need this because ssh-keygen is not in the path by default
+      if (process.platform === 'win32') {
+
+        // Get needed vars
+        var gitBin = 'C:\\Program Files (x86)\\Git\\bin;';
+        var path = process.env.path;
+
+        // Only add the gitbin to the path if the path doesn't start with
+        // it. We want to make sure gitBin is first so other things like
+        // putty don't F with it.
+        // See https://github.com/kalabox/kalabox/issues/342
+        if (!_.startsWith(path, gitBin)) {
+          process.env.Path = gitBin + path;
+        }
+      }
+
+      var keyOpts = {
+        location: PRIVATE_KEY_PATH,
+        comment: email,
+        read: false,
+        destroy: false
+      };
+
+      return Promise.fromNode(function(callback) {
+        keygen(keyOpts, callback);
+      });
+    }
+  })
+
+  // Look to see if pantheon has our pubkey
+  .then(function() {
+
+    // Grab our public key
+    var pubKey = loadPubKey();
+
+    // Grab public key fingerprints from pantheon
+    return self.getSSHKeys()
+
+    // IF THE GLOVE FITS! YOU MUST ACQUIT!
+    .then(function(keys) {
+      return _.has(keys, pubKey.print);
+    })
+
+    // Post a key to pantheon if needed
+    .then(function(hasKey) {
+      if (!hasKey) {
+        return self.postSSHKey(pubKey.data);
+      }
+    });
+  })
+
+  // Actually return the session
+  .then(function() {
+    return self.session;
+  });
+
+};
+
+/*
  * Get full list of sites
  */
 Client.prototype.getSites = function() {
@@ -333,20 +475,24 @@ Client.prototype.getSites = function() {
     return Promise.resolve(this.sites);
   }
 
-  // Session up here because we need session.user_id
-  var session = this.getSession();
   // Save for later
   var self = this;
 
-  // Grab our headers to auth with the endpoint
-  var data = {
-    headers: this.__getSessionHeaders()
-  };
+  // Session up here because we need session.user_id
+  return self.getSession()
 
-  // Send REST request.
-  return this.__request('get', ['users', session.user_uuid, 'sites'], data)
+  .then(function(session) {
 
-  // @todo: Validate response and return ID.
+    // Grab our headers to auth with the endpoint
+    var data = {
+      headers: self.__getSessionHeaders(session)
+    };
+
+    return self.__request('get', ['users', session.user_uuid, 'sites'], data);
+
+  })
+
+  // Return sites
   .then(function(sites) {
     self.sites = sites;
     return self.sites;
@@ -368,48 +514,24 @@ Client.prototype.getEnvironments = function(uuid) {
   // Save for later
   var self = this;
 
-  // Grab our headers to auth with the endpoint
-  var data = {
-    headers: this.__getSessionHeaders()
-  };
+  // Session up here because we need session.user_id
+  return self.getSession()
 
-  // Send REST request.
-  return this.__request('get', ['sites', uuid.trim(), 'environments'], data)
+  .then(function(session) {
+
+    // Grab our headers to auth with the endpoint
+    var data = {
+      headers: self.__getSessionHeaders(session)
+    };
+
+    return self.__request('get', ['sites', uuid.trim(), 'environments'], data);
+
+  })
 
   // @todo: Validate response and return ID.
   .then(function(envs) {
     self.sites[uuid].information.envs = envs;
     return self.sites[uuid].information.envs;
-  });
-
-};
-
-/*
- * Get full list of our products
- */
-Client.prototype.getProducts = function() {
-
-  // Just grab the cached sites if we already have
-  // made a request this process
-  if (this.products !== undefined) {
-    return Promise.resolve(this.products);
-  }
-
-  // Save for later
-  var self = this;
-
-  // Grab our headers to auth with the endpoint
-  var data = {
-    headers: this.__getSessionHeaders()
-  };
-
-  // Send REST request.
-  return this.__request('get', ['products'], data)
-
-  // Validate response and return ID.
-  .then(function(products) {
-    self.products = products;
-    return self.products;
   });
 
 };
@@ -430,17 +552,23 @@ Client.prototype.getBackups = function(uuid, env) {
   // Save for later
   var self = this;
 
-  // Grab our headers to auth with the endpoint
-  var data = {
-    headers: this.__getSessionHeaders()
-  };
+  // Session up here because we need session.user_id
+  return self.getSession()
 
-  // Send REST request.
-  return this.__request(
-    'get',
-    ['sites', uuid.trim(), 'environments', env.trim(), 'backups', 'catalog'],
-    data
-  )
+  .then(function(session) {
+
+    // Grab our headers to auth with the endpoint
+    var data = {
+      headers: self.__getSessionHeaders(session)
+    };
+
+    // Send REST request.
+    return this.__request(
+      'get',
+      ['sites', uuid.trim(), 'environments', env.trim(), 'backups', 'catalog'],
+      data
+    );
+  })
 
   // Validate response and return ID.
   .then(function(backups) {
@@ -466,17 +594,23 @@ Client.prototype.getBindings = function(uuid) {
   // Save for later
   var self = this;
 
-  // Grab our headers to auth with the endpoint
-  var data = {
-    headers: this.__getSessionHeaders()
-  };
+  // Session up here because we need session.user_id
+  return self.getSession()
 
-  // Send REST request.
-  return this.__request(
-    'get',
-    ['sites', uuid.trim(), 'bindings'],
-    data
-  )
+  .then(function(session) {
+
+    // Grab our headers to auth with the endpoint
+    var data = {
+      headers: self.__getSessionHeaders(session)
+    };
+
+    // Send REST request.
+    return this.__request(
+      'get',
+      ['sites', uuid.trim(), 'bindings'],
+      data
+    );
+  })
 
   // Validate response and return ID.
   .then(function(bindings) {
@@ -499,22 +633,27 @@ Client.prototype.getProfile = function() {
     return Promise.resolve(this.profile);
   }
 
-  // Session up here because we need session.user_id
-  var session = this.getSession();
   // Save for later
   var self = this;
 
-  // Grab our headers to auth with the endpoint
-  var data = {
-    headers: this.__getSessionHeaders()
-  };
+  // Session up here because we need session.user_id
+  return self.getSession()
 
-  // Send REST request.
-  return this.__request(
-    'get',
-    ['users', session.user_uuid, 'profile'],
-    data
-  )
+  .then(function(session) {
+
+    // Grab our headers to auth with the endpoint
+    var data = {
+      headers: self.__getSessionHeaders(session)
+    };
+
+    // Send REST request.
+    return self.__request(
+      'get',
+      ['users', session.user_uuid, 'profile'],
+      data
+    );
+
+  })
 
   // Validate response and return ID.
   .then(function(profile) {
@@ -531,22 +670,27 @@ Client.prototype.getProfile = function() {
  */
 Client.prototype.getSSHKeys = function() {
 
-  // Session up here because we need session.user_id
-  var session = this.getSession();
   // Save for later
   var self = this;
 
-  // Grab our headers to auth with the endpoint
-  var data = {
-    headers: this.__getSessionHeaders()
-  };
+    // Session up here because we need session.user_id
+  return self.getSession()
 
-  // Send REST request.
-  return this.__request(
-    'get',
-    ['users', session.user_uuid, 'keys'],
-    data
-  )
+  .then(function(session) {
+
+    // Grab our headers to auth with the endpoint
+    var data = {
+      headers: self.__getSessionHeaders(session)
+    };
+
+    // Send REST request.
+    return self.__request(
+      'get',
+      ['users', session.user_uuid, 'keys'],
+      data
+    );
+
+  })
 
   // Validate response and return ID.
   .then(function(keys) {
@@ -563,26 +707,31 @@ Client.prototype.getSSHKeys = function() {
  */
 Client.prototype.postSSHKey = function(sshKey) {
 
-  // Session up here because we need session.user_id
-  var session = this.getSession();
   // Save for later
   var self = this;
 
-  // Grab our headers to auth with the endpoint
-  var data = {
-    headers: this.__getSessionHeaders(),
-    data: JSON.stringify(sshKey),
-    query: {
-      validate: true
-    }
-  };
+  // Session up here because we need session.user_id
+  return self.getSession()
 
-  // Send REST request.
-  return this.__request(
-    'post',
-    ['users', session.user_uuid, 'keys'],
-    data
-  )
+  .then(function(session) {
+
+    // Grab our headers to auth with the endpoint
+    var data = {
+      headers: self.__getSessionHeaders(session),
+      data: JSON.stringify(sshKey),
+      query: {
+        validate: true
+      }
+    };
+
+    // Send REST request.
+    return self.__request(
+      'post',
+      ['users', session.user_uuid, 'keys'],
+      data
+    );
+
+  })
 
   // Validate response and return ID.
   .then(function(keys) {

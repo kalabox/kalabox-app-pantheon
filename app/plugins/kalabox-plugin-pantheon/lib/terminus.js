@@ -82,28 +82,33 @@ Terminus.prototype.__getCreateOpts = function() {
 };
 
 /*
- * Send a request to a terminus container
+ * Send a request to a terminus container. This assumes you have authenticated
+ * first
  */
 Terminus.prototype.__request = function(cmd, args, options) {
 
   // Save for later.
   var self = this;
 
-  // Grab the global config
-  var globalConfig = this.kbox.core.deps.get('globalConfig');
+  // Try to get a session first
+  return pantheon.getSession()
 
-  // Get create options.
-  var createOpts = this.__getCreateOpts();
+  // We have the session so now we can get the provicer
+  .then(function(session) {
+    return self.kbox.engine.provider();
+  })
 
-  // We need a special entry for this request
-  /* jshint ignore:start */
-  //jscs:disable
-  createOpts.Entrypoint = ["/bin/sh", "-c"];
-  /* jshint ignore:end */
-
-  // Get provider.
-  return this.kbox.engine.provider()
+  // And run a command
   .then(function(provider) {
+
+    // Get create options.
+    var createOpts = self.__getCreateOpts();
+
+    // We need a special entry for this request
+    /* jshint ignore:start */
+    //jscs:disable
+    createOpts.Entrypoint = ["/bin/sh", "-c"];
+    /* jshint ignore:end */
 
     // Get start options
     var startOpts = self.__getStartOpts();
@@ -140,6 +145,7 @@ Terminus.prototype.getOpts = function(options) {
 
 /*
  * Run an interactive terminus command
+ * @todo: do we want to auth at all here?
  */
 Terminus.prototype.cmd = function(cmd, opts, done) {
 

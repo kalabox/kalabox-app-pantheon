@@ -7,6 +7,8 @@
     "kalabox-plugin-drush": "https://github.com/kalabox/kalabox-plugin-drush/tarball/master",
     "kalabox-plugin-git": "https://github.com/kalabox/kalabox-plugin-git/tarball/master",
     "kalabox-plugin-rsync": "https://github.com/kalabox/kalabox-plugin-rsync/tarball/master",
+    "ssh-fingerprint": "0.0.1",
+    "ssh-keygen": "^0.2.1",
     "lodash": "^3.9.3",
     "restler": "^3.3.0"
   }
