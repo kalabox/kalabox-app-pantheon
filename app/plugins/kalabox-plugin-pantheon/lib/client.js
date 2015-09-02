@@ -69,6 +69,7 @@ function Client(id, address) {
 Client.prototype.__setSession = function(session) {
 
   // @todo: how do we validate?
+  // @todo: only write file if its changed? md5 hash compare?
 
   if (session) {
 
@@ -115,7 +116,7 @@ Client.prototype.__setSession = function(session) {
 /*
  * Helper function for reading file cache.
  */
-Client.prototype.getSessionCache = function() {
+Client.prototype.getSessionFile = function() {
 
   var self = this;
   var data;
@@ -140,6 +141,7 @@ Client.prototype.getSessionCache = function() {
   // If file cache was loaded, parse the contents and set the session.
   if (data) {
     var session = JSON.parse(data);
+    self.__setSession(session);
     return session;
   } else {
     return undefined;
@@ -148,48 +150,57 @@ Client.prototype.getSessionCache = function() {
 };
 
 /*
- * Reset the session
+ * Make sure our session is still 100% 2legit2quit
  */
-Client.prototype.__resetSession = function() {
+Client.prototype.validateSession = function(session) {
 
-  // Delete file cache.
-  fs.unlinkSync(SESSIONFILE);
-  return undefined;
-
-};
-
-/*
- * Make sure we have a session token
- */
-Client.prototype.getSession = function(email) {
-
-  var self = this;
-
-  // Get this instance's cached session.
-  var session = self.session || self.getSessionCache();
+  // Session is false, session is tricksy if it is undefined
+  if (session === undefined) {
+    return false;
+  }
 
   /*
+   * Session is illegitimate if its expired
+   *
    * Date.now uses miliseconds, while session_expire_time seems to use
    * seconds, so converting them to match is needed. So here I'm just
    * multiplying session_expire_time by 1000 to be in miliseconds.
    */
   if (session && Date.now() > (session.session_expire_time * 1000)) {
-    session = self.session = self.__resetSession();
+    return false;
   }
 
-  // Kill session if it doesn't have the full name on it so we can get it
+  // Kill session if it doesn't have the full name on it so we can reauth
+  // and get this important data
   if (session && session.name === undefined) {
-    session = self.session = self.__resetSession();
+    return false;
   }
 
-  // At this point if session is defined we are good to go!
-  if (session) {
-    self.__setSession(session);
-    return Promise.resolve(session);
+  // Session is lookin MIGHTY FINE! MIGHTY FINE INDEED!
+  return true;
+
+};
+
+/*
+ * Returns the session if it exists and is valid
+ */
+Client.prototype.getSession = function() {
+
+  // Get this instance's cached session.
+  var session = this.session || this.getSessionFile();
+
+  // If we have a valid session we return it
+  if (this.validateSession(session)) {
+    return session;
   }
 
+  else {
+    return undefined;
+  }
+
+/*
   // Otherwise we need to prompt the user to reauth
-  else if (!session) {
+  else {
 
     // Build a basic prompt for pantheon auth
     var questions = [
@@ -203,6 +214,7 @@ Client.prototype.getSession = function(email) {
     /*
      * Helper method to promisigy fs.exists
      */
+/*
     var askIt = function(questions) {
       return new Promise(function(answers) {
         inquirer.prompt(questions, answers);
@@ -215,21 +227,20 @@ Client.prototype.getSession = function(email) {
     // Get my answers
     .then(function(answers) {
 
+      console.log("INQUIRE!");
       // If no email try to grab from session cache
       // @todo: eventually we want this to grab a specific user session file
       if (!email) {
-        var session = self.getSessionCache();
+        var session = self.getSessionFile();
         email = session.email;
       }
 
       // Login
-      return self.__login(email, answers.password);
+      return self.__auth(email, answers.password);
 
-    })
+    });
 
-    .nodeify(Promise.resolve(session));
-
-  }
+  }*/
 
 };
 
@@ -257,6 +268,7 @@ Client.prototype.__url = function(parts) {
 
 /*
  * Send and handle a REST request.
+ * @todo: make this less ugly
  */
 Client.prototype.__request = function(verb, pathname, data) {
 
@@ -300,7 +312,7 @@ Client.prototype.__request = function(verb, pathname, data) {
 /*
  * Auth with pantheon
  */
-Client.prototype.__auth = function(email, password) {
+Client.prototype.auth = function(email, password) {
 
   // @todo: Should we worried about caching here at all?
 
@@ -475,22 +487,18 @@ Client.prototype.getSites = function() {
     return Promise.resolve(this.sites);
   }
 
-  // Save for later
+  // Get the session for user info
+  var session = this.getSession();
+
+  // Need this for promises down the stack
   var self = this;
 
-  // Session up here because we need session.user_id
-  return self.getSession()
+  // Grab our headers to auth with the endpoint
+  var data = {
+    headers: self.__getSessionHeaders(session)
+  };
 
-  .then(function(session) {
-
-    // Grab our headers to auth with the endpoint
-    var data = {
-      headers: self.__getSessionHeaders(session)
-    };
-
-    return self.__request('get', ['users', session.user_uuid, 'sites'], data);
-
-  })
+  return self.__request('get', ['users', session.user_uuid, 'sites'], data)
 
   // Return sites
   .then(function(sites) {
@@ -503,35 +511,28 @@ Client.prototype.getSites = function() {
 /*
  * Get full list of environments
  */
-Client.prototype.getEnvironments = function(uuid) {
+Client.prototype.getEnvironments = function(sid) {
 
   // Just grab the cached envs if we already have
   // made a request this process
-  if (this.sites[uuid].information.envs !== undefined) {
-    return Promise.resolve(this.sites[uuid].information.envs);
+  if (this.sites[sid].information.envs !== undefined) {
+    return Promise.resolve(this.sites[sid].information.envs);
   }
 
-  // Save for later
+  // Need this for promises down the stack
   var self = this;
 
-  // Session up here because we need session.user_id
-  return self.getSession()
+  // Grab our headers to auth with the endpoint
+  var data = {
+    headers: this.__getSessionHeaders(this.getSession())
+  };
 
-  .then(function(session) {
-
-    // Grab our headers to auth with the endpoint
-    var data = {
-      headers: self.__getSessionHeaders(session)
-    };
-
-    return self.__request('get', ['sites', uuid.trim(), 'environments'], data);
-
-  })
+  return this.__request('get', ['sites', sid.trim(), 'environments'], data)
 
   // @todo: Validate response and return ID.
   .then(function(envs) {
-    self.sites[uuid].information.envs = envs;
-    return self.sites[uuid].information.envs;
+    self.sites[sid].information.envs = envs;
+    return self.sites[sid].information.envs;
   });
 
 };
@@ -541,7 +542,7 @@ Client.prototype.getEnvironments = function(uuid) {
  *
  * sites/1b377733-0fa4-4453-b9f5-c43477274010/environments/dev/backups/catalog/
  */
-Client.prototype.getBackups = function(uuid, env) {
+Client.prototype.getBackups = function(sid, env) {
 
   // Just grab the cached backups if we already have
   // made a request this process
@@ -549,26 +550,20 @@ Client.prototype.getBackups = function(uuid, env) {
     return Promise.resolve(this.backups);
   }
 
-  // Save for later
+  // Need this for promises down the stack
   var self = this;
 
-  // Session up here because we need session.user_id
-  return self.getSession()
+  // Grab our headers to auth with the endpoint
+  var data = {
+    headers: this.__getSessionHeaders(this.getSession())
+  };
 
-  .then(function(session) {
-
-    // Grab our headers to auth with the endpoint
-    var data = {
-      headers: self.__getSessionHeaders(session)
-    };
-
-    // Send REST request.
-    return this.__request(
-      'get',
-      ['sites', uuid.trim(), 'environments', env.trim(), 'backups', 'catalog'],
-      data
-    );
-  })
+  // Send REST request.
+  return this.__request(
+    'get',
+    ['sites', sid.trim(), 'environments', env.trim(), 'backups', 'catalog'],
+    data
+  )
 
   // Validate response and return ID.
   .then(function(backups) {
@@ -583,7 +578,7 @@ Client.prototype.getBackups = function(uuid, env) {
  *
  * sites/1b377733-0fa4-4453-b9f5-c43477274010/environments/dev/backups/catalog/
  */
-Client.prototype.getBindings = function(uuid) {
+Client.prototype.getBindings = function(sid) {
 
   // Just grab the cached backups if we already have
   // made a request this process
@@ -591,26 +586,13 @@ Client.prototype.getBindings = function(uuid) {
     return Promise.resolve(this.bindings);
   }
 
-  // Save for later
-  var self = this;
+  // Grab our headers to auth with the endpoint
+  var data = {
+    headers: this.__getSessionHeaders(this.getSession())
+  };
 
-  // Session up here because we need session.user_id
-  return self.getSession()
-
-  .then(function(session) {
-
-    // Grab our headers to auth with the endpoint
-    var data = {
-      headers: self.__getSessionHeaders(session)
-    };
-
-    // Send REST request.
-    return this.__request(
-      'get',
-      ['sites', uuid.trim(), 'bindings'],
-      data
-    );
-  })
+  // Send REST request.
+  return this.__request('get', ['sites', sid.trim(), 'bindings'], data)
 
   // Validate response and return ID.
   .then(function(bindings) {
@@ -633,27 +615,16 @@ Client.prototype.getProfile = function() {
     return Promise.resolve(this.profile);
   }
 
-  // Save for later
-  var self = this;
+  // Get the session for user info
+  var session = this.getSession();
 
-  // Session up here because we need session.user_id
-  return self.getSession()
+  // Grab our headers to auth with the endpoint
+  var data = {
+    headers: this.__getSessionHeaders(session)
+  };
 
-  .then(function(session) {
-
-    // Grab our headers to auth with the endpoint
-    var data = {
-      headers: self.__getSessionHeaders(session)
-    };
-
-    // Send REST request.
-    return self.__request(
-      'get',
-      ['users', session.user_uuid, 'profile'],
-      data
-    );
-
-  })
+  // Send REST request.
+  return this.__request('get', ['users', session.user_uuid, 'profile'], data)
 
   // Validate response and return ID.
   .then(function(profile) {
@@ -670,27 +641,16 @@ Client.prototype.getProfile = function() {
  */
 Client.prototype.getSSHKeys = function() {
 
-  // Save for later
-  var self = this;
+  // Get the session for user info
+  var session = this.getSession();
 
-    // Session up here because we need session.user_id
-  return self.getSession()
+  // Grab our headers to auth with the endpoint
+  var data = {
+    headers: this.__getSessionHeaders(this.getSession())
+  };
 
-  .then(function(session) {
-
-    // Grab our headers to auth with the endpoint
-    var data = {
-      headers: self.__getSessionHeaders(session)
-    };
-
-    // Send REST request.
-    return self.__request(
-      'get',
-      ['users', session.user_uuid, 'keys'],
-      data
-    );
-
-  })
+  // Send REST request.
+  return this.__request('get', ['users', session.user_uuid, 'keys'], data)
 
   // Validate response and return ID.
   .then(function(keys) {
@@ -707,31 +667,20 @@ Client.prototype.getSSHKeys = function() {
  */
 Client.prototype.postSSHKey = function(sshKey) {
 
-  // Save for later
-  var self = this;
+  // Get the session for user info
+  var session = this.getSession();
 
-  // Session up here because we need session.user_id
-  return self.getSession()
+  // Grab our headers to auth with the endpoint
+  var data = {
+    headers: this.__getSessionHeaders(session),
+    data: JSON.stringify(sshKey),
+    query: {
+      validate: true
+    }
+  };
 
-  .then(function(session) {
-
-    // Grab our headers to auth with the endpoint
-    var data = {
-      headers: self.__getSessionHeaders(session),
-      data: JSON.stringify(sshKey),
-      query: {
-        validate: true
-      }
-    };
-
-    // Send REST request.
-    return self.__request(
-      'post',
-      ['users', session.user_uuid, 'keys'],
-      data
-    );
-
-  })
+  // Send REST request.
+  return this.__request('post', ['users', session.user_uuid, 'keys'], data)
 
   // Validate response and return ID.
   .then(function(keys) {
