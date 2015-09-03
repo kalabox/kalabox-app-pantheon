@@ -263,8 +263,17 @@ Client.prototype.reAuthSession = function() {
     // Get the email
     // @todo: eventually get this from app config when we switch to
     // a multi user name jam
+
     var session = self.getSessionFile();
-    var email = session.email;
+    var email;
+
+    if (!session) {
+      var config = self.__getOpts();
+      email = config.account;
+    }
+    else {
+      email = session.email;
+    }
 
     // Login
     return self.auth(email, answers.password);
