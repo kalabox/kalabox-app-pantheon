@@ -375,12 +375,65 @@ Client.prototype.auth = function(email, password) {
 };
 
 /*
- * login with pantheon
- * this is different from auth in that it does needed kalabox things as well
- * like grab some extra info and handle ssh keys
+ * Get users ssh keys
+ *
+ * GET /users/USERID/keys
+ *
  */
-Client.prototype.__login = function(email, password) {
+Client.prototype.__getSSHKeys = function() {
 
+  // Get the session for user info
+  var session = this.getSession();
+
+  // Send REST request.
+  return this.__request('get', ['users', session.user_uuid, 'keys'], {})
+
+  // Return keys
+  .then(function(keys) {
+    return keys;
+  });
+
+};
+
+/*
+ * Post users ssh keys
+ *
+ * POST /users/USERID/keys
+ *
+ */
+Client.prototype.__postSSHKey = function(sshKey) {
+
+  // Get the session for user info
+  var session = this.getSession();
+
+  // Send in our ssh key with validation on
+  var data = {
+    data: sshKey,
+    query: {
+      validate: true
+    }
+  };
+
+  // Send REST request.
+  return this.__request('postJson', ['users', session.user_uuid, 'keys'], data)
+
+  // Return keys
+  .then(function(keys) {
+    return keys;
+  });
+
+};
+
+/*
+ * Set up our SSH keys if needed
+ *
+ * We only needs to check for this if we are going to run something in either
+ * the terminus/git/rsync containers
+ */
+Client.prototype.sshKeySetup = function() {
+
+  // @todo: switch this and constants when we start injection kbox into this
+  // thing
   var platformIsWindows = process.platform === 'win32';
   var envKey = platformIsWindows ? 'USERPROFILE' : 'HOME';
 
@@ -405,32 +458,20 @@ Client.prototype.__login = function(email, password) {
    * Helper method to promisigy fs.exists
    */
   var existsAsync = function(path) {
-    return new Promise(function(resolve) {
-      fs.exists(path, resolve);
+    return new Promise(function(exists) {
+      fs.exists(path, exists);
     });
   };
 
   // Some things to use later
   var self = this;
 
-  // Login to the pantheon, set up SSH keys if needed
-  // and pull a list of sites
-  // @todo: ERROR HANDLING
-  // @todo: better debug logging
-  // @toto: AFRICA
-  return self.__auth(email, password)
+  // Now check to see whether we have a pantheon SSH key already
+  // @todo: we shouldnt assume that because a private key exists that a
+  // public one does as well
+  return existsAsync(PRIVATE_KEY_PATH)
 
-  // We've got a session!
-  .then(function(session) {
-
-    // Now check to see whether we have a pantheon SSH key already
-    // @todo: we shouldnt assume that because a private key exists that a
-    // public one does as well
-    return existsAsync(PRIVATE_KEY_PATH);
-
-  })
-
-  // Generate a new SSH key if eneded
+  // Generate a new SSH key if needed
   .then(function(exists) {
     if (!exists) {
 
@@ -451,13 +492,16 @@ Client.prototype.__login = function(email, password) {
         }
       }
 
+      // Build our key option array
+      // @todo: add session email for comment?
       var keyOpts = {
         location: PRIVATE_KEY_PATH,
-        comment: email,
+        comment: 'me@kalabox',
         read: false,
         destroy: false
       };
 
+      // Generate our key if needed
       return Promise.fromNode(function(callback) {
         keygen(keyOpts, callback);
       });
@@ -471,7 +515,7 @@ Client.prototype.__login = function(email, password) {
     var pubKey = loadPubKey();
 
     // Grab public key fingerprints from pantheon
-    return self.getSSHKeys()
+    return self.__getSSHKeys()
 
     // IF THE GLOVE FITS! YOU MUST ACQUIT!
     .then(function(keys) {
@@ -481,14 +525,9 @@ Client.prototype.__login = function(email, password) {
     // Post a key to pantheon if needed
     .then(function(hasKey) {
       if (!hasKey) {
-        return self.postSSHKey(pubKey.data);
+        return self.__postSSHKey(pubKey.data);
       }
     });
-  })
-
-  // Actually return the session
-  .then(function() {
-    return self.session;
   });
 
 };
@@ -554,7 +593,7 @@ Client.prototype.getBackups = function(sid, env) {
 /*
  * Get full list of our sites bindings
  *
- * GET sites/SITEID/environments/dev/backups/catalog/
+ * GET sites/SITEID/environments/dev/backups/catalog
  */
 Client.prototype.getBindings = function(sid) {
 
@@ -584,56 +623,6 @@ Client.prototype.getProfile = function() {
   // Return the profile
   .then(function(profile) {
     return profile;
-  });
-
-};
-
-/*
- * Get users ssh keys
- *
- * GET /users/USERID/keys
- *
- */
-Client.prototype.getSSHKeys = function() {
-
-  // Get the session for user info
-  var session = this.getSession();
-
-  // Send REST request.
-  return this.__request('get', ['users', session.user_uuid, 'keys'], {})
-
-  // Return keys
-  .then(function(keys) {
-    return keys;
-  });
-
-};
-
-/*
- * Post users ssh keys
- *
- * POST /users/USERID/keys
- *
- */
-Client.prototype.postSSHKey = function(sshKey) {
-
-  // Get the session for user info
-  var session = this.getSession();
-
-  // Send in our ssh key with validation on
-  var data = {
-    data: sshKey,
-    query: {
-      validate: true
-    }
-  };
-
-  // Send REST request.
-  return this.__request('postJson', ['users', session.user_uuid, 'keys'], data)
-
-  // Return keys
-  .then(function(keys) {
-    return keys;
   });
 
 };
