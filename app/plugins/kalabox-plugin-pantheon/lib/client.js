@@ -47,11 +47,7 @@ function Client(id, address) {
   this.id = id;
 
   // Das Kindacache
-  this.sites = undefined;
-  this.backups = undefined;
-  this.products = undefined;
   this.session = undefined;
-  this.profile = undefined;
 
   // The address argument is also optional.
   if (address) {
@@ -272,8 +268,29 @@ Client.prototype.__url = function(parts) {
  */
 Client.prototype.__request = function(verb, pathname, data) {
 
-  // Save for later.
+  // @todo: Try each request a few times?
+
+  // Need this for all the promises we will make
   var self = this;
+
+  // Skip this part for an authorize request since we may
+  // not have a session yet and dont need auth headers anyway
+  if (!_.includes(pathname, 'authorize')) {
+
+    // Grab a session to set up our auth
+    var session = this.getSession();
+
+    // @todo: try a reauth prompt if session is not defined
+    /*
+    if (session === undefined) {
+    }
+    */
+
+    // Build our header and merge it into any other
+    // data we might be sending along
+    var headers = this.__getSessionHeaders(session);
+    data = _.merge(data, {headers: headers});
+  }
 
   // Build url.
   return Promise.try(function() {
@@ -478,61 +495,37 @@ Client.prototype.__login = function(email, password) {
 
 /*
  * Get full list of sites
+ *
+ * sites/USERID/sites
  */
 Client.prototype.getSites = function() {
-
-  // Just grab the cached sites if we already have
-  // made a request this process
-  if (this.sites !== undefined) {
-    return Promise.resolve(this.sites);
-  }
 
   // Get the session for user info
   var session = this.getSession();
 
-  // Need this for promises down the stack
-  var self = this;
-
-  // Grab our headers to auth with the endpoint
-  var data = {
-    headers: self.__getSessionHeaders(session)
-  };
-
-  return self.__request('get', ['users', session.user_uuid, 'sites'], data)
+  // Make the request
+  return this.__request('get', ['users', session.user_uuid, 'sites'], {})
 
   // Return sites
   .then(function(sites) {
-    self.sites = sites;
-    return self.sites;
+    return sites;
   });
 
 };
 
 /*
  * Get full list of environments
+ *
+ * sites/SITEID/environments/
  */
 Client.prototype.getEnvironments = function(sid) {
 
-  // Just grab the cached envs if we already have
-  // made a request this process
-  if (this.sites[sid].information.envs !== undefined) {
-    return Promise.resolve(this.sites[sid].information.envs);
-  }
+  // Make request
+  return this.__request('get', ['sites', sid.trim(), 'environments'], {})
 
-  // Need this for promises down the stack
-  var self = this;
-
-  // Grab our headers to auth with the endpoint
-  var data = {
-    headers: this.__getSessionHeaders(this.getSession())
-  };
-
-  return this.__request('get', ['sites', sid.trim(), 'environments'], data)
-
-  // @todo: Validate response and return ID.
+  // Return object of envs
   .then(function(envs) {
-    self.sites[sid].information.envs = envs;
-    return self.sites[sid].information.envs;
+    return envs;
   });
 
 };
@@ -540,35 +533,20 @@ Client.prototype.getEnvironments = function(sid) {
 /*
  * Get full list of our backups
  *
- * sites/1b377733-0fa4-4453-b9f5-c43477274010/environments/dev/backups/catalog/
+ * sites/SITEID/environments/ENV/backups/catalog/
  */
 Client.prototype.getBackups = function(sid, env) {
-
-  // Just grab the cached backups if we already have
-  // made a request this process
-  if (this.backups !== undefined) {
-    return Promise.resolve(this.backups);
-  }
-
-  // Need this for promises down the stack
-  var self = this;
-
-  // Grab our headers to auth with the endpoint
-  var data = {
-    headers: this.__getSessionHeaders(this.getSession())
-  };
 
   // Send REST request.
   return this.__request(
     'get',
     ['sites', sid.trim(), 'environments', env.trim(), 'backups', 'catalog'],
-    data
+    {}
   )
 
-  // Validate response and return ID.
+  // Return object of backups
   .then(function(backups) {
-    self.backups = backups;
-    return self.backups;
+    return backups;
   });
 
 };
@@ -576,25 +554,13 @@ Client.prototype.getBackups = function(sid, env) {
 /*
  * Get full list of our sites bindings
  *
- * sites/1b377733-0fa4-4453-b9f5-c43477274010/environments/dev/backups/catalog/
+ * GET sites/SITEID/environments/dev/backups/catalog/
  */
 Client.prototype.getBindings = function(sid) {
 
-  // Just grab the cached backups if we already have
-  // made a request this process
-  if (this.bindings !== undefined) {
-    return Promise.resolve(this.bindings);
-  }
-
-  // Grab our headers to auth with the endpoint
-  var data = {
-    headers: this.__getSessionHeaders(this.getSession())
-  };
-
   // Send REST request.
-  return this.__request('get', ['sites', sid.trim(), 'bindings'], data)
+  return this.__request('get', ['sites', sid.trim(), 'bindings'], {})
 
-  // Validate response and return ID.
   .then(function(bindings) {
     return bindings;
   });
@@ -604,29 +570,18 @@ Client.prototype.getBindings = function(sid) {
 /*
  * Get users profile
  *
- * https://dashboard.getpantheon.com/api/users/UUID/profile
+ * GET /users/USERID/profile
  *
  */
 Client.prototype.getProfile = function() {
 
-  // Just grab the cached profile if we already have
-  // made a request this process
-  if (this.profile !== undefined) {
-    return Promise.resolve(this.profile);
-  }
-
   // Get the session for user info
   var session = this.getSession();
 
-  // Grab our headers to auth with the endpoint
-  var data = {
-    headers: this.__getSessionHeaders(session)
-  };
-
   // Send REST request.
-  return this.__request('get', ['users', session.user_uuid, 'profile'], data)
+  return this.__request('get', ['users', session.user_uuid, 'profile'], {})
 
-  // Validate response and return ID.
+  // Return the profile
   .then(function(profile) {
     return profile;
   });
@@ -636,7 +591,7 @@ Client.prototype.getProfile = function() {
 /*
  * Get users ssh keys
  *
- * GET https://dashboard.getpantheon.com/api/users/UUID/keys
+ * GET /users/USERID/keys
  *
  */
 Client.prototype.getSSHKeys = function() {
@@ -644,15 +599,10 @@ Client.prototype.getSSHKeys = function() {
   // Get the session for user info
   var session = this.getSession();
 
-  // Grab our headers to auth with the endpoint
-  var data = {
-    headers: this.__getSessionHeaders(this.getSession())
-  };
-
   // Send REST request.
-  return this.__request('get', ['users', session.user_uuid, 'keys'], data)
+  return this.__request('get', ['users', session.user_uuid, 'keys'], {})
 
-  // Validate response and return ID.
+  // Return keys
   .then(function(keys) {
     return keys;
   });
@@ -662,7 +612,7 @@ Client.prototype.getSSHKeys = function() {
 /*
  * Post users ssh keys
  *
- * POST https://dashboard.getpantheon.com/api/users/UUID/keys
+ * POST /users/USERID/keys
  *
  */
 Client.prototype.postSSHKey = function(sshKey) {
@@ -670,19 +620,18 @@ Client.prototype.postSSHKey = function(sshKey) {
   // Get the session for user info
   var session = this.getSession();
 
-  // Grab our headers to auth with the endpoint
+  // Send in our ssh key with validation on
   var data = {
-    headers: this.__getSessionHeaders(session),
-    data: JSON.stringify(sshKey),
+    data: sshKey,
     query: {
       validate: true
     }
   };
 
   // Send REST request.
-  return this.__request('post', ['users', session.user_uuid, 'keys'], data)
+  return this.__request('postJson', ['users', session.user_uuid, 'keys'], data)
 
-  // Validate response and return ID.
+  // Return keys
   .then(function(keys) {
     return keys;
   });

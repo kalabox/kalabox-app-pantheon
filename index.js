@@ -1,7 +1,7 @@
-#!/usr/bin/env node
 
 'use strict';
 
+// @todo: load in terminus here instead;
 var Client = require('./app/plugins/kalabox-plugin-pantheon/lib/client.js');
 var pantheon = new Client();
 
