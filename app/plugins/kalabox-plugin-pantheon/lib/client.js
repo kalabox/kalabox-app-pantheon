@@ -23,48 +23,60 @@ var inquirer = require('inquirer');
 Promise.longStackTraces();
 
 /*
- * Default endpoint.
- */
-var PANTHEON_API = {
-  protocol: 'https',
-  hostname: 'dashboard.getpantheon.com',
-  port: '443'
-};
-
-/*
- * CONSTANTS
- */
-var HOMEKEY = (process.platform === 'win32') ? 'USERPROFILE' : 'HOME';
-var CACHEDIR = path.join(process.env[HOMEKEY], '.terminus', 'cache');
-var SESSIONFILE = path.join(CACHEDIR, 'session');
-
-/*
  * Constructor.
  */
-function Client(id, address) {
+function Client(kbox, app) {
 
-  // The id argument is optional.
-  this.id = id;
+  /*
+   * Default endpoint.
+   */
+  var PANTHEON_API = {
+    protocol: 'https',
+    hostname: 'dashboard.getpantheon.com',
+    port: '443'
+  };
+
+  // Load in our kbox object and some relevant things
+  this.kbox = kbox;
+  var globalConfig = this.kbox.core.deps.lookup('globalConfig');
+  var homeDir = globalConfig.home;
+  this.cacheDir = path.join(homeDir, '.kalabox', 'terminus', 'session');
+  if (!fs.existsSync(this.cacheDir)) {
+    fs.mkdirpSync(this.cacheDir);
+  }
+
+  this.app = app;
+
+  // Pantheon endpoint
+  this.target = PANTHEON_API;
 
   // Das Kindacache
   this.session = undefined;
   this.sites = undefined;
   this.keySet = false;
 
-  // The address argument is also optional.
-  if (address) {
-    this.target = urls.parse(address);
-  } else {
-    // Grab the default target that points to the production instance.
-    this.target = PANTHEON_API;
+}
+
+/**
+ * Gets plugin conf from the appconfig or from CLI arg
+ **/
+Client.prototype.__getOpts = function(options) {
+
+  var opts;
+
+  if (this.app) {
+    // Grab our options from config
+    opts = this.app.config.pluginConf['kalabox-plugin-pantheon'];
   }
 
-}
+  return opts;
+
+};
 
 /*
  * Set the session
  */
-Client.prototype.__setSession = function(session) {
+Client.prototype.setSession = function(session) {
 
   // @todo: how do we validate?
   // @todo: only write file if its changed? md5 hash compare?
@@ -97,9 +109,10 @@ Client.prototype.__setSession = function(session) {
   };
 
   // Save a cache locally so we can share among terminus clients
-  fs.mkdirpSync(CACHEDIR);
+  fs.mkdirpSync(this.cacheDir);
+  var sessionFile = path.join(this.cacheDir, this.session.email);
   var writableSession = JSON.stringify(this.session);
-  fs.writeFileSync(SESSIONFILE, writableSession);
+  fs.writeFileSync(sessionFile, writableSession);
 
   return this.session;
 
@@ -108,36 +121,50 @@ Client.prototype.__setSession = function(session) {
 /*
  * Helper function for reading file cache.
  */
-Client.prototype.getSessionFile = function() {
+Client.prototype.getSessionFiles = function() {
 
   var self = this;
-  var data;
+  var files = fs.readdirSync(this.cacheDir);
+  var sessions = [];
 
-  // Try to load contents of file cache.
-  try {
-    data = fs.readFileSync(SESSIONFILE, 'utf8');
-    /*
-     * This is to handle a special case where the file cache's contents
-     * are set to the string 'null' or are empty/newline. It should be handled
-     * as if the file does not exist or is empty.
-     */
-    if (data === 'null' || data === 'null\n' || data === '' || data === '\n') {
-      data = undefined;
+  // Try to load all our session files
+  _.forEach(files, function(filename) {
+    // Try to read in each file
+    try {
+      // Read in the file
+      var sessionFile = path.join(self.cacheDir, filename);
+      var data = fs.readFileSync(sessionFile, 'utf8');
+      var session = JSON.parse(data);
+      sessions.push(session);
     }
-  } catch (err) {
-    if (err.code !== 'ENOENT') {
-      throw err;
+    catch (err) {
+      if (err.code !== 'ENOENT') {
+        throw err;
+      }
     }
-  }
+  });
 
   // If file cache was loaded, parse the contents and set the session.
-  if (data) {
-    var session = JSON.parse(data);
-    self.__setSession(session);
-    return session;
+  if (!_.isEmpty(sessions)) {
+    return sessions;
   } else {
     return undefined;
   }
+
+};
+
+/*
+ * Helper function for reading specific file cache.
+ */
+Client.prototype.getSessionFile = function(email) {
+
+  var sessions = this.getSessionFiles();
+
+  var session = _.find(sessions, function(sess) {
+    return sess.email === email;
+  });
+
+  return session;
 
 };
 
@@ -176,10 +203,17 @@ Client.prototype.validateSession = function(session) {
 /*
  * Returns the session if it exists and is valid
  */
-Client.prototype.getSession = function() {
+Client.prototype.getSession = function(email) {
+
+  // If no email try to load from app conf
+  // @todo: if no email then load all the sessions we have saved
+  if (!email && this.app) {
+    var config = this.__getOpts();
+    email = config.account;
+  }
 
   // Get this instance's cached session.
-  var session = this.session || this.getSessionFile();
+  var session = this.session || this.getSessionFile(email);
 
   // If we have a valid session we return it
   if (this.validateSession(session)) {
@@ -346,7 +380,10 @@ Client.prototype.__request = function(verb, pathname, data) {
  */
 Client.prototype.auth = function(email, password) {
 
-  // @todo: Should we worried about caching here at all?
+  // Check static cache
+  if (this.session !== undefined) {
+    return Promise.resolve(this.session);
+  }
 
   // Save this for later
   var self = this;
@@ -364,14 +401,12 @@ Client.prototype.auth = function(email, password) {
   // Validate response and return ID.
   .then(function(response) {
 
-   // @todo: validate response
-
     // Set the email and placeholder name
     response.email = email;
     response.name = '';
 
     // Set the session once here so we can run the profile disco request
-    self.session = self.__setSession(response);
+    self.session = self.setSession(response);
 
     // Set the fullname
     return self.getProfile()
@@ -381,7 +416,7 @@ Client.prototype.auth = function(email, password) {
       .then(function() {
         // Set session again with additional info
         // @todo: this might be redundant
-        self.session = self.__setSession(self.session);
+        self.session = self.setSession(self.session);
         return self.session;
       });
 

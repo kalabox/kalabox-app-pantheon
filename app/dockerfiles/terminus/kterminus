@@ -22,7 +22,7 @@ fi
 # Set the terminus cache file correctly
 # @todo: eventually get this to load the correct session for the app
 mkdir -p /src/config/terminus/cache
-cp -f /ssh/.terminus/cache/session /src/config/terminus/cache/session
+cp -f /ssh/.kalabox/terminus/session/${PANTHEON_ACCOUNT} /src/config/terminus/cache/session
 
 source /root/.phpbrew/bashrc > /dev/null
 phpbrew -d switch ${PHP_VERSION} > /dev/null

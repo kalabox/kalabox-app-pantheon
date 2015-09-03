@@ -12,16 +12,16 @@ Promise.longStackTraces();
 // "Constants"
 var PLUGIN_NAME = 'kalabox-plugin-pantheon';
 
-// Terminus node clients
-// for some things it is better to use the node client because we dont have
-// to worry about an error we need to handle killing the whole damn thing
-var Client = require('./client.js');
-var pantheon = new Client();
-
 /*
  * Constructor.
  */
 function Terminus(kbox, app) {
+
+  // Terminus node clients
+  // for some things it is better to use the node client because we dont have
+  // to worry about an error we need to handle killing the whole damn thing
+  var Client = require('./client.js');
+  this.pantheon = new Client(kbox, app);
 
   // Kbox things
   this.app = app;
@@ -97,14 +97,14 @@ Terminus.prototype.__request = function(cmd, args, options) {
   var query = self.__buildQuery(cmd, args, options);
 
   // Grab a session to set up our auth
-  var session = pantheon.getSession();
+  var session = this.pantheon.getSession();
 
   // Prompt the user to reauth if the session is invalid
   // @todo: the mostly repeated conditional here is gross lets improve it
   if (session === undefined) {
 
     // Reuath attempt
-    return pantheon.reAuthSession()
+    return this.pantheon.reAuthSession()
 
     // Set our session to be the new session
     .then(function(reAuthSession) {
@@ -192,14 +192,14 @@ Terminus.prototype.cmd = function(cmd, opts, done) {
   var image = 'terminus';
 
   // Grab a session to set up our auth
-  var session = pantheon.getSession();
+  var session = this.pantheon.getSession();
 
   // Prompt the user to reauth if the session is invalid
   // @todo: the mostly repeated conditional here is gross lets improve it
   if (session === undefined) {
 
     // Reuath attempt
-    return pantheon.reAuthSession()
+    return this.pantheon.reAuthSession()
 
     // Set our session to be the new session
     .then(function(reAuthSession) {
@@ -359,11 +359,10 @@ Terminus.prototype.createDBBackup = function(site, env) {
  */
 Terminus.prototype.hasDBBackup = function(uuid, env) {
 
-  return pantheon.getBackups(uuid, env)
+  return this.pantheon.getBackups(uuid, env)
 
   .then(function(backups) {
     var keyString = _.keys(backups).join('');
-    console.log(keyString);
     return Promise.resolve(_.includes(keyString, 'backup_database'));
   });
 
@@ -376,7 +375,7 @@ Terminus.prototype.hasDBBackup = function(uuid, env) {
  */
 Terminus.prototype.getBindings = function(uuid) {
 
-  return pantheon.getBindings(uuid);
+  return this.pantheon.getBindings(uuid);
 
 };
 

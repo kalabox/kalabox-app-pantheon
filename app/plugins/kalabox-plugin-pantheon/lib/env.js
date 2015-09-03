@@ -6,18 +6,18 @@ var crypto = require('crypto');
 // NPM modules
 var _ = require('lodash');
 
-// Terminus node client
-// for some things it is better to use the node client because we dont have
-// to worry about an error we need to handle killing the whole damn thing
-var Client = require('./client.js');
-var pantheon = new Client();
-
-// Constants
-var PLUGIN_NAME = 'kalabox-plugin-pantheon';
-
 module.exports = function(kbox) {
 
+  // Constants
+  var PLUGIN_NAME = 'kalabox-plugin-pantheon';
+
   kbox.ifApp(function(app) {
+
+    // Terminus node client
+    // for some things it is better to use the node client because we dont have
+    // to worry about an error we need to handle killing the whole damn thing
+    var Client = require('./client.js');
+    var pantheon = new Client(kbox, app);
 
     // Framework specific stuff
     // @todo: eventually we will grab the php version directly via terminus
@@ -145,6 +145,7 @@ module.exports = function(kbox) {
         'DB_USER=pantheon',
         'DB_PASSWORD=',
         'DB_NAME=pantheon',
+        'PANTHEON_ACCOUNT=' + app.config.pluginConf[PLUGIN_NAME].account,
         'PANTHEON_SITE=UUID',
         'PANTHEON_SITE_NAME=' + app.name,
         'PANTHEON_ENVIRONMENT=kalabox',
@@ -247,6 +248,11 @@ module.exports = function(kbox) {
       var gitInfo = getGitInfo();
       var gitEnvVar = ['GITUSER=' + gitInfo.name, 'GITEMAIL=' + gitInfo.email];
       createOptions = addPush(createOptions, gitEnvVar);
+
+      // All containers need the correct pantheon User
+      var pantheonAccount = app.config.pluginConf[PLUGIN_NAME].account;
+      var pantheonUser = ['PANTHEON_ACCOUNT=' + pantheonAccount];
+      createOptions = addPush(createOptions, pantheonUser);
 
       // Make sure we have SSH keys
       // @todo: we are assuming our temp containers are the only ones that
