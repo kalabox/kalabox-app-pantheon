@@ -69,11 +69,12 @@ module.exports = function(kbox) {
     var getGitInfo = function() {
 
       var session = pantheon.getSession();
-
-      return {
-        email: session.email,
-        name: session.name
-      };
+      if (session && session.email && session.name) {
+        return {
+          email: session.email,
+          name: session.name
+        };
+      }
 
     };
 
@@ -245,6 +246,7 @@ module.exports = function(kbox) {
       createOptions = addPush(createOptions, sshEnvVar);
 
       // All containers need the correct git user/email info
+      // but only do this if we have a session to use
       var gitInfo = getGitInfo();
       var gitEnvVar = ['GITUSER=' + gitInfo.name, 'GITEMAIL=' + gitInfo.email];
       createOptions = addPush(createOptions, gitEnvVar);
