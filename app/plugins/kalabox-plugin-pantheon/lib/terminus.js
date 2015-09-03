@@ -81,29 +81,50 @@ Terminus.prototype.__request = function(cmd, args, options) {
   // Save for later.
   var self = this;
 
-  return self.kbox.engine.provider()
+  // Get create options.
+  var createOpts = self.__getCreateOpts();
 
-  // And run a command
-  .then(function(provider) {
+  // We need a special entry for this request
+  /* jshint ignore:start */
+  //jscs:disable
+  createOpts.Entrypoint = ["/bin/sh", "-c"];
+  /* jshint ignore:end */
 
-    // Get create options.
-    var createOpts = self.__getCreateOpts();
+  // Get start options
+  var startOpts = self.__getStartOpts();
 
-    // We need a special entry for this request
-    /* jshint ignore:start */
-    //jscs:disable
-    createOpts.Entrypoint = ["/bin/sh", "-c"];
-    /* jshint ignore:end */
+  // Start a terminus container and run a terminus command against it
+  var query = self.__buildQuery(cmd, args, options);
 
-    // Get start options
-    var startOpts = self.__getStartOpts();
+  // Grab a session to set up our auth
+  var session = pantheon.getSession();
 
-    // Start a terminus container and run a terminus command against it
-    var query = self.__buildQuery(cmd, args, options);
+  // Prompt the user to reauth if the session is invalid
+  // @todo: the mostly repeated conditional here is gross lets improve it
+  if (session === undefined) {
+
+    // Reuath attempt
+    return pantheon.reAuthSession()
+
+    // Set our session to be the new session
+    .then(function(reAuthSession) {
+
+      return self.kbox.engine.use('terminus', createOpts, startOpts, function(container) {
+        return self.kbox.engine.queryData(container.id, query);
+      });
+
+    });
+
+  }
+
+  else {
+
     return self.kbox.engine.use('terminus', createOpts, startOpts, function(container) {
       return self.kbox.engine.queryData(container.id, query);
     });
-  });
+
+  }
+
 };
 
 /*
@@ -170,10 +191,40 @@ Terminus.prototype.cmd = function(cmd, opts, done) {
   // Image name.
   var image = 'terminus';
 
-  // Perform a container run.
-  return engine.run(image, cmd, createOpts, startOpts)
-  // Return.
-  .nodeify(done);
+  // Grab a session to set up our auth
+  var session = pantheon.getSession();
+
+  // Prompt the user to reauth if the session is invalid
+  // @todo: the mostly repeated conditional here is gross lets improve it
+  if (session === undefined) {
+
+    // Reuath attempt
+    return pantheon.reAuthSession()
+
+    // Set our session to be the new session
+    .then(function(reAuthSession) {
+
+      //@todo: validate session again?
+      // Perform a container run.
+      return engine.run(image, cmd, createOpts, startOpts)
+
+      // Return.
+      .nodeify(done);
+
+    });
+
+  }
+
+  else {
+
+    // Perform a container run.
+    return engine.run(image, cmd, createOpts, startOpts)
+
+    // Return.
+    .nodeify(done);
+
+  }
+
 
 };
 

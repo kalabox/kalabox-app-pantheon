@@ -196,12 +196,13 @@ Client.prototype.getSession = function() {
 /*
  * If our session is not valid lets try to get a new one
  */
-Client.prototype.__reAuthSession = function() {
+Client.prototype.reAuthSession = function() {
 
   // We need ourselves present when we make promises
   var self = this;
 
   // Prompt questions
+  // @todo: display the account for the PW
   var questions = [
     {
       name: 'password',
@@ -282,7 +283,7 @@ Client.prototype.__request = function(verb, pathname, data) {
     if (session === undefined) {
 
       // Reuath attempt
-      return this.__reAuthSession()
+      return this.reAuthSession()
 
       // Set our session to be the new session
       .then(function(reAuthSession) {
