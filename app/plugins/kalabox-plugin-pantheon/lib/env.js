@@ -187,6 +187,7 @@ module.exports = function(kbox) {
     // Get our environments based on the framework
     var installEnv = getInstallSpec(framework);
 
+    // EVENTS
     /*
      * Inject every app component with the install environment
      */
@@ -215,8 +216,10 @@ module.exports = function(kbox) {
      */
     kbox.core.events.on('pre-engine-create', function(createOptions, done) {
 
+      var name = createOptions.name;
+
       // Only do this on named containers
-      if (createOptions.name) {
+      if (name) {
 
         // Don't add phpversion to db containers
         var split = createOptions.name.split('_');
@@ -245,7 +248,31 @@ module.exports = function(kbox) {
       var gitEnvVar = ['GITUSER=' + gitInfo.name, 'GITEMAIL=' + gitInfo.email];
       createOptions = addPush(createOptions, gitEnvVar);
 
-      done();
+      // Make sure we have SSH keys
+      // @todo: we are assuming our temp containers are the only ones that
+      // need our pantheon ssh keys which may not be a good assumption
+      // @todo: this IS a bad assumption the git container gets name undefined
+      // we should change this or rework something
+      if (name === undefined || _.includes(name, 'kalabox_temp')) {
+
+        // @todo: two file reads and a request might not be great for perfomance
+        // here even with static caching
+        return pantheon.sshKeySetup()
+
+        .then(function(keySet) {
+          if (!keySet) {
+            // @todo: something helpful
+          }
+        })
+
+        .nodeify(done);
+
+      }
+      else {
+
+        done();
+
+      }
 
     });
 

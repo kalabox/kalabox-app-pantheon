@@ -33,13 +33,6 @@ function Terminus(kbox, app) {
 }
 
 /*
- * WE DEFINITELY NEED TO EITHER RETRIEVE OR VALIDATE A SESSION BEFORE WE
- * ACTALLY DO STUFF OR LOGIN
- *
- * @todo @todo @todo @todo @todo @todo @todo @todo @todo @todo @todo @todo
- */
-
-/*
  * Builds a query for use in a terminus container
  */
 Terminus.prototype.__buildQuery = function(cmd, args, options) {
@@ -56,7 +49,6 @@ Terminus.prototype.__getStartOpts = function() {
   // Grab the path of the home dir inside the VM
   var homeBind = this.app.config.homeBind;
   return this.kbox.util.docker.StartOpts()
-    .bind(homeBind, '/terminus')
     .bind(homeBind, '/ssh')
     .bind(this.app.rootBind, '/src')
     .json();
@@ -82,21 +74,14 @@ Terminus.prototype.__getCreateOpts = function() {
 };
 
 /*
- * Send a request to a terminus container. This assumes you have authenticated
- * first
+ * Send a request to a terminus container.
  */
 Terminus.prototype.__request = function(cmd, args, options) {
 
   // Save for later.
   var self = this;
 
-  // Try to get a session first
-  return pantheon.getSession()
-
-  // We have the session so now we can get the provicer
-  .then(function(session) {
-    return self.kbox.engine.provider();
-  })
+  return self.kbox.engine.provider()
 
   // And run a command
   .then(function(provider) {
@@ -259,6 +244,7 @@ Terminus.prototype.getUUID = function(site) {
     ['site', 'info'],
     ['--json', '--site=' + site, '--field=id']
   )
+
   .then(function(uuid) {
     self.uuid = uuid;
     return Promise.resolve(self.uuid);
@@ -323,11 +309,13 @@ Terminus.prototype.createDBBackup = function(site, env) {
 Terminus.prototype.hasDBBackup = function(uuid, env) {
 
   return pantheon.getBackups(uuid, env)
-    .then(function(backups) {
-      var keyString = _.keys(backups).join('');
-      console.log(keyString);
-      return Promise.resolve(_.includes(keyString, 'backup_database'));
-    });
+
+  .then(function(backups) {
+    var keyString = _.keys(backups).join('');
+    console.log(keyString);
+    return Promise.resolve(_.includes(keyString, 'backup_database'));
+  });
+
 };
 
 /*
@@ -338,6 +326,7 @@ Terminus.prototype.hasDBBackup = function(uuid, env) {
 Terminus.prototype.getBindings = function(uuid) {
 
   return pantheon.getBindings(uuid);
+
 };
 
 // Return constructor as the module object.

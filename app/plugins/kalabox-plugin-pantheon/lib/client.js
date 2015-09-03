@@ -48,6 +48,8 @@ function Client(id, address) {
 
   // Das Kindacache
   this.session = undefined;
+  this.sites = undefined;
+  this.keySet = false;
 
   // The address argument is also optional.
   if (address) {
@@ -420,14 +422,14 @@ Client.prototype.__postSSHKey = function(sshKey) {
 
   // Send in our ssh key with validation on
   var data = {
-    data: sshKey,
+    data: JSON.stringify(sshKey),
     query: {
       validate: true
     }
   };
 
   // Send REST request.
-  return this.__request('postJson', ['users', session.user_uuid, 'keys'], data)
+  return this.__request('post', ['users', session.user_uuid, 'keys'], data)
 
   // Return keys
   .then(function(keys) {
@@ -443,6 +445,11 @@ Client.prototype.__postSSHKey = function(sshKey) {
  * the terminus/git/rsync containers
  */
 Client.prototype.sshKeySetup = function() {
+
+  // Check static cache
+  if (this.keySet === true) {
+    return Promise.resolve(true);
+  }
 
   // @todo: switch this and constants when we start injection kbox into this
   // thing
@@ -539,7 +546,15 @@ Client.prototype.sshKeySetup = function() {
       if (!hasKey) {
         return self.__postSSHKey(pubKey.data);
       }
+    })
+
+    // Set cache to say yes
+    // @todo: handle error
+    .then(function() {
+      self.keySet = true;
+      return self.keySet;
     });
+
   });
 
 };
@@ -551,6 +566,15 @@ Client.prototype.sshKeySetup = function() {
  */
 Client.prototype.getSites = function() {
 
+  // Just grab the cached sites if we already have
+  // made a request this process
+  if (this.sites !== undefined) {
+    return Promise.resolve(this.sites);
+  }
+
+  // Some things to use later
+  var self = this;
+
   // Get the session for user info
   var session = this.getSession();
 
@@ -559,6 +583,7 @@ Client.prototype.getSites = function() {
 
   // Return sites
   .then(function(sites) {
+    self.sites = sites;
     return sites;
   });
 
