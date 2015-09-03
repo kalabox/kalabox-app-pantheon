@@ -67,46 +67,40 @@ Client.prototype.__setSession = function(session) {
   // @todo: how do we validate?
   // @todo: only write file if its changed? md5 hash compare?
 
-  if (session) {
-
-    // Make sure we are translating expire correctly
-    var expires;
-    if (session.session_expire_time) {
-      expires = session.session_expire_time;
-    }
-    else {
-      expires = session.expires_at;
-    }
-
-    // Make sure we are translating uid correctly
-    var uid;
-    if (session.user_uuid) {
-      uid = session.user_uuid;
-    }
-    else {
-      uid = session.user_id;
-    }
-
-    // Set our runtime cache
-    this.session = {
-      session: session.session,
-      session_expire_time: expires,
-      user_uuid: uid,
-      email: session.email,
-      name: session.name
-    };
-
-    // Save a cache locally so we can share among terminus clients
-    fs.mkdirpSync(CACHEDIR);
-    var writableSession = JSON.stringify(this.session);
-    fs.writeFileSync(SESSIONFILE, writableSession);
-
+  // Make sure we are translating expire correctly
+  var expires;
+  if (session.session_expire_time) {
+    expires = session.session_expire_time;
   }
-
   else {
-    // @todo: fail?
+    expires = session.expires_at;
   }
+
+  // Make sure we are translating uid correctly
+  var uid;
+  if (session.user_uuid) {
+    uid = session.user_uuid;
+  }
+  else {
+    uid = session.user_id;
+  }
+
+  // Set our runtime cache
+  this.session = {
+    session: session.session,
+    session_expire_time: expires,
+    user_uuid: uid,
+    email: session.email,
+    name: session.name
+  };
+
+  // Save a cache locally so we can share among terminus clients
+  fs.mkdirpSync(CACHEDIR);
+  var writableSession = JSON.stringify(this.session);
+  fs.writeFileSync(SESSIONFILE, writableSession);
+
   return this.session;
+
 };
 
 /*
@@ -190,53 +184,55 @@ Client.prototype.getSession = function() {
     return session;
   }
 
+  // We have nothing!
   else {
     return undefined;
   }
 
+};
+
 /*
-  // Otherwise we need to prompt the user to reauth
-  else {
+ * If our session is not valid lets try to get a new one
+ */
+Client.prototype.__reAuthSession = function() {
 
-    // Build a basic prompt for pantheon auth
-    var questions = [
-      {
-        name: 'password',
-        type: 'password',
-        message: 'Pantheon dashboard password'
-      }
-    ];
+  // We need ourselves present when we make promises
+  var self = this;
 
-    /*
-     * Helper method to promisigy fs.exists
-     */
-/*
-    var askIt = function(questions) {
-      return new Promise(function(answers) {
-        inquirer.prompt(questions, answers);
-      });
-    };
+  // Prompt questions
+  var questions = [
+    {
+      name: 'password',
+      type: 'password',
+      message: 'Pantheon dashboard password'
+    }
+  ];
 
-    // Run the prompt and return the password
-    return askIt(questions)
-
-    // Get my answers
-    .then(function(answers) {
-
-      console.log("INQUIRE!");
-      // If no email try to grab from session cache
-      // @todo: eventually we want this to grab a specific user session file
-      if (!email) {
-        var session = self.getSessionFile();
-        email = session.email;
-      }
-
-      // Login
-      return self.__auth(email, answers.password);
-
+  /*
+   * Helper method to promisigy inquiries
+   */
+  var askIt = function(questions) {
+    return new Promise(function(answers) {
+      inquirer.prompt(questions, answers);
     });
+  };
 
-  }*/
+  // Run the prompt and return the password
+  return askIt(questions)
+
+  // Get my answers
+  .then(function(answers) {
+
+    // Get the email
+    // @todo: eventually get this from app config when we switch to
+    // a multi user name jam
+    var session = self.getSessionFile();
+    var email = session.email;
+
+    // Login
+    return self.auth(email, answers.password);
+
+  });
 
 };
 
@@ -280,23 +276,39 @@ Client.prototype.__request = function(verb, pathname, data) {
     // Grab a session to set up our auth
     var session = this.getSession();
 
-    // @todo: try a reauth prompt if session is not defined
-    /*
+    // Prompt the user to reauth if the session is invalid
     if (session === undefined) {
+
+      // Reuath attempt
+      return this.__reAuthSession()
+
+      // Set our session to be the new session
+      .then(function(reAuthSession) {
+        session = reAuthSession;
+      });
+
     }
-    */
 
     // Build our header and merge it into any other
     // data we might be sending along
     var headers = this.__getSessionHeaders(session);
     data = _.merge(data, {headers: headers});
+
   }
 
-  // Build url.
+  // Format our URL
   return Promise.try(function() {
+
+    // Build the URL object
     var obj = _.extend(self.target, {pathname: self.__url(pathname)});
+
+    // Format to url string and return
     return urls.format(obj);
+
   })
+
+  // Make the Request and handle the result
+  // @otdo: clean this code up
   .then(function(url) {
 
     // Send REST request.
