@@ -12,16 +12,16 @@ Promise.longStackTraces();
 // "Constants"
 var PLUGIN_NAME = 'kalabox-plugin-pantheon';
 
-// Terminus node clients
-// for some things it is better to use the node client because we dont have
-// to worry about an error we need to handle killing the whole damn thing
-var Client = require('./client.js');
-var pantheon = new Client();
-
 /*
  * Constructor.
  */
 function Terminus(kbox, app) {
+
+  // Terminus node clients
+  // for some things it is better to use the node client because we dont have
+  // to worry about an error we need to handle killing the whole damn thing
+  var Client = require('./client.js');
+  this.pantheon = new Client(kbox, app);
 
   // Kbox things
   this.app = app;
@@ -31,13 +31,6 @@ function Terminus(kbox, app) {
   this.uuid = undefined;
 
 }
-
-/*
- * WE DEFINITELY NEED TO EITHER RETRIEVE OR VALIDATE A SESSION BEFORE WE
- * ACTALLY DO STUFF OR LOGIN
- *
- * @todo @todo @todo @todo @todo @todo @todo @todo @todo @todo @todo @todo
- */
 
 /*
  * Builds a query for use in a terminus container
@@ -56,7 +49,6 @@ Terminus.prototype.__getStartOpts = function() {
   // Grab the path of the home dir inside the VM
   var homeBind = this.app.config.homeBind;
   return this.kbox.util.docker.StartOpts()
-    .bind(homeBind, '/terminus')
     .bind(homeBind, '/ssh')
     .bind(this.app.rootBind, '/src')
     .json();
@@ -82,18 +74,15 @@ Terminus.prototype.__getCreateOpts = function() {
 };
 
 /*
- * Send a request to a terminus container
+ * Send a request to a terminus container.
  */
 Terminus.prototype.__request = function(cmd, args, options) {
 
   // Save for later.
   var self = this;
 
-  // Grab the global config
-  var globalConfig = this.kbox.core.deps.get('globalConfig');
-
   // Get create options.
-  var createOpts = this.__getCreateOpts();
+  var createOpts = self.__getCreateOpts();
 
   // We need a special entry for this request
   /* jshint ignore:start */
@@ -101,19 +90,41 @@ Terminus.prototype.__request = function(cmd, args, options) {
   createOpts.Entrypoint = ["/bin/sh", "-c"];
   /* jshint ignore:end */
 
-  // Get provider.
-  return this.kbox.engine.provider()
-  .then(function(provider) {
+  // Get start options
+  var startOpts = self.__getStartOpts();
 
-    // Get start options
-    var startOpts = self.__getStartOpts();
+  // Start a terminus container and run a terminus command against it
+  var query = self.__buildQuery(cmd, args, options);
 
-    // Start a terminus container and run a terminus command against it
-    var query = self.__buildQuery(cmd, args, options);
+  // Grab a session to set up our auth
+  var session = this.pantheon.getSession();
+
+  // Prompt the user to reauth if the session is invalid
+  // @todo: the mostly repeated conditional here is gross lets improve it
+  if (session === undefined) {
+
+    // Reuath attempt
+    return this.pantheon.reAuthSession()
+
+    // Set our session to be the new session
+    .then(function(reAuthSession) {
+
+      return self.kbox.engine.use('terminus', createOpts, startOpts, function(container) {
+        return self.kbox.engine.queryData(container.id, query);
+      });
+
+    });
+
+  }
+
+  else {
+
     return self.kbox.engine.use('terminus', createOpts, startOpts, function(container) {
       return self.kbox.engine.queryData(container.id, query);
     });
-  });
+
+  }
+
 };
 
 /*
@@ -140,6 +151,7 @@ Terminus.prototype.getOpts = function(options) {
 
 /*
  * Run an interactive terminus command
+ * @todo: do we want to auth at all here?
  */
 Terminus.prototype.cmd = function(cmd, opts, done) {
 
@@ -179,10 +191,40 @@ Terminus.prototype.cmd = function(cmd, opts, done) {
   // Image name.
   var image = 'terminus';
 
-  // Perform a container run.
-  return engine.run(image, cmd, createOpts, startOpts)
-  // Return.
-  .nodeify(done);
+  // Grab a session to set up our auth
+  var session = this.pantheon.getSession();
+
+  // Prompt the user to reauth if the session is invalid
+  // @todo: the mostly repeated conditional here is gross lets improve it
+  if (session === undefined) {
+
+    // Reuath attempt
+    return this.pantheon.reAuthSession()
+
+    // Set our session to be the new session
+    .then(function(reAuthSession) {
+
+      //@todo: validate session again?
+      // Perform a container run.
+      return engine.run(image, cmd, createOpts, startOpts)
+
+      // Return.
+      .nodeify(done);
+
+    });
+
+  }
+
+  else {
+
+    // Perform a container run.
+    return engine.run(image, cmd, createOpts, startOpts)
+
+    // Return.
+    .nodeify(done);
+
+  }
+
 
 };
 
@@ -253,6 +295,7 @@ Terminus.prototype.getUUID = function(site) {
     ['site', 'info'],
     ['--json', '--site=' + site, '--field=id']
   )
+
   .then(function(uuid) {
     self.uuid = uuid;
     return Promise.resolve(self.uuid);
@@ -316,12 +359,13 @@ Terminus.prototype.createDBBackup = function(site, env) {
  */
 Terminus.prototype.hasDBBackup = function(uuid, env) {
 
-  return pantheon.getBackups(uuid, env)
-    .then(function(backups) {
-      var keyString = _.keys(backups).join('');
-      console.log(keyString);
-      return Promise.resolve(_.includes(keyString, 'backup_database'));
-    });
+  return this.pantheon.getBackups(uuid, env)
+
+  .then(function(backups) {
+    var keyString = _.keys(backups).join('');
+    return Promise.resolve(_.includes(keyString, 'backup_database'));
+  });
+
 };
 
 /*
@@ -331,7 +375,8 @@ Terminus.prototype.hasDBBackup = function(uuid, env) {
  */
 Terminus.prototype.getBindings = function(uuid) {
 
-  return pantheon.getBindings(uuid);
+  return this.pantheon.getBindings(uuid);
+
 };
 
 // Return constructor as the module object.

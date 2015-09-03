@@ -63,7 +63,7 @@ module.exports = function(kbox) {
         .then(function() {
           return terminus.getUUID(site)
           .then(function(uuid) {
-            siteid = uuid;
+            siteid = uuid.trim();
           });
         })
         // Wake the site

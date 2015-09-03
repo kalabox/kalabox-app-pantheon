@@ -1,11 +1,10 @@
-#!/usr/bin/env node
 
 'use strict';
 
-var Client = require('./app/plugins/kalabox-plugin-pantheon/lib/client.js');
-var pantheon = new Client();
-
 module.exports = function(kbox) {
+
+  var Client = require('./app/plugins/kalabox-plugin-pantheon/lib/client.js');
+  var pantheon = new Client(kbox);
 
   // Load our events
   // @todo: need a better way to load this so it is

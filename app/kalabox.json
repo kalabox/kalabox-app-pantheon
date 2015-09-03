@@ -13,6 +13,7 @@
   "pluginConf": {
     "kalabox-plugin-pantheon": {
       "action": "pull",
+      "account": "",
       "drush-version": "6",
       "env": "",
       "framework": "",
