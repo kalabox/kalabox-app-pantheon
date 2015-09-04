@@ -231,6 +231,7 @@ module.exports = function(kbox) {
       // @todo: notions of this for start states?
       // no files/db options, just a git pull?
       task.path = [app.name, 'pull'];
+      task.category = 'appAction';
       task.description = 'Pull down new code and optionally data and files.';
       task.kind = 'delegate';
 

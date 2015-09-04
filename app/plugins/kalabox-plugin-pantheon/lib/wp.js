@@ -93,6 +93,7 @@ module.exports = function(kbox) {
     // wp-cli wrapper: kbox wp COMMAND
     kbox.tasks.add(function(task) {
       task.path = [app.name, 'wp'];
+      task.category = 'appCmd';
       task.description = 'Run wp-cli commands.';
       task.kind = 'delegate';
       task.func = function(done) {

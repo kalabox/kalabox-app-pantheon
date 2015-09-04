@@ -174,6 +174,7 @@ module.exports = function(kbox) {
       var pantheonConf = app.config.pluginConf['kalabox-plugin-pantheon'];
 
       task.path = [app.name, 'push'];
+      task.category = 'appAction';
       task.description = 'Push up new code and optionally data and files.';
       task.kind = 'delegate';
       task.options.push({
