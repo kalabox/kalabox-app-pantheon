@@ -24,6 +24,7 @@ module.exports = function(kbox) {
     // kbox terminus COMMAND
     kbox.tasks.add(function(task) {
       task.path = [app.name, 'terminus'];
+      task.category = 'appCmd';
       task.description = 'Run terminus commands.';
       task.kind = 'delegate';
       task.func = function(done) {
@@ -36,6 +37,7 @@ module.exports = function(kbox) {
     // kbox drush COMMAND
     kbox.tasks.add(function(task) {
       task.path = [app.name, 'drush'];
+      task.category = 'appCmd';
       task.description = 'Run drush commands.';
       task.kind = 'delegate';
       task.options.push({
