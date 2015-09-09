@@ -3,7 +3,7 @@
 
 module.exports = function(kbox) {
 
-  var Client = require('./app/plugins/kalabox-plugin-pantheon/lib/client.js');
+  var Client = require('./node_modules/kalabox-plugin-pantheon/lib/client.js');
   var pantheon = new Client(kbox);
 
   // Load our events
