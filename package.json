@@ -16,6 +16,14 @@
     "url": "http://github.com/kalabox/kalabox-app-pantheon",
     "email": "mike@kalamuna.com"
   },
+  "scripts": {
+    "postinstall": "node ./scripts/downloadLibs.js"
+  },
+  "postInstallAssets": {
+    "kalabox-plugin-pantheon": {
+      "client": "lib/client.js"
+    }
+  },
   "dependencies": {
     "bluebird": "^2.9.32",
     "fs-extra": "^0.24.0",

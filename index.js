@@ -3,7 +3,11 @@
 
 module.exports = function(kbox) {
 
-  var Client = require('./app/plugins/kalabox-plugin-pantheon/lib/client.js');
+  // Pkg.json
+  var pkgJson = require('./package.json');
+
+  var clientPath = pkgJson.postInstallAssets['kalabox-plugin-pantheon'].client;
+  var Client = require(clientPath);
   var pantheon = new Client(kbox);
 
   // Load our events

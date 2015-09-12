@@ -22,3 +22,4 @@ built
 *.id_rsa
 string
 pantheon.aliases.drushrc.php
+vendor
