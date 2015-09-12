@@ -5,9 +5,13 @@ module.exports = function(kbox) {
 
   // Pkg.json
   var pkgJson = require('./package.json');
+  var PLUGIN_NAME = 'kalabox-plugin-pantheon';
 
-  var clientPath = pkgJson.postInstallAssets['kalabox-plugin-pantheon'].client;
-  var Client = require(clientPath);
+  // Instrinsc modules
+  var path = require('path');
+
+  var clientPath = pkgJson.postInstallAssets[PLUGIN_NAME].client;
+  var Client = require(path.join('vendor', PLUGIN_NAME, clientPath);
   var pantheon = new Client(kbox);
 
   // Load our events
