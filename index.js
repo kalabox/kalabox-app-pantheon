@@ -12,7 +12,7 @@ module.exports = function(kbox) {
 
   // Grab vendor modules
   var clientPath = pkgJson.postInstallAssets[PLUGIN_NAME].client;
-  var Client = require(path.join('vendor', PLUGIN_NAME, clientPath);
+  var Client = require(path.join('vendor', PLUGIN_NAME, clientPath));
   var pantheon = new Client(kbox);
 
   // Load our events
