@@ -10,6 +10,7 @@ module.exports = function(kbox) {
   // Instrinsc modules
   var path = require('path');
 
+  // Grab vendor modules
   var clientPath = pkgJson.postInstallAssets[PLUGIN_NAME].client;
   var Client = require(path.join('vendor', PLUGIN_NAME, clientPath);
   var pantheon = new Client(kbox);
