@@ -78,6 +78,36 @@ after-success() {
     BUILD_VERSION=$(node -pe 'JSON.parse(process.argv[1]).version' "$(cat $TRAVIS_BUILD_DIR/package.json)")
     echo $BUILD_VERSION
 
+    # SET UP SSH THINGS
+    eval "$(ssh-agent)"
+    chmod 600 $HOME/.ssh/travis.id_rsa
+    ssh-add $HOME/.ssh/travis.id_rsa
+    git config --global user.name "Kala C. Bot"
+    git config --global user.email "kalacommitbot@kalamuna.com"
+
+    # Reset upstream so we can push our changes to it
+    # We need to re-add this in because our clone was originally read-only
+    git remote rm origin
+    git remote add origin git@github.com:$TRAVIS_REPO_SLUG.git
+    git checkout $TRAVIS_BRANCH
+
+    if [ "$TRAVIS_BRANCH" === 'master']; then
+      # If we are on the master branch then we need to grab the dev
+      # releases of packages when we build our app deps later on
+      export KALABOX_DEV=true
+    fi
+
+    # Go into app and build out the deps so all kalabox needs to do is grab the
+    # package and extract without doing messy things like npm install frmo kbox
+    cd $TRAVIS_BUILD_DIR/app
+    rm -rf node_modules
+    npm install --production
+    cd $TRAVIS_BUILD_DIR
+
+    # Commit our new app deps
+    git add --all
+    git commit -m "BUILT OUT APP DEPS [ci skip]" --author="Kala C. Bot <kalacommitbot@kalamuna.com>" --no-verify
+
     # Only do stuff if
     #   1. DISCO_TAG is non-empty
     #   2. Our commit is a tagged commit
@@ -96,13 +126,6 @@ after-success() {
       #   2. If this is a new minor version and that minor version is larger than previous minor versions
       if [ "${DISCO_ARRAY[1]}" -gt "${BUILD_ARRAY[1]}" ] ||
         ([ "${DISCO_ARRAY[1]}" -eq "${BUILD_ARRAY[1]}" ] && [ "${DISCO_ARRAY[2]}" -gt "${BUILD_ARRAY[2]}" ]); then
-
-        # SET UP SSH THINGS
-        eval "$(ssh-agent)"
-        chmod 600 $HOME/.ssh/travis.id_rsa
-        ssh-add $HOME/.ssh/travis.id_rsa
-        git config --global user.name "Kala C. Bot"
-        git config --global user.email "kalacommitbot@kalamuna.com"
 
         # DEFINE SOME FUN COMMIT MESSAGE VERBS
         COMMIT_MSG[0]='TWERKING'
@@ -123,11 +146,8 @@ after-success() {
         # Bump our things and reset tags
         grunt bump-patch
 
-        # Reset upstream and tags so we can push our changes to it
+        # Reset upstream tags so we can push our changes to it
         # We need to re-add this in because our clone was originally read-only
-        git remote rm origin
-        git remote add origin git@github.com:$TRAVIS_REPO_SLUG.git
-        git checkout $TRAVIS_BRANCH
         git tag -d $DISCO_TAG
         git push origin :$DISCO_TAG
 
@@ -135,13 +155,17 @@ after-success() {
         git add --all
         git commit -m "${COMMIT_MSG} VERSION ${DISCO_TAG} [ci skip]" --author="Kala C. Bot <kalacommitbot@kalamuna.com>" --no-verify
         git tag $DISCO_TAG
-        git push origin $TRAVIS_BRANCH --tags
 
         # NODE PACKAGES
         # Deploy to NPM
         $HOME/npm-config.sh > /dev/null
         npm publish ./
       fi
+
+      # Push up our generated app deps plus a tag if we also have a new version
+      git push origin $TRAVIS_BRANCH --tags
+
+    else
     fi
   fi
 }
