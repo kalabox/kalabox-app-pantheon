@@ -14,7 +14,7 @@ cache
 coverage
 doc
 deploy
-node_modules
+node_modules/*
 cids
 .boot2docker
 built
