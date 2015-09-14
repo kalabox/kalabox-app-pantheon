@@ -1,8 +1,19 @@
 'use strict';
 
-var taskOpts = require('./tasks');
-
 module.exports = function(kbox, appName) {
+
+  var taskOpts = {
+    gitUsername: {
+      name: 'git-username',
+      kind: 'string',
+      description: 'Your git username.'
+    },
+    gitEmail: {
+      name: 'git-email',
+      kind: 'string',
+      description: 'Your git email.'
+    }
+  };
 
   // Add an option
   kbox.create.add(appName, {

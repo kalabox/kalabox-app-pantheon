@@ -19,6 +19,8 @@ COPY gitconfig /root/.gitconfig
 
 RUN chmod +x /usr/local/bin/kgit
 
+ENV SSH_KEY id_rsa
+
 ENTRYPOINT ["/usr/local/bin/kgit"]
 
 ```

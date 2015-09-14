@@ -15,9 +15,6 @@ var PLUGIN_NAME = 'kalabox-plugin-pantheon';
  */
 function Terminus(kbox, app) {
 
-  var Promise = kbox.Promise;
-  Promise.longStackTraces();
-
   // Terminus node clients
   // for some things it is better to use the node client because we dont have
   // to worry about an error we need to handle killing the whole damn thing
@@ -156,9 +153,8 @@ Terminus.prototype.getOpts = function(options) {
  */
 Terminus.prototype.cmd = function(cmd, opts, done) {
 
-  // Get engine, promise and global config
+  // Get engine and global config
   var engine = this.kbox.engine;
-  var Promise = this.kbox.Promise;
   var globalConfig = this.kbox.core.deps.lookup('globalConfig');
 
   // Get create options.
@@ -281,17 +277,17 @@ Terminus.prototype.setConnectionMode = function(site, env) {
  */
 Terminus.prototype.getUUID = function(site) {
 
-  // We run this a lot so lets cache per run and do a lookup before we
-  // make a request
-  if (this.uuid !== undefined) {
-    return Promise.resolve(this.uuid);
-  }
-
   // More of this sort of thing
   var self = this;
 
+  // We run this a lot so lets cache per run and do a lookup before we
+  // make a request
+  if (self.uuid !== undefined) {
+    return self.kbox.Promise.resolve(self.uuid);
+  }
+
   // Make a request
-  return this.__request(
+  return self.__request(
     ['kterminus'],
     ['site', 'info'],
     ['--json', '--site=' + site, '--field=id']
@@ -299,7 +295,7 @@ Terminus.prototype.getUUID = function(site) {
 
   .then(function(uuid) {
     self.uuid = uuid;
-    return Promise.resolve(self.uuid);
+    return self.kbox.Promise.resolve(self.uuid);
   });
 
 };
@@ -360,11 +356,13 @@ Terminus.prototype.createDBBackup = function(site, env) {
  */
 Terminus.prototype.hasDBBackup = function(uuid, env) {
 
+  var self = this;
+
   return this.pantheon.getBackups(uuid, env)
 
   .then(function(backups) {
     var keyString = _.keys(backups).join('');
-    return Promise.resolve(_.includes(keyString, 'backup_database'));
+    return self.kbox.Promise.resolve(_.includes(keyString, 'backup_database'));
   });
 
 };

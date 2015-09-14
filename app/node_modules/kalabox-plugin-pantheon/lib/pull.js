@@ -1,310 +1,229 @@
 'use strict';
 
-// Intrinsic modules.
-var url = require('url');
-var fs = require('fs');
-var path = require('path');
+module.exports = function(kbox, app) {
 
-// NPM modules
-var Promise = require('bluebird');
-var _ = require('lodash');
+  // Grab some kalabox modules
+  var events = kbox.core.events;
+  var engine = kbox.engine;
+  var Promise = kbox.Promise;
+  Promise.longStackTraces();
 
-// "Constants"
-var PLUGIN_NAME = 'kalabox-plugin-pantheon';
+  // Intrinsic modules.
+  var url = require('url');
+  var fs = require('fs');
+  var path = require('path');
 
-module.exports = function(kbox) {
+  // NPM modules
+  var _ = require('lodash');
 
-  kbox.ifApp(function(app) {
+  // "Constants"
+  var PLUGIN_NAME = 'kalabox-plugin-pantheon';
 
-    // Grab the terminus client
-    var Terminus = require('./terminus.js');
-    var terminus = new Terminus(kbox, app);
+  // Grab the terminus client
+  var Terminus = require('./terminus.js');
+  var terminus = new Terminus(kbox, app);
 
-    // Grab delegated helpers
-    var pathToRoot = path.resolve(__dirname, '..', '..', '..');
-    var pathToNode = path.join(pathToRoot, 'node_modules');
-    var Git = require(pathToNode + '/kalabox-plugin-git/lib/git.js');
-    var git = new Git(kbox, app);
-    var Rsync = require(pathToNode + '/kalabox-plugin-rsync/lib/rsync.js');
-    var rsync = new Rsync(kbox, app);
+  // Grab delegated helpers
+  var pathToRoot = path.resolve(__dirname, '..', '..', '..');
+  var pathToNode = path.join(pathToRoot, 'node_modules');
+  var Git = require(pathToNode + '/kalabox-plugin-git/lib/git.js');
+  var git = new Git(kbox, app);
+  var Rsync = require(pathToNode + '/kalabox-plugin-rsync/lib/rsync.js');
+  var rsync = new Rsync(kbox, app);
 
-    // Grab some kalabox modules
-    var events = kbox.core.events;
-    var engine = kbox.engine;
+  /*
+   * Pull down our sites code
+   */
+  var pullCode = function(site, env, type) {
 
-    // Nobody expects the Spanish Inquisition!
-    var inquirer = require('inquirer');
+    // the pantheon site UUID
+    var siteid = null;
+    var repo = null;
 
-    /*
-     * Pull down our sites code
-     */
-    var pullCode = function(site, env, type) {
+    // Check to see what our connection mode is
+    return terminus.getConnectionMode(site, env)
 
-      // the pantheon site UUID
-      var siteid = null;
-      var repo = null;
-
-      // Check to see what our connection mode is
-      return terminus.getConnectionMode(site, env)
-        // Set the connection mode to git if needed
-        // and then try again
-        .then(function(connectionMode) {
-          var modeSplit = connectionMode.split(':');
-          var mode = modeSplit[1].trim().toLowerCase();
-          if (mode !== 'git') {
-            // @todo: actually test this part
-            return terminus.setConnectionMode(site, env)
-              .then(function(data) {
-                pullCode(site, env);
-              });
-          }
-        })
-        // Grab the sites UUID from teh machinename
-        .then(function() {
-          return terminus.getUUID(site)
-          .then(function(uuid) {
-            siteid = uuid.trim();
+    // Set the connection mode to git if needed
+    // and then try again
+    .then(function(connectionMode) {
+      var modeSplit = connectionMode.split(':');
+      var mode = modeSplit[1].trim().toLowerCase();
+      if (mode !== 'git') {
+        // @todo: actually test this part
+        return terminus.setConnectionMode(site, env)
+          .then(function(data) {
+            pullCode(site, env);
           });
-        })
-        // Wake the site
-        .then(function() {
-          return terminus.wakeSite(site, env);
-        })
-        // Generate our code repo URL and CUT THAT MEAT!
-        // errr PULL THAT CODE!
-        .then(function() {
-          // @todo: better way to generate this?
-          // @todo: is 'dev' the only thing that
-          var build = {
-            protocol: 'ssh',
-            slashes: true,
-            auth: ['codeserver', 'dev', siteid].join('.'),
-            hostname: ['codeserver', 'dev', siteid, 'drush', 'in'].join('.'),
-            port: 2222,
-            pathname: ['~', 'repository.git'].join('/')
-          };
-          repo = url.format(build);
-          if (type === 'clone') {
-            return git.cmd(['clone', repo, './'], [])
-              .then(function() {
-                if (env !== 'dev') {
-                  return git.cmd(['fetch', 'origin'], []);
-                }
-              })
-              .then(function() {
-                if (env !== 'dev') {
-                  return git.cmd(['checkout', env], []);
-                }
-              });
-          }
-          else {
-            var branch = (env === 'dev') ? 'master' : env;
-            return git.cmd(['pull', 'origin', branch], []);
-          }
-        });
-    };
+      }
+    })
 
-    /*
-     * Pull down our sites database
-     */
-    var pullDB = function(site, env) {
-      // Get the cid of this apps database
-      // @todo: this looks gross
-      var dbID = _.result(_.find(app.components, function(cmp) {
-        return cmp.name === 'db';
-      }), 'containerId');
-      var wasRunning = null;
-      var defaults = {
-        PublishAllPorts: true,
-        Binds: [app.rootBind + ':/src:rw']
-      };
-
-      return engine.isRunning(dbID)
-        .then(function(status) {
-          wasRunning = status;
-          if (!wasRunning) {
-            return engine.start(dbID, defaults);
-          }
-        })
-        .then(function() {
-          return terminus.getUUID(site);
-        })
-        .then(function(uuid) {
-          return terminus.hasDBBackup(uuid.trim(), env);
-        })
-        .then(function(hasBackup) {
-          // @todo: might want to always create a new backup?
-          // @todo: maybe if latest backup is old?
-          if (!hasBackup) {
-            return terminus.createDBBackup(site, env);
-          }
-        })
-        .then(function() {
-          return terminus.downloadDBBackup(site, env);
-        })
-        .then(function(data) {
-          var downloadSplit = data.split('Downloaded');
-          var dbFile = downloadSplit[1].trim();
-          // Perform a container run.
-          var payload = ['import-mysql', 'localhost', null, '3306', dbFile];
-          return engine.queryData(dbID, payload);
-        })
-        .then(function(data) {
-          // @todo: use real logger
-          console.log(data);
-        })
-        // Stop the DB
-        .then(function() {
-          if (!wasRunning) {
-            return engine.stop(dbID);
-          }
-        });
-    };
-
-    /*
-     * Pull down our sites database
-     */
-    var pullFiles = function(site, env) {
-      // the pantheon site UUID
-      var siteid = null;
-      // Get our UUID
-      // @todo: cache this
+    // Grab the sites UUID from teh machinename
+    .then(function() {
       return terminus.getUUID(site)
-        .then(function(uuid) {
-          siteid = uuid.trim();
-        })
-        // Generate our code repo URL and CUT THAT MEAT!
-        // errr PULL THAT CODE!
-        .then(function() {
-          // @todo: lots of cleanup here
-          // /kbox rsync -rlvz --size-only --ipv4 --progress -e 'ssh -p 2222'
-          var envSite = [env, siteid].join('.');
-          var fileBox = envSite + '@appserver.' + envSite + '.drush.in:files/';
-          var fileMount = '/media';
-          var opts = '-rlvz --size-only --ipv4 --progress -e \'ssh -p 2222\'';
+      .then(function(uuid) {
+        siteid = uuid.trim();
+      });
+    })
 
-          return rsync.cmd([opts, fileBox, fileMount], true);
-        });
-    };
+    // Wake the site up
+    .then(function() {
+      return terminus.wakeSite(site, env);
+    })
 
-    // Events
-    // Install the terminus container for our things and also
-    // pull down a site or create a new site
-    events.on('post-install', function(app, done) {
-      // Make sure we install the terminus container for this app
-      var opts = {
-        name: 'terminus',
-        srcRoot: path.resolve(__dirname, '..', '..', '..'),
+    // Generate our code repo URL and CUT THAT MEAT!
+    // errr PULL THAT CODE!
+    .then(function() {
+      // @todo: better way to generate this?
+      // @todo: is 'dev' the only thing that
+      var build = {
+        protocol: 'ssh',
+        slashes: true,
+        auth: ['codeserver', 'dev', siteid].join('.'),
+        hostname: ['codeserver', 'dev', siteid, 'drush', 'in'].join('.'),
+        port: 2222,
+        pathname: ['~', 'repository.git'].join('/')
       };
-      // Our pantheon config for later on
-      var pantheonConf = app.config.pluginConf['kalabox-plugin-pantheon'];
-      // @todo: fs.existsSync is not recommended and pending deprecation
-      var firstTime = !fs.existsSync(app.config.codeRoot);
-      // Install the terminus container and then do install things if
-      // this is the first time
-      return engine.build(opts)
+
+      // Format our metadata into a url
+      repo = url.format(build);
+
+      // Do this if we are gitting for the first time
+      if (type === 'clone') {
+
+        // Clone the repo
+        return git.cmd(['clone', repo, './'], [])
+
+        // Grab branches if we need more than master
         .then(function() {
-          return terminus.getSiteAliases();
-        })
-        .then(function() {
-          if (firstTime) {
-            return pullCode(pantheonConf.site, pantheonConf.env, 'clone');
+          if (env !== 'dev') {
+            return git.cmd(['fetch', 'origin'], []);
           }
         })
+
+        // Checkout correct branch if needed
         .then(function() {
-          if (firstTime && pantheonConf.action === 'pull') {
-            return pullDB(pantheonConf.site, pantheonConf.env);
+          if (env !== 'dev') {
+            return git.cmd(['checkout', env], []);
           }
-        })
-        .then(function() {
-          if (firstTime && pantheonConf.action === 'pull') {
-            return pullFiles(pantheonConf.site, pantheonConf.env);
-          }
-        })
-        .nodeify(done);
-    });
-
-    // kbox appname pull COMMAND
-    kbox.tasks.add(function(task) {
-
-      var pantheonConf = app.config.pluginConf['kalabox-plugin-pantheon'];
-      // @todo: notions of this for start states?
-      // no files/db options, just a git pull?
-      task.path = [app.name, 'pull'];
-      task.category = 'appAction';
-      task.description = 'Pull down new code and optionally data and files.';
-      task.kind = 'delegate';
-
-      // Only want these options for pull sites
-      if (pantheonConf.action === 'pull') {
-        task.options.push({
-          name: 'database',
-          kind: 'boolean',
-          description: 'Import latest database backup.'
-        });
-        task.options.push({
-          name: 'files',
-          kind: 'boolean',
-          description: 'Import latest files.'
         });
       }
 
-      task.func = function(done) {
+      // If we already have da git then just pull down the correct branch
+      else {
+        var branch = (env === 'dev') ? 'master' : env;
+        return git.cmd(['pull', 'origin', branch], []);
+      }
 
-        // Grab the CLI options that are available
-        var options = this.options;
-        var questions = [
-          {
-            type: 'confirm',
-            name: 'database',
-            message: 'Also refresh from latest database backup?',
-          },
-          {
-            type: 'confirm',
-            name: 'files',
-            message: 'Also grab latest files?',
-          },
-        ];
-
-        // Filter out interactive questions based on passed in options
-        questions = _.filter(questions, function(question) {
-
-          var option = options[question.name];
-
-          if (question.filter) {
-            options[question.name] = question.filter(options[question.name]);
-          }
-
-          if (option === false || option === undefined) {
-            return true;
-          }
-
-          else {
-            return !_.includes(Object.keys(options), question.name);
-          }
-        });
-
-        // Launch the inquiry
-        inquirer.prompt(questions, function(answers) {
-          var choices = _.merge({}, options, answers);
-          return terminus.getSiteAliases()
-          .then(function() {
-            return pullCode(pantheonConf.site, pantheonConf.env, 'pull');
-          })
-          .then(function() {
-            if (choices.database) {
-              return pullDB(pantheonConf.site, pantheonConf.env);
-            }
-          })
-          .then(function() {
-            if (choices.files) {
-              return pullFiles(pantheonConf.site, pantheonConf.env);
-            }
-          })
-          .nodeify(done);
-        });
-
-      };
     });
-  });
+  };
+
+  /*
+   * Pull down our sites database
+   */
+  var pullDB = function(site, env) {
+    // Get the cid of this apps database
+    // @todo: this looks gross
+    var dbID = _.result(_.find(app.components, function(cmp) {
+      return cmp.name === 'db';
+    }), 'containerId');
+
+    // Set some default things
+    var wasRunning = null;
+    var defaults = {
+      PublishAllPorts: true,
+      Binds: [app.rootBind + ':/src:rw']
+    };
+
+    // Check if the DB container is already running
+    return engine.isRunning(dbID)
+
+    // If not running START IT UP
+    .then(function(status) {
+      wasRunning = status;
+      if (!wasRunning) {
+        return engine.start(dbID, defaults);
+      }
+    })
+
+    // GEt the UUID for this site
+    .then(function() {
+      return terminus.getUUID(site);
+    })
+
+    // Check if site has a backup
+    .then(function(uuid) {
+      return terminus.hasDBBackup(uuid.trim(), env);
+    })
+
+    // If no backup then MAKE THAT SHIT
+    .then(function(hasBackup) {
+      // @todo: might want to always create a new backup?
+      // @todo: maybe if latest backup is old?
+      if (!hasBackup) {
+        return terminus.createDBBackup(site, env);
+      }
+    })
+
+    // Download the backup
+    .then(function() {
+      return terminus.downloadDBBackup(site, env);
+    })
+
+    // Import the backup
+    .then(function(data) {
+      var downloadSplit = data.split('Downloaded');
+      var dbFile = downloadSplit[1].trim();
+      // Perform a container run.
+      var payload = ['import-mysql', 'localhost', null, '3306', dbFile];
+      return engine.queryData(dbID, payload);
+    })
+
+    // Seems worthless?
+    .then(function(data) {
+      // @todo: use real logger
+      console.log(data);
+    })
+
+    // Stop the DB container if that is how we found it initially
+    .then(function() {
+      if (!wasRunning) {
+        return engine.stop(dbID);
+      }
+    });
+
+  };
+
+  /*
+   * Pull down our sites database
+   */
+  var pullFiles = function(site, env) {
+
+    // Get our UUID
+    return terminus.getUUID(site)
+
+    // Generate our code repo URL and CUT THAT MEAT!
+    // errr PULL THAT CODE!
+    .then(function(uuid) {
+      // This can have a newline in it that F's everything
+      var siteid = uuid.trim();
+
+      // @todo: lots of cleanup here
+      // Hack together an rsync command
+      var envSite = [env, siteid].join('.');
+      var fileBox = envSite + '@appserver.' + envSite + '.drush.in:files/';
+      var fileMount = '/media';
+      var opts = '-rlvz --size-only --ipv4 --progress -e \'ssh -p 2222\'';
+
+      // Rysnc our files
+      return rsync.cmd([opts, fileBox, fileMount], true);
+
+    });
+  };
+
+  return {
+    pullCode: pullCode,
+    pullDB: pullDB,
+    pullFiles: pullFiles
+  };
+
 };

@@ -1,12 +1,13 @@
 'use strict';
 
-// Intrinsic modules
-var crypto = require('crypto');
-
-// NPM modules
-var _ = require('lodash');
-
 module.exports = function(kbox) {
+
+  // Intrinsic modules
+  var crypto = require('crypto');
+  var path = require('path');
+
+  // NPM modules
+  var _ = require('lodash');
 
   // Constants
   var PLUGIN_NAME = 'kalabox-plugin-pantheon';
@@ -282,6 +283,20 @@ module.exports = function(kbox) {
 
       }
 
+    });
+
+    // Install the terminus container for our things and also
+    // pull down a site or create a new site
+    kbox.core.events.on('post-install', function(app, done) {
+      // Make sure we install the terminus container for this app
+      var opts = {
+        name: 'terminus',
+        srcRoot: path.resolve(__dirname, '..', '..', '..'),
+      };
+      // Install the terminus container and then do install things if
+      // this is the first time
+      return kbox.engine.build(opts)
+      .nodeify(done);
     });
 
     /*
