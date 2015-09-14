@@ -165,7 +165,6 @@ after-success() {
       # Push up our generated app deps plus a tag if we also have a new version
       git push origin $TRAVIS_BRANCH --tags
 
-    else
     fi
   fi
 }
