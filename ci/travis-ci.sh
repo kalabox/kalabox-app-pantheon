@@ -91,10 +91,11 @@ after-success() {
     git remote add origin git@github.com:$TRAVIS_REPO_SLUG.git
     git checkout $TRAVIS_BRANCH
 
-    if [ "$TRAVIS_BRANCH" === 'master']; then
+    if [ "$TRAVIS_BRANCH" === "master"]; then
       # If we are on the master branch then we need to grab the dev
       # releases of packages when we build our app deps later on
       export KALABOX_DEV=true
+      echo $KALABOX_DEV
     fi
 
     # Go into app and build out the deps so all kalabox needs to do is grab the
@@ -161,11 +162,11 @@ after-success() {
         $HOME/npm-config.sh > /dev/null
         npm publish ./
       fi
-
-      # Push up our generated app deps plus a tag if we also have a new version
-      git push origin $TRAVIS_BRANCH --tags
-
     fi
+
+    # Push up our generated app deps plus a tag if we also have a new version
+    git push origin $TRAVIS_BRANCH --tags
+
   fi
 }
 
