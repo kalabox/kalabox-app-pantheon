@@ -5,10 +5,17 @@
   },
   "version": "0.10.0",
   "postInstallPkgs": [
-    "kalabox-plugin-pantheon@^0.10.0",
     "kalabox-plugin-drush@^0.10.0",
     "kalabox-plugin-git@^0.10.0",
     "kalabox-plugin-rsync@^0.10.0"
   ],
-  "dependencies": {}
+  "dependencies": {
+    "bluebird": "^2.9.32",
+    "fs-extra": "^0.18.2",
+    "inquirer": "^0.9.0",
+    "ssh-fingerprint": "0.0.1",
+    "ssh-keygen": "^0.2.1",
+    "lodash": "^3.9.3",
+    "restler": "^3.3.0"
+  }
 }

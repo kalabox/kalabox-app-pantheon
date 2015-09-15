@@ -5,7 +5,7 @@ module.exports = function(kbox) {
 
   // Pkg.json
   var pkgJson = require('./package.json');
-  var PLUGIN_NAME = 'kalabox-plugin-pantheon';
+  var PLUGIN_NAME = 'kalabox-app-pantheon';
 
   // Instrinsc modules
   var path = require('path');

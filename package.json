@@ -20,16 +20,14 @@
     "postinstall": "node ./scripts/downloadLibs.js"
   },
   "postInstallAssets": {
-    "kalabox-plugin-pantheon": {
-      "client": "lib/client.js"
+    "kalabox-app-pantheon": {
+      "client": "app/plugins/kalabox-plugin-pantheon/lib/client.js"
     }
   },
   "dependencies": {
     "bluebird": "^2.9.32",
-    "fs-extra": "^0.24.0",
-    "lodash": "^3.9.3",
-    "ssh-fingerprint": "0.0.1",
-    "ssh-keygen": "^0.2.1"
+    "fs-extra": "^0.18.2",
+    "lodash": "^3.9.3"
   },
   "devDependencies": {
     "grunt": "^0.4.5",
