@@ -2,7 +2,7 @@
 
 COMMAND=$1
 EXIT_VALUE=0
-
+PLUGIN_REPO="kalabox/kalabox-plugin-git"
 ##
 # SCRIPT COMMANDS
 ##
@@ -12,23 +12,29 @@ EXIT_VALUE=0
 # Do some stuff before npm install
 #
 before-install() {
+  # Gather intel
+  echo $TRAVIS_TAG
+  echo $TRAVIS_BRANCH
+  echo $TRAVIS_PULL_REQUEST
+  echo $TRAVIS_REPO_SLUG
+  echo $TRAVIS_NODE_VERSION
+  echo $TRAVIS_BUILD_DIR
   # Add our key
-  if ([ $TRAVIS_BRANCH == "master" ] || [ ! -z "$TRAVIS_TAG" ]) &&
-    [ $TRAVIS_PULL_REQUEST == "false" ] &&
-    [ $TRAVIS_REPO_SLUG == "kalabox/kalabox-plugin-git" ]; then
+  if [ $TRAVIS_PULL_REQUEST == "false" ] &&
+    [ -z "$TRAVIS_TAG" ] &&
+    [ $TRAVIS_REPO_SLUG == $PLUGIN_REPO ] &&
+    [ $TRAVIS_NODE_VERSION == "0.12" ]; then
       openssl aes-256-cbc -K $encrypted_dd11ce1f2e12_key -iv $encrypted_dd11ce1f2e12_iv -in ci/travis.id_rsa.enc -out $HOME/.ssh/travis.id_rsa -d
   fi
 }
-
-#$ node -pe 'JSON.parse(process.argv[1]).foo' "$(cat foobar.json)"
 
 # before-script
 #
 # Setup Drupal to run the tests.
 #
 before-script() {
+  # Global install some npm
   npm install -g grunt-cli
-  # Upgrade to lastest NPM
   npm install -g npm
 }
 
@@ -38,12 +44,7 @@ before-script() {
 #
 script() {
   # Code l/hinting and standards
-  grunt test
-  # @todo clean this up
-  EXIT_STATUS=$?
-  if [[ $EXIT_STATUS != 0 ]] ; then
-    exit $EXIT_STATUS
-  fi
+  run_command grunt test
 }
 
 # after-script
@@ -59,46 +60,88 @@ after-script() {
 # Clean up after the tests.
 #
 after-success() {
-  if ([ $TRAVIS_BRANCH == "master" ] || [ ! -z "$TRAVIS_TAG" ]) &&
-    [ $TRAVIS_PULL_REQUEST == "false" ] &&
-    [ $TRAVIS_REPO_SLUG == "kalabox/kalabox-plugin-git" ]; then
+  # Check for correct travis conditions aka
+  # 1. Is not a pull request
+  # 2. Is not a "travis" tag
+  # 3. Is correct slug
+  # 4. Is latest node version
+  if [ $TRAVIS_PULL_REQUEST == "false" ] &&
+    [ -z "$TRAVIS_TAG" ] &&
+    [ $TRAVIS_REPO_SLUG == $PLUGIN_REPO ] &&
+    [ $TRAVIS_NODE_VERSION == "0.12" ]; then
 
-    # Only do our stuff on the latest node version
-    if [ $TRAVIS_NODE_VERSION == "0.12" ] ; then
-      # DO VERSION BUMPING FOR KALABOX/KALABOX
-      COMMIT_MESSAGE=$(git log --format=%B -n 1)
-      BUILD_VERSION=$(node -pe 'JSON.parse(process.argv[1]).version' "$(cat $TRAVIS_BUILD_DIR/package.json)")
-      # BUMP patch but only on master and not a tag
-      if [ -z "$TRAVIS_TAG" ] && [ $TRAVIS_BRANCH == "master" ] && [ "${COMMIT_MESSAGE}" != "Release v${BUILD_VERSION}" ] ; then
+    # Try to grab our git tag
+    DISCO_TAG=$(git describe --contains HEAD)
+    echo $DISCO_TAG
+    # Grab our package.json version
+    BUILD_VERSION=$(node -pe 'JSON.parse(process.argv[1]).version' "$(cat $TRAVIS_BUILD_DIR/package.json)")
+    echo $BUILD_VERSION
+
+    # Only do stuff if
+    #   1. DISCO_TAG is non-empty
+    #   2. Our commit is a tagged commit
+    #   3. Our branch name is contained within the tag
+    # If this is all true then we want to roll a new package and push up other relevant
+    # versioned thing. This gaurantees that we can still tag things without setting off a build/deploy
+    if [ ! -z "$DISCO_TAG" ] && [[ ! "$DISCO_TAG" =~ "~" ]] && [[ "$DISCO_TAG" =~ "$TRAVIS_BRANCH" ]]; then
+
+      # Split our package version and tag into arrays so we can make sure our tag is larger
+      # than the package version
+      IFS='.' read -a BUILD_ARRAY <<< "$BUILD_VERSION"
+      IFS='.' read -a DISCO_ARRAY <<< "$DISCO_TAG"
+
+      # Build and deploy packages only in the two scenarios
+      #   1. If our minor versions are the same and the tag patch version is larger
+      #   2. If this is a new minor version and that minor version is larger than previous minor versions
+      if [ "${DISCO_ARRAY[1]}" -gt "${BUILD_ARRAY[1]}" ] ||
+        ([ "${DISCO_ARRAY[1]}" -eq "${BUILD_ARRAY[1]}" ] && [ "${DISCO_ARRAY[2]}" -gt "${BUILD_ARRAY[2]}" ]); then
+
+        # SET UP SSH THINGS
+        eval "$(ssh-agent)"
+        chmod 600 $HOME/.ssh/travis.id_rsa
+        ssh-add $HOME/.ssh/travis.id_rsa
+        git config --global user.name "Kala C. Bot"
+        git config --global user.email "kalacommitbot@kalamuna.com"
+
+        # DEFINE SOME FUN COMMIT MESSAGE VERBS
+        COMMIT_MSG[0]='TWERKING'
+        COMMIT_MSG[1]='BUILDING'
+        COMMIT_MSG[2]='HYPERSPLICING'
+        COMMIT_MSG[3]='RICK ROLLIN'
+        COMMIT_MSG[4]='CONSTRUCTING'
+        COMMIT_MSG[5]='DECREEING'
+        COMMIT_MSG[6]='MOLECULARLY REASSEMBLING'
+        COMMIT_MSG[7]='SCRIBING'
+        COMMIT_MSG[8]='ROUGH RIDING'
+        COMMIT_MSG[9]='LIBERATING'
+        MODULUS=${#COMMIT_MSG[@]}
+        COMMIT_RANDOM=$((${DISCO_ARRAY[2]}%${MODULUS}))
+        COMMIT_MSG=${COMMIT_MSG[COMMIT_RANDOM]}
+
+        # PUSH BACK TO OUR GIT REPO
+        # Bump our things and reset tags
         grunt bump-patch
+
+        # Reset upstream and tags so we can push our changes to it
+        # We need to re-add this in because our clone was originally read-only
+        git remote rm origin
+        git remote add origin git@github.com:$TRAVIS_REPO_SLUG.git
+        git checkout $TRAVIS_BRANCH
+        git tag -d $DISCO_TAG
+        git push origin :$DISCO_TAG
+
+        # Add all our new code and push reset tag with ci skipping on
+        git add --all
+        git commit -m "${COMMIT_MSG} VERSION ${DISCO_TAG} [ci skip]" --author="Kala C. Bot <kalacommitbot@kalamuna.com>" --no-verify
+        git tag $DISCO_TAG
+        git push origin $TRAVIS_BRANCH --tags
+
+        # NODE PACKAGES
+        # Deploy to NPM
+        $HOME/npm-config.sh > /dev/null
+        npm publish ./
       fi
-      # Get updated build version
-      BUILD_VERSION=$(node -pe 'JSON.parse(process.argv[1]).version' "$(cat $TRAVIS_BUILD_DIR/package.json)")
-      chmod 600 $HOME/.ssh/travis.id_rsa
-
-      # SET UP SSH THINGS
-      eval "$(ssh-agent)"
-      ssh-add $HOME/.ssh/travis.id_rsa
-      git config --global user.name "Kala C. Bot"
-      git config --global user.email "kalacommitbot@kalamuna.com"
-
-      # RESET UPSTREAM SO WE CAN PUSH VERSION CHANGES TO IT
-      # We need to re-add this in because our clone was originally read-only
-      git remote rm origin
-      git remote add origin git@github.com:$TRAVIS_REPO_SLUG.git
-      git checkout $TRAVIS_BRANCH
-      git add -A
-      if [ -z "$TRAVIS_TAG" ]; then
-        git commit -m "KALABOT TWERKING VERSION ${BUILD_VERSION} [ci skip]" --author="Kala C. Bot <kalacommitbot@kalamuna.com>" --no-verify
-      fi
-      git push origin $TRAVIS_BRANCH
-
-      # DEPLOY OUR BUILD TO NPM
-      $HOME/npm-config.sh > /dev/null
-      npm publish ./
     fi
-  else
-    exit $EXIT_VALUE
   fi
 }
 
