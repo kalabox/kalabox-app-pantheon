@@ -8,8 +8,8 @@
   ],
   "shareIgnores": [
     "sites/default/files/*",
-    "files",
-    ".git"
+    "files/*",
+    "wp-content/uploads/*"
   ],
   "pluginConf": {
     "kalabox-plugin-pantheon": {
