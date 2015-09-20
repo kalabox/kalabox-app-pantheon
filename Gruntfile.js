@@ -26,11 +26,14 @@ module.exports = function(grunt) {
     // This handles automatic version bumping in travis
     bump: {
       options: {
-        files: ['package.json'],
+        files: [
+          'package.json',
+          'app/package.json'
+        ],
         updateConfigs: [],
         commit: true,
         commitMessage: 'Release v%VERSION%',
-        commitFiles: ['package.json', 'bower.json'],
+        commitFiles: ['package.json', 'app/package.json'],
         createTag: true,
         tagName: 'v%VERSION%',
         tagMessage: 'Version %VERSION%',
