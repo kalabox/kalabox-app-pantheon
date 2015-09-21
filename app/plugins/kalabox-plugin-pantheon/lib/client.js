@@ -18,6 +18,7 @@ var fingerprint = require('ssh-fingerprint');
 var keygen = require('ssh-keygen');
 var inquirer = require('inquirer');
 var Promise = require('bluebird');
+var retry = require('retry-bluebird');
 Promise.longStackTraces();
 
 /*
@@ -355,27 +356,17 @@ Client.prototype.__request = function(verb, pathname, data) {
   // @otdo: clean this code up
   .then(function(url) {
 
-    // Send REST request.
-    return new Promise(function(fulfill, reject) {
-      rest[verb](url, data)
-      .on('success', fulfill)
-      .on('fail', function(data, resp) {
-        var err = new Error(data);
-        reject(err);
-      })
-      .on('error', reject);
-    })
-    // Give request a twenty second timeout.
-    .timeout(20 * 1000)
-    // Wrap errors for more information.
-    .catch(function(err) {
-      var dataString = typeof data === 'object' ? JSON.stringify(data) : data;
-      // @todo: retry on fail
-      throw new Error(err,
-        'Error during REST request. url=%s, data=%s.',
-        [verb, url].join(':'),
-        dataString
-      );
+    return retry({max: 7}, function() {
+      // Send REST request.
+      return new Promise(function(fulfill, reject) {
+        rest[verb](url, data)
+        .on('success', fulfill)
+        .on('fail', function(data, resp) {
+          var err = new Error(data);
+          reject(err);
+        })
+        .on('error', reject);
+      });
     });
 
   });
