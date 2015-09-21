@@ -133,7 +133,7 @@ var getProjectVersion = function(project, callback) {
 
   // If we are in dev mode this is trivial
   if (getDevMode() === true || getDevMode() === 'true') {
-    callback('master');
+    callback('v' + ['0', getMinorVersion()].join('.'));
   }
   // If not we need to do some exploration on the github API
   else {

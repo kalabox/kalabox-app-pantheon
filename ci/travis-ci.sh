@@ -91,7 +91,7 @@ after-success() {
     git remote add origin git@github.com:$TRAVIS_REPO_SLUG.git
     git checkout $TRAVIS_BRANCH
 
-    if [ $TRAVIS_BRANCH == "master" ]; then
+    if [ -z "$DISCO_TAG" ]; then
       # If we are on the master branch then we need to grab the dev
       # releases of packages when we build our app deps later on
       export KALABOX_DEV=true
