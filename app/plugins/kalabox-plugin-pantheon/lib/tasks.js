@@ -137,7 +137,7 @@ module.exports = function(kbox) {
 
           // Pull our code
           .then(function() {
-            return puller.pullCode(pantheonConf.site, pantheonConf.env, 'pull');
+            return puller.pullCode(pantheonConf.site, pantheonConf.env);
           })
 
           // Pull our DB if selected
@@ -161,7 +161,7 @@ module.exports = function(kbox) {
       };
     });
 
-    // kbox appname pull
+    // kbox appname push
     kbox.tasks.add(function(task) {
 
       // Grab pantheon conf
@@ -267,7 +267,7 @@ module.exports = function(kbox) {
 
       // Pull our code for the first time
       .then(function() {
-        return puller.pullCode(pantheonConf.site, pantheonConf.env, 'clone');
+        return puller.pullCode(pantheonConf.site, pantheonConf.env);
       })
 
       // Pull our DB
