@@ -5,6 +5,7 @@ module.exports = function(kbox) {
   // Intrinsic modules
   var crypto = require('crypto');
   var path = require('path');
+  var fs = require('fs');
 
   // NPM modules
   var _ = require('lodash');
@@ -345,19 +346,33 @@ module.exports = function(kbox) {
       // Symlinks
       else if (component.name === 'appserver') {
 
-        // Symlink the filemount to /media
-        var fileMount = frameworkSpec[framework].filemount;
-        var cmd = ['ln', '-nsf', '/media', '/code/' + fileMount];
+        // Emulate /srv/bindings
+        var cmd = ['mkdir', '-p', '/srv/bindings'];
         return kbox.engine.queryData(component.containerId, cmd)
 
         // Emulate /srv/bindings
         .then(function() {
-          var cmd = ['mkdir', '-p', '/srv/bindings'];
-          return kbox.engine.queryData(component.containerId, cmd);
-        })
-        .then(function() {
           var cmd = ['ln', '-nsf', '/', '/srv/bindings/kalabox'];
           return kbox.engine.queryData(component.containerId, cmd);
+        })
+        // Symlink the filemount to /media if appropriate
+        .then(function() {
+
+          // Grab the filemount
+          var fileMount = frameworkSpec[framework].filemount;
+
+          // Get the mount directory
+          var upOneDir = fileMount.split('/');
+          upOneDir.pop();
+          var mountDir = path.join(app.root, upOneDir.join(path.sep));
+
+          // Check if mount dir exists and set the symlink if it does
+          if (fs.existsSync(mountDir)) {
+            var lnkFile = '/' + [app.config.codeDir, fileMount].join('/');
+            var cmd = ['ln', '-nsf', '/media', lnkFile];
+            return kbox.engine.queryData(component.containerId, cmd);
+          }
+
         })
 
         .nodeify(done);
