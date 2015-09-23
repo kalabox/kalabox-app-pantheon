@@ -34,7 +34,13 @@ module.exports = function(kbox, app) {
   /*
    * Pull down our sites code
    */
-  var pullCode = function(site, env, type) {
+  var pullCode = function(site, env) {
+
+    // Handle the use case where someone destroys/builds and then
+    // wants to grab their site. Also coud help correct a botched
+    // first create
+    var gitFile = path.join(app.config.codeRoot, '.git');
+    var type = (fs.existsSync(gitFile)) ? 'pull' : 'clone';
 
     // the pantheon site UUID
     var siteid = null;
