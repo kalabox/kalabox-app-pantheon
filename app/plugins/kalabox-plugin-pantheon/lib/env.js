@@ -355,24 +355,29 @@ module.exports = function(kbox) {
           var cmd = ['ln', '-nsf', '/', '/srv/bindings/kalabox'];
           return kbox.engine.queryData(component.containerId, cmd);
         })
-        // Symlink the filemount to /media if appropriate
+        // Check if symlink dir exists
         .then(function() {
-
-          // Grab the filemount
           var fileMount = frameworkSpec[framework].filemount;
-
-          // Get the mount directory
           var upOneDir = fileMount.split('/');
           upOneDir.pop();
-          var mountDir = path.join(app.root, upOneDir.join(path.sep));
-
-          // Check if mount dir exists and set the symlink if it does
-          if (fs.existsSync(mountDir)) {
+          var codeDir = app.config.codeDir;
+          var dirCheck = '/' + [codeDir, upOneDir.join('/')].join('/');
+          var cmd = ['ls', dirCheck];
+          return kbox.engine.queryData(component.containerId, cmd);
+        })
+        // Check if we can create the symlink or not
+        .catch(function(error) {
+          return !_.contains(error.message, 'Non-zero exit code');
+        })
+        // Symlink the filemount to /media if appropriate
+        .then(function(canCreate) {
+          if (canCreate !== false) {
+            var fileMount = frameworkSpec[framework].filemount;
+            // Check if mount dir exists and set the symlink if it does
             var lnkFile = '/' + [app.config.codeDir, fileMount].join('/');
             var cmd = ['ln', '-nsf', '/media', lnkFile];
             return kbox.engine.queryData(component.containerId, cmd);
           }
-
         })
 
         .nodeify(done);
