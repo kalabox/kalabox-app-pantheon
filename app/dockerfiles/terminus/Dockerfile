@@ -14,7 +14,7 @@ RUN \
   ln -s /usr/local/src/drush6/drush /usr/bin/drush6 && \
   curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
   chmod +x wp-cli.phar && mv wp-cli.phar /usr/local/bin/wp && \
-  curl https://github.com/pantheon-systems/cli/releases/download/0.8.0/terminus.phar -L -o /usr/local/bin/terminus && \
+  curl https://github.com/pantheon-systems/cli/releases/download/0.8.1/terminus.phar -L -o /usr/local/bin/terminus && \
   chmod +x /usr/local/bin/terminus && \
   apt-get -y clean && \
   apt-get -y autoclean && \

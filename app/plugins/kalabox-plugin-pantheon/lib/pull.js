@@ -52,9 +52,7 @@ module.exports = function(kbox, app) {
     // Set the connection mode to git if needed
     // and then try again
     .then(function(connectionMode) {
-      var modeSplit = connectionMode.split(':');
-      var mode = modeSplit[1].trim().toLowerCase();
-      if (mode !== 'git') {
+      if (connectionMode.connection_mode !== 'git') {
         // @todo: actually test this part
         return terminus.setConnectionMode(site, env)
           .then(function(data) {
@@ -67,7 +65,7 @@ module.exports = function(kbox, app) {
     .then(function() {
       return terminus.getUUID(site)
       .then(function(uuid) {
-        siteid = uuid.trim();
+        siteid = uuid;
       });
     })
 
@@ -158,7 +156,7 @@ module.exports = function(kbox, app) {
 
     // Check if site has a backup
     .then(function(uuid) {
-      return terminus.hasDBBackup(uuid.trim(), env);
+      return terminus.hasDBBackup(uuid, env);
     })
 
     // If no backup then MAKE THAT SHIT
@@ -176,6 +174,8 @@ module.exports = function(kbox, app) {
     })
 
     // Import the backup
+    // @todo: waiting for resolution on
+    // https://github.com/kalabox/kalabox/issues/539
     .then(function(data) {
       var downloadSplit = data.split('Downloaded');
       var dbFile = downloadSplit[1].trim();
@@ -211,7 +211,7 @@ module.exports = function(kbox, app) {
     // errr PULL THAT CODE!
     .then(function(uuid) {
       // This can have a newline in it that F's everything
-      var siteid = uuid.trim();
+      var siteid = uuid;
 
       // @todo: lots of cleanup here
       // Hack together an rsync command
