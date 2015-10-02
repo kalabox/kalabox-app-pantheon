@@ -326,6 +326,12 @@ Terminus.prototype.getSiteAliases = function() {
 Terminus.prototype.downloadDBBackup = function(site, env) {
 
   // Request the DB output
+  // @todo: waiting for resolution on
+  // https://github.com/kalabox/kalabox/issues/539
+  // For now we assume the download completed ok and we are looking
+  // for a hardcoded location
+  // Ultimately we want to parse data correctly to get the DB dump
+  // location
   return this.__request(
     ['kterminus'],
     ['site', 'backups', 'get'],
@@ -333,7 +339,7 @@ Terminus.prototype.downloadDBBackup = function(site, env) {
       '--site=' + site,
       '--env=' + env,
       '--element=db',
-      '--to=/src/config/terminus',
+      '--to=/src/config/terminus/kalabox-import-db.sql.gz',
       '--latest'
     ]
   );

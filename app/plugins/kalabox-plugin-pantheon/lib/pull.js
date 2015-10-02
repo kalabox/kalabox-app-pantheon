@@ -174,11 +174,14 @@ module.exports = function(kbox, app) {
     })
 
     // Import the backup
-    // @todo: waiting for resolution on
-    // https://github.com/kalabox/kalabox/issues/539
     .then(function(data) {
-      var downloadSplit = data.split('Downloaded');
-      var dbFile = downloadSplit[1].trim();
+      // @todo: waiting for resolution on
+      // https://github.com/kalabox/kalabox/issues/539
+      // For now we assume the download completed ok and we are looking
+      // for a hardcoded location
+      // Ultimately we want to parse data correctly to get the DB dump
+      // location
+      var dbFile = '/src/config/terminus/kalabox-import-db.sql.gz';
       // Perform a container run.
       var payload = ['import-mysql', 'localhost', null, '3306', dbFile];
       return engine.queryData(dbID, payload);
