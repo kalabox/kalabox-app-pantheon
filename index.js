@@ -10,6 +10,9 @@ module.exports = function(kbox) {
   // Instrinsc modules
   var path = require('path');
 
+  // NPM modules
+  var _ = require('lodash');
+
   // Grab vendor modules
   var clientPath = pkgJson.postInstallAssets[PLUGIN_NAME].client;
   var Client = require('./' + path.join('vendor', PLUGIN_NAME, clientPath));
@@ -35,6 +38,39 @@ module.exports = function(kbox) {
   // Task to create kalabox apps
   kbox.tasks.add(function(task) {
     kbox.create.buildTask(task, 'pantheon');
+  });
+
+  // Create integration.
+  kbox.integrations.create('pantheon', function(api) {
+
+    // Set the sites method of the api.
+    api.methods.sites = function() {
+      var self = this;
+      // Get email.
+      return kbox.Promise.try(function() {
+        return self.ask({
+          id: 'email'
+        });
+      })
+      // Set session based on email.
+      .then(function(email) {
+        var session = pantheon.getSessionFile(email);
+        pantheon.setSession(session);
+      })
+      // Get and map sites.
+      .then(function() {
+        return pantheon.getSites()
+        .then(function(sites) {
+          return _.map(sites, function(val, key) {
+            return {
+              name: val.information.name,
+              id: key
+            };
+          });
+        });
+      });
+    };
+
   });
 
 };

@@ -161,6 +161,41 @@ module.exports = function(kbox) {
       };
     });
 
+    // Set the integrations pull method.
+    kbox.integrations.get('pantheon').methods.pull = function() {
+      var self = this;
+      return kbox.Promise.all([
+        self.ask({
+          id: 'shouldPullFiles'
+        }),
+        self.ask({
+          id: 'shouldPullDatabase'
+        })
+      ])
+      .spread(function(shouldPullFiles, shouldPullDatabase) {
+        // Grab pantheon config so we can mix in interactives
+        var pantheonConf = app.config.pluginConf['kalabox-plugin-pantheon'];
+        // Grab pantheon aliases
+        return terminus.getSiteAliases()
+        // Pull our code
+        .then(function() {
+          return puller.pullCode(pantheonConf.site, pantheonConf.env);
+        })
+        // Pull our DB if selected
+        .then(function() {
+          if (shouldPullDatabase) {
+            return puller.pullDB(pantheonConf.site, pantheonConf.env);
+          }
+        })
+        // Pull our files if selected
+        .then(function() {
+          if (shouldPullFiles) {
+            return puller.pullFiles(pantheonConf.site, pantheonConf.env);
+          }
+        });
+      });
+    };
+
     // kbox appname push
     kbox.tasks.add(function(task) {
 
