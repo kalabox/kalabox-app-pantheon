@@ -174,6 +174,7 @@ module.exports = function(kbox) {
       task.kind = 'delegate';
       task.options.push({
         name: 'message',
+        alias: 'm',
         kind: 'string',
         description: 'Tell us about your change'
       });
@@ -197,7 +198,7 @@ module.exports = function(kbox) {
         var questions = [
           {
             type: 'input',
-            name: 'm',
+            name: 'message',
             message: 'Tell us about these changes.',
             default: 'Best changes ever!'
           },
