@@ -353,7 +353,7 @@ Client.prototype.__request = function(verb, pathname, data) {
   })
 
   // Make the Request and handle the result
-  // @otdo: clean this code up
+  // @todo: clean this code up
   .then(function(url) {
 
     return retry({max: 7}, function() {
@@ -631,7 +631,7 @@ Client.prototype.getSites = function() {
 Client.prototype.getEnvironments = function(sid) {
 
   // Make request
-  return this.__request('get', ['sites', sid.trim(), 'environments'], {})
+  return this.__request('get', ['sites', sid, 'environments'], {})
 
   // Return object of envs
   .then(function(envs) {
@@ -650,7 +650,7 @@ Client.prototype.getBackups = function(sid, env) {
   // Send REST request.
   return this.__request(
     'get',
-    ['sites', sid.trim(), 'environments', env.trim(), 'backups', 'catalog'],
+    ['sites', sid, 'environments', env, 'backups', 'catalog'],
     {}
   )
 
@@ -669,7 +669,7 @@ Client.prototype.getBackups = function(sid, env) {
 Client.prototype.getBindings = function(sid) {
 
   // Send REST request.
-  return this.__request('get', ['sites', sid.trim(), 'bindings'], {})
+  return this.__request('get', ['sites', sid, 'bindings'], {})
 
   .then(function(bindings) {
     return bindings;

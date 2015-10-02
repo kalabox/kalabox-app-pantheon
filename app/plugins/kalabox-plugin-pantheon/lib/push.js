@@ -46,15 +46,14 @@ module.exports = function(kbox, app) {
     // Set the connection mode to git if needed
     // and then try again
     .then(function(connectionMode) {
-      var modeSplit = connectionMode.split(':');
-      var mode = modeSplit[1].trim().toLowerCase();
 
       // If we are in SFTP mode set back to git
-      if (mode !== 'git') {
+      if (connectionMode.connection_mode !== 'git') {
 
         // @todo: actually test this part
         return terminus.setConnectionMode(site, env)
 
+        // Try again after we set the connection mode correctly
         .then(function(data) {
           pushCode(site, env);
         });
@@ -178,7 +177,7 @@ module.exports = function(kbox, app) {
 
     // Push up our files
     .then(function(uuid) {
-      var siteid = uuid.trim();
+      var siteid = uuid;
       // @todo: lots of cleanup here
       var envSite = [env, siteid].join('.');
       var fileBox = envSite + '@appserver.' + envSite + '.drush.in:files/';

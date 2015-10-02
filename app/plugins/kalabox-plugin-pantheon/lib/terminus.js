@@ -247,11 +247,17 @@ Terminus.prototype.wakeSite = function(site, env) {
  */
 Terminus.prototype.getConnectionMode = function(site, env) {
 
+  // Grab the data
   return this.__request(
     ['kterminus'],
     ['site', 'connection-mode'],
     ['--json', '--site=' + site, '--env=' + env]
-  );
+  )
+
+  // Return a parsed json object
+  .then(function(connectionMode) {
+    return JSON.parse(connectionMode);
+  });
 
 };
 
@@ -294,7 +300,7 @@ Terminus.prototype.getUUID = function(site) {
   )
 
   .then(function(uuid) {
-    self.uuid = uuid;
+    self.uuid = JSON.parse(uuid);
     return self.kbox.Promise.resolve(self.uuid);
   });
 
@@ -315,21 +321,29 @@ Terminus.prototype.getSiteAliases = function() {
  * Get latest DB backup and save it in /other
  *
  * terminus site backups get
- * --element=database --site=<site> --env=<env> --to-directory=$HOME/Desktop/ --latest
+ * --element=database --site=<site> --env=<env> --to=$HOME/Desktop/ --latest
  */
 Terminus.prototype.downloadDBBackup = function(site, env) {
 
+  // Request the DB output
+  // @todo: waiting for resolution on
+  // https://github.com/kalabox/kalabox/issues/539
+  // For now we assume the download completed ok and we are looking
+  // for a hardcoded location
+  // Ultimately we want to parse data correctly to get the DB dump
+  // location
   return this.__request(
     ['kterminus'],
     ['site', 'backups', 'get'],
     [
-      '--json',
-      '--element=database',
       '--site=' + site,
       '--env=' + env,
-      '--to-directory=/src/config/terminus',
+      '--element=db',
+      '--to=/src/config/terminus/kalabox-import-db.sql.gz',
       '--latest'
-    ]);
+    ]
+  );
+
 };
 
 /*
@@ -345,7 +359,7 @@ Terminus.prototype.createDBBackup = function(site, env) {
     ['site', 'backups', 'create'],
     [
       '--json',
-      '--element=database',
+      '--element=db',
       '--site=' + site,
       '--env=' + env
     ]);
