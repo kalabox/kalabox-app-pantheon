@@ -77,7 +77,9 @@ module.exports = function(kbox) {
       task.func = function(done) {
         var opts = drush.getOpts(this.options);
         var cmd = this.payload;
-        cmd.unshift('@dev');
+        if (task.options.name !== undefined) {
+          cmd.unshift('@dev');
+        }
         cmd.push('--strict=0');
         drush.cmd(cmd, opts, done);
       };
