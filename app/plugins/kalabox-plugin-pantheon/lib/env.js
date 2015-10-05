@@ -22,23 +22,17 @@ module.exports = function(kbox) {
     var pantheon = new Client(kbox, app);
 
     // Framework specific stuff
-    // @todo: eventually we will grab the php version directly via terminus
-    // see https://github.com/pantheon-systems/cli/issues/431
     var frameworkSpec = {
       drupal: {
-        php: '5.3.29',
         filemount: 'sites/default/files'
       },
       drupal8: {
-        php: '5.5.24',
         filemount: 'sites/default/files'
       },
       wordpress: {
-        php: '5.5.24',
         filemount: 'wp-content/uploads'
       },
       backdrop: {
-        php: '5.3.29',
         filemount: 'files'
       }
     };
@@ -229,10 +223,9 @@ module.exports = function(kbox) {
         var split = createOptions.name.split('_');
         var type = (split[2]) ? split[2] : split[1];
 
-        // @todo: once https://github.com/pantheon-systems/cli/issues/431
-        // happens we want to change this back to userConf
+        // Set the PHP version from the config
         if (type !== 'db') {
-          var phpVar = 'PHP_VERSION=' + frameworkSpec[framework].php;
+          var phpVar = 'PHP_VERSION=' + app.config.pluginConf[PLUGIN_NAME].php;
           if (!_.includes(installEnv, phpVar)) {
             installEnv.push(phpVar);
           }
