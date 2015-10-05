@@ -13,13 +13,11 @@
   ],
   "pluginConf": {
     "kalabox-plugin-pantheon": {
-      "action": "pull",
       "account": "",
       "drush-version": "6",
       "env": "",
       "framework": "",
-      "php": "5.3.29",
-      "product": "",
+      "php": "",
       "site": "",
       "uuid": "",
       "upstream": ""
