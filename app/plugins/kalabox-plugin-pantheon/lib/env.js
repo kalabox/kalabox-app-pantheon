@@ -64,11 +64,19 @@ module.exports = function(kbox) {
      */
     var getGitInfo = function() {
 
+      // Use our session if we can
       var session = pantheon.getSession();
       if (session && session.email && session.name) {
         return {
           email: session.email,
           name: session.name
+        };
+      }
+      // If we cant for whatever reason then so this instead
+      else {
+        return {
+          email: app.config.pluginConf[PLUGIN_NAME].account,
+          name: app.config.pluginConf[PLUGIN_NAME].account
         };
       }
 
@@ -214,10 +222,8 @@ module.exports = function(kbox) {
      */
     kbox.core.events.on('pre-engine-create', function(createOptions, done) {
 
-      var name = createOptions.name;
-
       // Only do this on named containers
-      if (name) {
+      if (createOptions.name) {
 
         // Don't add phpversion to db containers
         var split = createOptions.name.split('_');
@@ -252,30 +258,17 @@ module.exports = function(kbox) {
       createOptions = addPush(createOptions, pantheonUser);
 
       // Make sure we have SSH keys
-      // @todo: we are assuming our temp containers are the only ones that
-      // need our pantheon ssh keys which may not be a good assumption
-      // @todo: this IS a bad assumption the git container gets name undefined
-      // we should change this or rework something
-      if (name === undefined || _.includes(name, 'kalabox_temp')) {
+      return pantheon.sshKeySetup(createOptions)
 
-        // @todo: two file reads and a request might not be great for perfomance
-        // here even with static caching
-        return pantheon.sshKeySetup()
+      // Stuff
+      .then(function(keySet) {
+        if (!keySet) {
+          // @todo: something helpful
+        }
+      })
 
-        .then(function(keySet) {
-          if (!keySet) {
-            // @todo: something helpful
-          }
-        })
-
-        .nodeify(done);
-
-      }
-      else {
-
-        done();
-
-      }
+      // Return
+      .nodeify(done);
 
     });
 

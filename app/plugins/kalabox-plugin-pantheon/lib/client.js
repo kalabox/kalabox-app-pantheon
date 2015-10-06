@@ -219,10 +219,24 @@ Client.prototype.getSession = function(email) {
     return session;
   }
 
-  // We have nothing!
+  // At least return the email and name even if we are invalid
   else {
-    return undefined;
+    return {
+      email: session.email,
+      name: session.name
+    };
   }
+
+};
+
+/*
+ * Returns true if we need to reauth
+ */
+Client.prototype.needsReauth = function(session) {
+
+  var reUp = (session && session.session === undefined);
+  this.kbox.core.log.debug('SESSION VALID => ' + !reUp);
+  return reUp;
 
 };
 
@@ -234,13 +248,15 @@ Client.prototype.reAuthSession = function() {
   // We need ourselves present when we make promises
   var self = this;
 
+  var session = this.getSession();
+
   // Prompt questions
   // @todo: display the account for the PW
   var questions = [
     {
       name: 'password',
       type: 'password',
-      message: 'Pantheon dashboard password'
+      message: 'Pantheon dashboard password (' + session.email + ')'
     }
   ];
 
@@ -249,6 +265,7 @@ Client.prototype.reAuthSession = function() {
    */
   var askIt = function(questions) {
     return new Promise(function(answers) {
+      console.log('Your Pantheon session has expired. We need to reauth!');
       inquirer.prompt(questions, answers);
     });
   };
@@ -322,7 +339,7 @@ Client.prototype.__request = function(verb, pathname, data) {
     var session = this.getSession();
 
     // Prompt the user to reauth if the session is invalid
-    if (session === undefined) {
+    if (this.needsReauth(session)) {
 
       // Reuath attempt
       return this.reAuthSession()
@@ -478,10 +495,45 @@ Client.prototype.__postSSHKey = function(sshKey) {
  * We only needs to check for this if we are going to run something in either
  * the terminus/git/rsync containers
  */
-Client.prototype.sshKeySetup = function() {
+Client.prototype.sshKeySetup = function(opts) {
 
   // Check static cache
   if (this.keySet === true) {
+    return Promise.resolve(true);
+  }
+
+  /*
+   * Determines whether a container needs SSH keys or not
+   * @todo: this is better than what we had but probably still needs
+   * improvement
+   */
+  var needsSshKeys = function(opts) {
+
+    // Check if we have a temp container or not
+    var isTemp = _.includes(opts.name, 'kalabox_temp');
+
+    // Check to see if this container is named correctly
+    var namedCorrect = opts.name === undefined || isTemp;
+
+    // Check to see if this image is invalidates the need
+    var imageCorrect = true;
+    if (opts.image) {
+      // Get image type
+      var type = _.head(_.last(opts.image.split('/')).split(':'));
+
+      // List of excluded images
+      var badImageTypes = ['debian'];
+
+      // Change to false if our image type is an excluded type
+      imageCorrect = !_.includes(badImageTypes, type);
+    }
+
+    return namedCorrect && imageCorrect;
+
+  };
+
+  // Resolve if this container does not need sshKeys
+  if (!needsSshKeys(opts)) {
     return Promise.resolve(true);
   }
 
