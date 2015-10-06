@@ -99,7 +99,7 @@ Terminus.prototype.__request = function(cmd, args, options) {
 
   // Prompt the user to reauth if the session is invalid
   // @todo: the mostly repeated conditional here is gross lets improve it
-  if (session === undefined) {
+  if (this.pantheon.needsReauth(session)) {
 
     // Reuath attempt
     return this.pantheon.reAuthSession()
@@ -193,7 +193,7 @@ Terminus.prototype.cmd = function(cmd, opts, done) {
 
   // Prompt the user to reauth if the session is invalid
   // @todo: the mostly repeated conditional here is gross lets improve it
-  if (session === undefined) {
+  if (this.pantheon.needsReauth(session)) {
 
     // Reuath attempt
     return this.pantheon.reAuthSession()
