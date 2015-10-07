@@ -13,7 +13,7 @@ module.exports = function(kbox) {
   // "Constants"
   var PLUGIN_NAME = 'kalabox-plugin-pantheon';
 
-  kbox.ifApp(function(app) {
+  kbox.whenAppRegistered(function(app) {
 
     // Get our push and pull stuff
     var puller = require('./pull.js')(kbox, app);
@@ -162,7 +162,7 @@ module.exports = function(kbox) {
     });
 
     // Set the integrations pull method.
-    kbox.integrations.get('pantheon').methods.pull = function() {
+    kbox.integrations.get('pantheon').setMethod('pull', function() {
       var self = this;
       return kbox.Promise.all([
         self.ask({
@@ -194,7 +194,7 @@ module.exports = function(kbox) {
           }
         });
       });
-    };
+    });
 
     // kbox appname push
     kbox.tasks.add(function(task) {
