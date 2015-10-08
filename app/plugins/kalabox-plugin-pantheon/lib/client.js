@@ -598,10 +598,12 @@ Client.prototype.sshKeySetup = function(opts) {
       }
 
       // Build our key option array
-      // @todo: add session email for comment?
+      // @todo: add session email for comment
+      var pw = (process.platform === 'win32' ? '\'\'' : '');
       var keyOpts = {
         location: PRIVATE_KEY_PATH,
         comment: 'me@kalabox',
+        password: pw,
         read: false,
         destroy: false
       };
@@ -612,9 +614,6 @@ Client.prototype.sshKeySetup = function(opts) {
       });
     }
   })
-
-  // Windows seems to need a brief delay
-  .delay(1000)
 
   // Look to see if pantheon has our pubkey
   .then(function() {
