@@ -613,6 +613,9 @@ Client.prototype.sshKeySetup = function(opts) {
     }
   })
 
+  // Windows seems to need a brief delay
+  .delay(1000)
+
   // Look to see if pantheon has our pubkey
   .then(function() {
 
