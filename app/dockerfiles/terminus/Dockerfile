@@ -10,7 +10,7 @@ RUN \
   ln -s /usr/local/bin/composer /usr/bin/composer && \
   git clone --depth 1 --branch 5.11.0 https://github.com/drush-ops/drush.git /usr/local/src/drush5 && \
   git clone --depth 1 --branch 6.6.0 https://github.com/drush-ops/drush.git /usr/local/src/drush6 && \
-  git clone --depth 1 --branch master https://github.com/drush-ops/drush.git /usr/local/src/drush8 && \
+  git clone --branch 8.0.0-rc1 https://github.com/drush-ops/drush.git /usr/local/src/drush8 && \
   ln -s /usr/local/src/drush5/drush /usr/bin/drush5 && \
   ln -s /usr/local/src/drush6/drush /usr/bin/drush6 && \
   ln -s /usr/local/src/drush8/drush /usr/bin/drush8 && \
