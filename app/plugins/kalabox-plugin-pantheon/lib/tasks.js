@@ -49,22 +49,6 @@ module.exports = function(kbox) {
       });
     };
 
-    /*
-     * Add alias commands onto specific version of drush.
-     */
-     var decorateDrush = function(cmd, options) {
-        var drushVersion = options['drush-version'];
-        // Need dev alias for drush 5,6,7.
-        if (drushVersion !== '8') {
-           cmd.unshift('@dev');
-        }
-       // Need strict=0 for drush 6 on pantheon.
-        if (drushVersion === '6') {
-          cmd.push('--strict=0');
-        }
-        return cmd;
-     };
-
     // Tasks
     // kbox terminus COMMAND
     kbox.tasks.add(function(task) {
@@ -93,7 +77,14 @@ module.exports = function(kbox) {
       task.func = function(done) {
         var opts = drush.getOpts(this.options);
         var cmd = this.payload;
-        drush.cmd(decorateDrush(cmd, opts), opts, done);
+        cmd.unshift('@dev');
+        if (opts['drush-version'] === '6') {
+          cmd.push('--strict=0');
+        }
+        if (opts['drush-version'] === '8') {
+          cmd.push('--alias-path=/src/config/drush');
+        }
+        drush.cmd(cmd, opts, done);
       };
     });
 
