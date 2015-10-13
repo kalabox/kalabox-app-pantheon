@@ -164,34 +164,40 @@ module.exports = function(kbox) {
     // Set the integrations pull method.
     kbox.integrations.get('pantheon').setMethod('pull', function() {
       var self = this;
-      return kbox.Promise.all([
-        self.ask({
+      return self.ask([
+        {
           id: 'shouldPullFiles'
-        }),
-        self.ask({
+        },
+        {
           id: 'shouldPullDatabase'
-        })
+        }
       ])
-      .spread(function(shouldPullFiles, shouldPullDatabase) {
+      .then(function(answers) {
         // Grab pantheon config so we can mix in interactives
         var pantheonConf = app.config.pluginConf['kalabox-plugin-pantheon'];
         // Grab pantheon aliases
         return terminus.getSiteAliases()
         // Pull our code
         .then(function() {
+          self.update('Pulling code.');
           return puller.pullCode(pantheonConf.site, pantheonConf.env);
         })
         // Pull our DB if selected
         .then(function() {
-          if (shouldPullDatabase) {
+          if (answers.shouldPullDatabase) {
+            self.update('Pulling database.');
             return puller.pullDB(pantheonConf.site, pantheonConf.env);
           }
         })
         // Pull our files if selected
         .then(function() {
-          if (shouldPullFiles) {
+          if (answers.shouldPullFiles) {
+            self.update('Pulling files.');
             return puller.pullFiles(pantheonConf.site, pantheonConf.env);
           }
+        })
+        .then(function() {
+          self.update('Done pulling.');
         });
       });
     });

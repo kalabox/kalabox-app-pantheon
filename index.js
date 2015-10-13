@@ -43,18 +43,38 @@ module.exports = function(kbox) {
   // Create integration.
   kbox.integrations.create('pantheon', function(api) {
 
+    // Authorize login.
+    api.methods.auth = function(email, password) {
+      var self = this;
+      return kbox.Promise.try(function() {
+        return self.ask([
+          {
+            id: 'username'
+          },
+          {
+            id: 'password'
+          }
+        ]);
+      })
+      .then(function(answers) {
+        return pantheon.auth(answers.username, answers.password);
+      });
+    };
+
     // Set the sites method of the api.
     api.methods.sites = function() {
       var self = this;
       // Get email.
       return kbox.Promise.try(function() {
-        return self.ask({
-          id: 'email'
-        });
+        return self.ask([
+          {
+            id: 'username'
+          }
+        ]);
       })
       // Set session based on email.
-      .then(function(email) {
-        var session = pantheon.getSessionFile(email);
+      .then(function(answers) {
+        var session = pantheon.getSessionFile(answers.username);
         pantheon.setSession(session);
       })
       // Get and map sites.
