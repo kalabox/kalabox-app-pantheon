@@ -58,6 +58,9 @@ module.exports = function(kbox) {
       })
       .then(function(answers) {
         return pantheon.auth(answers.username, answers.password);
+      })
+      .tap(function(session) {
+        return pantheon.setSession(session);
       });
     };
 
