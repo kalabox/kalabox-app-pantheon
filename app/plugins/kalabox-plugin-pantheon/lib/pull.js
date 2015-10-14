@@ -208,36 +208,6 @@ module.exports = function(kbox, app) {
    */
   var pullFiles = function(site, env) {
 
-    /*
-     * Return options to exclude appropriate files from rysnc
-     * @todo: eventually we might want to do this by framework?
-     */
-    var getExcludes = function() {
-
-      /*
-       * Basic map function to translate a directory into
-       * a rsync exclusion string
-       */
-      var exclude = function(dir) {
-        return ['--exclude', '\'' + dir + '\''].join(' ');
-      };
-
-      // Generic list of dirs to exclude
-      var dirs = [
-        'js',
-        'css',
-        'ctools',
-        'imagecache',
-        'xmlsitemap',
-        'backup_migrate',
-        'styles',
-        'less'
-      ];
-
-      // Return exclude string
-      return _.map(dirs, exclude).join(' ');
-    };
-
     // Get our UUID
     return terminus.getUUID(site)
 
@@ -253,7 +223,7 @@ module.exports = function(kbox, app) {
       var fileBox = envSite + '@appserver.' + envSite + '.drush.in:files/';
       var fileMount = '/media';
       var connect = '-rlvz --size-only --ipv4 --progress -e \'ssh -p 2222\'';
-      var opts = [connect, getExcludes()].join(' ');
+      var opts = [connect, terminus.getExcludes()].join(' ');
 
       // Rysnc our files
       return rsync.cmd([opts, fileBox, fileMount], true);
