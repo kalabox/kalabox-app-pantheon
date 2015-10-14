@@ -39,6 +39,7 @@ module.exports = function(kbox, app) {
     // Handle the use case where someone destroys/builds and then
     // wants to grab their site. Also coud help correct a botched
     // first create
+    // @todo: this only works if you have started your app first
     var gitFile = path.join(app.config.codeRoot, '.git');
     var type = (fs.existsSync(gitFile)) ? 'pull' : 'clone';
 
@@ -221,7 +222,8 @@ module.exports = function(kbox, app) {
       var envSite = [env, siteid].join('.');
       var fileBox = envSite + '@appserver.' + envSite + '.drush.in:files/';
       var fileMount = '/media';
-      var opts = '-rlvz --size-only --ipv4 --progress -e \'ssh -p 2222\'';
+      var connect = '-rlvz --size-only --ipv4 --progress -e \'ssh -p 2222\'';
+      var opts = [connect, terminus.getExcludes()].join(' ');
 
       // Rysnc our files
       return rsync.cmd([opts, fileBox, fileMount], true);
