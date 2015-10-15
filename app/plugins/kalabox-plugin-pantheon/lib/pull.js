@@ -39,6 +39,7 @@ module.exports = function(kbox, app) {
     // Handle the use case where someone destroys/builds and then
     // wants to grab their site. Also coud help correct a botched
     // first create
+    // @todo: this only works if you have started your app first
     var gitFile = path.join(app.config.codeRoot, '.git');
     var type = (fs.existsSync(gitFile)) ? 'pull' : 'clone';
 
@@ -124,7 +125,7 @@ module.exports = function(kbox, app) {
   /*
    * Pull down our sites database
    */
-  var pullDB = function(site, env) {
+  var pullDB = function(site, env, newBackup) {
     // Get the cid of this apps database
     // @todo: this looks gross
     var dbID = _.result(_.find(app.components, function(cmp) {
@@ -159,11 +160,9 @@ module.exports = function(kbox, app) {
       return terminus.hasDBBackup(uuid, env);
     })
 
-    // If no backup then MAKE THAT SHIT
+    // If no backup or for backup then MAKE THAT SHIT
     .then(function(hasBackup) {
-      // @todo: might want to always create a new backup?
-      // @todo: maybe if latest backup is old?
-      if (!hasBackup) {
+      if (!hasBackup || newBackup) {
         return terminus.createDBBackup(site, env);
       }
     })
@@ -221,7 +220,8 @@ module.exports = function(kbox, app) {
       var envSite = [env, siteid].join('.');
       var fileBox = envSite + '@appserver.' + envSite + '.drush.in:files/';
       var fileMount = '/media';
-      var opts = '-rlvz --size-only --ipv4 --progress -e \'ssh -p 2222\'';
+      var connect = '-rlvz --size-only --ipv4 --progress -e \'ssh -p 2222\'';
+      var opts = [connect, terminus.getExcludes()].join(' ');
 
       // Rysnc our files
       return rsync.cmd([opts, fileBox, fileMount], true);

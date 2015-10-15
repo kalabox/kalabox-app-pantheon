@@ -59,6 +59,35 @@ module.exports = function(kbox) {
     };
 
     /*
+     * Basic kalabox.json validation function
+     * @todo: this is pretty weak for now
+     */
+    var validateKalaboxJson = function() {
+
+      // Path to kbox json
+      var kjPath = path.join(app.root, 'kalabox.json');
+
+      // Check to see if we even have a kalabox.json
+      if (!fs.existsSync(kjPath))  {
+        return false;
+      }
+
+      // Objectify
+      var kj = require(kjPath);
+      var pantheonConfig = kj.pluginConf[PLUGIN_NAME];
+
+      // Do a quick scan to make sure our pantheon plugin has all non-empty
+      // values
+      var isGood = _.reduce(pantheonConfig, function(current, now) {
+        return current && !_.isEmpty(now);
+      });
+
+      // Looks like we good! WE CNA DO THIS!
+      return isGood && true;
+
+    };
+
+    /*
      * Function to take starting options and add more options to it
      * without adding in dups
      */
@@ -186,6 +215,13 @@ module.exports = function(kbox) {
       return installEnv;
 
     };
+
+    // Do a basic validation of our install kalabox.json and throw
+    // and error with some advice before we continue
+    // @todo: better error message
+    if (!validateKalaboxJson()) {
+      throw new Error('Invalid kalabox.json. Look for missing properties!');
+    }
 
     // Grab framework from kalabox.json
     var framework = app.config.pluginConf[PLUGIN_NAME].framework;
