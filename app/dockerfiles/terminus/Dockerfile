@@ -5,6 +5,7 @@ FROM kalabox/pantheon-appserver:v0.10.0
 RUN \
   apt-get -y update && \
   apt-get install -y mysql-client php5-mysql php5-json postgresql-client-common sqlite php5-curl && \
+  apt-get install -y kdiff3-qt && \
   curl -sS https://getcomposer.org/installer | php && \
   mv composer.phar /usr/local/bin/composer && \
   ln -s /usr/local/bin/composer /usr/bin/composer && \
@@ -47,6 +48,7 @@ RUN \
 # Install some extra goodies
 RUN \
   cd /usr/share/drush/commands && \
-  curl -L "http://ftp.drupal.org/files/projects/registry_rebuild-7.x-2.2.tar.gz" | tar -zvx
+  curl -L "http://ftp.drupal.org/files/projects/registry_rebuild-7.x-2.2.tar.gz" | tar -zvx && \
+  curl -O "https://raw.githubusercontent.com/drush-ops/config-extra/1.0.0/config_extra.drush.inc"
 
 ENTRYPOINT ["/usr/local/bin/kterminus"]
