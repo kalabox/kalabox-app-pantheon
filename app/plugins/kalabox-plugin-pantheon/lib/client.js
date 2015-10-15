@@ -227,9 +227,10 @@ Client.prototype.getSession = function(email) {
         name: session.name
       };
     }
-    else {}
+    else {
       return undefined;
     }
+  }
 };
 
 /*
