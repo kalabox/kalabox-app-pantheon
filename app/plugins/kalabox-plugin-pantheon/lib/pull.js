@@ -125,7 +125,7 @@ module.exports = function(kbox, app) {
   /*
    * Pull down our sites database
    */
-  var pullDB = function(site, env) {
+  var pullDB = function(site, env, newBackup) {
     // Get the cid of this apps database
     // @todo: this looks gross
     var dbID = _.result(_.find(app.components, function(cmp) {
@@ -160,11 +160,9 @@ module.exports = function(kbox, app) {
       return terminus.hasDBBackup(uuid, env);
     })
 
-    // If no backup then MAKE THAT SHIT
+    // If no backup or for backup then MAKE THAT SHIT
     .then(function(hasBackup) {
-      // @todo: might want to always create a new backup?
-      // @todo: maybe if latest backup is old?
-      if (!hasBackup) {
+      if (!hasBackup || newBackup) {
         return terminus.createDBBackup(site, env);
       }
     })

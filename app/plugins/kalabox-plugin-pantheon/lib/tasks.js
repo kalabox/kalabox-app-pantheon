@@ -142,6 +142,11 @@ module.exports = function(kbox) {
         kind: 'string',
         description: 'Pull files from an env. ' + getOptions + ' and none'
       });
+      task.options.push({
+        name: 'newbackup',
+        kind: 'boolean',
+        description: 'True to generate a new DB backup'
+      });
 
       // This is what we run yo!
       task.func = function(done) {
@@ -170,6 +175,14 @@ module.exports = function(kbox) {
             },
             default: function(answers) {
               return pantheonConf.env;
+            }
+          },
+          {
+            type: 'confirm',
+            name: 'newbackup',
+            message: 'Create a new DB backup?',
+            when: function(answers) {
+              return answers.database;
             }
           },
           {
@@ -217,7 +230,13 @@ module.exports = function(kbox) {
           // Pull our DB if selected
           .then(function() {
             if (choices.database !== 'none') {
-              return puller.pullDB(pantheonConf.site, choices.database);
+
+              // Get our args
+              var site = pantheonConf.site;
+              var database = choices.database;
+              var newBackup = choices.newbackup;
+
+              return puller.pullDB(site, database, newBackup);
             }
           })
 
