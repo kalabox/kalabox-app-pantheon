@@ -117,7 +117,12 @@ module.exports = function(kbox) {
         var opts = drush.getOpts(this.options);
         var cmd = this.payload;
         cmd.unshift('@dev');
-        cmd.push('--strict=0');
+        if (opts['drush-version'] === '6') {
+          cmd.push('--strict=0');
+        }
+        if (opts['drush-version'] === '8') {
+          cmd.push('--alias-path=/src/config/drush');
+        }
         drush.cmd(cmd, opts, done);
       };
     });
