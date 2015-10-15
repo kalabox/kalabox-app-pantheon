@@ -27,6 +27,13 @@ module.exports = function(kbox) {
     var Drush = require(pathToNode + '/kalabox-plugin-drush/lib/drush.js');
     var drush = new Drush(kbox, app, 'terminus', PLUGIN_NAME);
 
+    // Get our config
+    var pantheonConf = app.config.pluginConf['kalabox-plugin-pantheon'];
+
+    // Supports pull env
+    var supportedPullEnvs = [pantheonConf.env, 'test', 'live'];
+    var supportedPushEnvs = [pantheonConf.env];
+
     /*
      * Filter out questions that have been answered interactively
      */
@@ -47,6 +54,38 @@ module.exports = function(kbox) {
         }
 
       });
+    };
+
+    /*
+     * Get choices array for supported pull environments
+     * @todo: allow multidev?
+     */
+    var getEnvPullChoices = function() {
+
+      // Map to a choices object and return
+      return _.map(supportedPullEnvs, function(env) {
+        return {
+          name: env,
+          value: env
+        };
+      });
+
+    };
+
+    /*
+     * Get choices array for supported pull environments
+     * @todo: allow multidev?
+     */
+    var getEnvPushChoices = function() {
+
+      // Map to a choices object and return
+      return _.map(supportedPushEnvs, function(env) {
+        return {
+          name: env,
+          value: env
+        };
+      });
+
     };
 
     // Tasks
@@ -91,23 +130,27 @@ module.exports = function(kbox) {
     // kbox pull
     kbox.tasks.add(function(task) {
 
-      // Grab pantheon config so we can mix in interactives
-      var pantheonConf = app.config.pluginConf['kalabox-plugin-pantheon'];
-
       // Define our task metadata
       task.path = [app.name, 'pull'];
       task.category = 'appAction';
       task.description = 'Pull down new code and optionally data and files.';
       task.kind = 'delegate';
+      // Build list of options for desc
+      var getOptions = 'Options are ' + supportedPullEnvs.join(', ');
       task.options.push({
         name: 'database',
-        kind: 'boolean',
-        description: 'Import latest database backup.'
+        kind: 'string',
+        description: 'Pull DB from an env. ' + getOptions + ' and none'
       });
       task.options.push({
         name: 'files',
+        kind: 'string',
+        description: 'Pull files from an env. ' + getOptions + ' and none'
+      });
+      task.options.push({
+        name: 'newbackup',
         kind: 'boolean',
-        description: 'Import latest files.'
+        description: 'True to generate a new DB backup'
       });
 
       // This is what we run yo!
@@ -117,15 +160,59 @@ module.exports = function(kbox) {
         var options = this.options;
         var questions = [
           {
-            type: 'confirm',
+            type: 'list',
             name: 'database',
-            message: 'Also refresh from latest database backup?',
+            message: 'Which database do you want to use?',
+            choices: function(answers) {
+
+              // Get approved choices
+              var choices = getEnvPullChoices();
+
+              // Add none choice
+              choices.push({
+                name: 'Do not pull a database',
+                value: 'none'
+              });
+
+              // Return our choices
+              return choices;
+
+            },
+            default: function(answers) {
+              return pantheonConf.env;
+            }
           },
           {
             type: 'confirm',
-            name: 'files',
-            message: 'Also grab latest files?',
+            name: 'newbackup',
+            message: 'Create a new DB backup?',
+            when: function(answers) {
+              return answers.database;
+            }
           },
+          {
+            type: 'list',
+            name: 'files',
+            message: 'Which files do you want to use?',
+            choices: function(answers) {
+
+              // Get approved choices
+              var choices = getEnvPullChoices();
+
+              // Add none choice
+              choices.push({
+                name: 'Do not pull files',
+                value: 'none'
+              });
+
+              // Return our choices
+              return choices;
+
+            },
+            default: function(answers) {
+              return answers.database || pantheonConf.env;
+            }
+          }
         ];
 
         // Filter out interactive questions based on passed in options
@@ -147,15 +234,21 @@ module.exports = function(kbox) {
 
           // Pull our DB if selected
           .then(function() {
-            if (choices.database) {
-              return puller.pullDB(pantheonConf.site, pantheonConf.env);
+            if (choices.database !== 'none') {
+
+              // Get our args
+              var site = pantheonConf.site;
+              var database = choices.database;
+              var newBackup = choices.newbackup;
+
+              return puller.pullDB(site, database, newBackup);
             }
           })
 
           // Pull our files if selected
           .then(function() {
-            if (choices.files) {
-              return puller.pullFiles(pantheonConf.site, pantheonConf.env);
+            if (choices.files !== 'none') {
+              return puller.pullFiles(pantheonConf.site, choices.database);
             }
           })
 
@@ -183,15 +276,17 @@ module.exports = function(kbox) {
         kind: 'string',
         description: 'Tell us about your change'
       });
+      // Build list of options for desc
+      var getOptions = 'Options are ' + supportedPushEnvs.join(', ');
       task.options.push({
         name: 'database',
-        kind: 'boolean',
-        description: 'Push local database up.'
+        kind: 'string',
+        description: 'Push DB to specific env. ' + getOptions + ' and none'
       });
       task.options.push({
         name: 'files',
-        kind: 'boolean',
-        description: 'Push local files up.'
+        kind: 'string',
+        description: 'Push files to a spefic env. ' + getOptions + ' and none'
       });
 
       // This is how we do it
@@ -202,21 +297,51 @@ module.exports = function(kbox) {
         var options = this.options;
         var questions = [
           {
-            type: 'input',
-            name: 'message',
-            message: 'Tell us about these changes.',
-            default: 'Best changes ever!'
-          },
-          {
-            type: 'confirm',
+            type: 'list',
             name: 'database',
-            message: 'Also push up your local database?',
+            message: 'Which env do you want to push the DB to?',
+            choices: function(answers) {
+
+              // Get approved choices
+              var choices = getEnvPushChoices();
+
+              // Add none choice
+              choices.push({
+                name: 'Do not push the database',
+                value: 'none'
+              });
+
+              // Return our choices
+              return choices;
+
+            },
+            default: function(answers) {
+              return pantheonConf.env;
+            }
           },
           {
-            type: 'confirm',
+            type: 'list',
             name: 'files',
-            message: 'Also push up your local files directory?',
-          },
+            message: 'Which env do you want to push the files to?',
+            choices: function(answers) {
+
+              // Get approved choices
+              var choices = getEnvPushChoices();
+
+              // Add none choice
+              choices.push({
+                name: 'Do not push the files',
+                value: 'none'
+              });
+
+              // Return our choices
+              return choices;
+
+            },
+            default: function(answers) {
+              return answers.database || pantheonConf.env;
+            }
+          }
         ];
 
         // Filter out interactive questions based on passed in options
@@ -242,15 +367,15 @@ module.exports = function(kbox) {
 
           // Push our DB is selected
           .then(function() {
-            if (choices.database) {
-              return pusher.pushDB(pantheonConf.site, pantheonConf.env);
+            if (choices.database !== 'none') {
+              return pusher.pushDB(pantheonConf.site, choices.database);
             }
           })
 
           // Push our files if selected
           .then(function() {
-            if (choices.files) {
-              return pusher.pushFiles(pantheonConf.site, pantheonConf.env);
+            if (choices.files !== 'none') {
+              return pusher.pushFiles(pantheonConf.site, choices.files);
             }
           })
 

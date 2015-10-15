@@ -221,12 +221,16 @@ Client.prototype.getSession = function(email) {
 
   // At least return the email and name even if we are invalid
   else {
-    return {
-      email: session.email,
-      name: session.name
-    };
+    if (session && session.email && session.name) {
+      return {
+        email: session.email,
+        name: session.name
+      };
+    }
+    else {
+      return undefined;
+    }
   }
-
 };
 
 /*
