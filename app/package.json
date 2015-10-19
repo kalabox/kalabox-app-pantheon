@@ -3,7 +3,7 @@
   "scripts": {
     "postinstall": "node ./scripts/downloadLibs.js"
   },
-  "version": "0.10.5",
+  "version": "0.10.6",
   "postInstallPkgs": [
     "kalabox-plugin-drush@^0.10.0",
     "kalabox-plugin-git@^0.10.0",
