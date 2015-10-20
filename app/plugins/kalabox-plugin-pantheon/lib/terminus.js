@@ -99,7 +99,7 @@ Terminus.prototype.__request = function(cmd, args, options) {
 
   // Prompt the user to reauth if the session is invalid
   // @todo: the mostly repeated conditional here is gross lets improve it
-  if (session === undefined) {
+  if (this.pantheon.needsReauth(session)) {
 
     // Reuath attempt
     return this.pantheon.reAuthSession()
@@ -193,7 +193,7 @@ Terminus.prototype.cmd = function(cmd, opts, done) {
 
   // Prompt the user to reauth if the session is invalid
   // @todo: the mostly repeated conditional here is gross lets improve it
-  if (session === undefined) {
+  if (this.pantheon.needsReauth(session)) {
 
     // Reuath attempt
     return this.pantheon.reAuthSession()
@@ -389,6 +389,41 @@ Terminus.prototype.hasDBBackup = function(uuid, env) {
 Terminus.prototype.getBindings = function(uuid) {
 
   return this.pantheon.getBindings(uuid);
+
+};
+
+/*
+ * This one is a little weird since its not really a terminus call
+ * but its something we should keep outside of push/pull for reusability
+ * @todo: maybe this goes into a util mod at some point?
+ * @todo: eventually we might want to do this by framework?
+ *
+ * https://dashboard.getpantheon.com/api/sites/UUID/bindings
+ */
+Terminus.prototype.getExcludes = function() {
+
+  /*
+   * Basic map function to translate a directory into
+   * a rsync exclusion string
+   */
+  var exclude = function(dir) {
+    return ['--exclude', '\'' + dir + '\''].join(' ');
+  };
+
+  // Generic list of dirs to exclude
+  var dirs = [
+    'js',
+    'css',
+    'ctools',
+    'imagecache',
+    'xmlsitemap',
+    'backup_migrate',
+    'styles',
+    'less'
+  ];
+
+  // Return exclude string
+  return _.map(dirs, exclude).join(' ');
 
 };
 

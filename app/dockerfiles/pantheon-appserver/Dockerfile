@@ -21,7 +21,7 @@ RUN \
 
 RUN \
   cd /root/.phpbrew && \
-  curl -L "http://github.com/kalabox/phpbrewer/releases/download/pantheon-1/php.tar.gz" | tar -zvx && \
+  curl -L "http://github.com/kalabox/phpbrewer/releases/download/pantheon-2/php.tar.gz" | tar -zvx && \
   rm /root/start.sh
 
 ENV PHP_VERSION 5.3.29

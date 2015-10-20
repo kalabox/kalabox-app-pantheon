@@ -21,4 +21,14 @@ fi
 source /root/.phpbrew/bashrc > /dev/null
 phpbrew -d switch ${PHP_VERSION} > /dev/null
 
+# Drush 8 needs us to set the php bin and php ini eplicitly
+# todo: other drush versions may require this as well?
+if [ "$DRUSH_VERSION" == "drush8" ]; then
+  # for some reason DRUSH_PHP is not working here so we are doing this instead
+  rm /usr/bin/php
+  ln -s ${PHPBREW_PATH}/php /usr/bin/php
+  # Export the php config
+  export PHP_INI="${HOME}/.phpbrew/php/php-${PHP_VERSION}/etc/php.ini"
+fi
+
 $DRUSH_VERSION "$@"

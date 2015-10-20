@@ -7,21 +7,19 @@
     "kalabox-plugin-pantheon"
   ],
   "shareIgnores": [
-    "sites/default/files/*",
-    "files/*",
-    "wp-content/uploads/*"
+    "sites/default/files",
+    "files",
+    "wp-content/uploads",
+    "!*modules*"
   ],
   "pluginConf": {
     "kalabox-plugin-pantheon": {
-      "action": "pull",
       "account": "",
       "drush-version": "6",
       "env": "",
       "framework": "",
-      "php": "5.3.29",
-      "product": "",
+      "php": "",
       "site": "",
-      "uuid": "",
       "upstream": ""
     }
   },

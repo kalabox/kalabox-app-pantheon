@@ -22,23 +22,17 @@ module.exports = function(kbox) {
     var pantheon = new Client(kbox, app);
 
     // Framework specific stuff
-    // @todo: eventually we will grab the php version directly via terminus
-    // see https://github.com/pantheon-systems/cli/issues/431
     var frameworkSpec = {
       drupal: {
-        php: '5.3.29',
         filemount: 'sites/default/files'
       },
       drupal8: {
-        php: '5.5.24',
         filemount: 'sites/default/files'
       },
       wordpress: {
-        php: '5.5.24',
         filemount: 'wp-content/uploads'
       },
       backdrop: {
-        php: '5.3.29',
         filemount: 'files'
       }
     };
@@ -65,16 +59,53 @@ module.exports = function(kbox) {
     };
 
     /*
+     * Basic kalabox.json validation function
+     * @todo: this is pretty weak for now
+     */
+    var validateKalaboxJson = function() {
+
+      // Path to kbox json
+      var kjPath = path.join(app.root, 'kalabox.json');
+
+      // Check to see if we even have a kalabox.json
+      if (!fs.existsSync(kjPath))  {
+        return false;
+      }
+
+      // Objectify
+      var kj = require(kjPath);
+      var pantheonConfig = kj.pluginConf[PLUGIN_NAME];
+
+      // Do a quick scan to make sure our pantheon plugin has all non-empty
+      // values
+      var isGood = _.reduce(pantheonConfig, function(current, now) {
+        return current && !_.isEmpty(now);
+      });
+
+      // Looks like we good! WE CNA DO THIS!
+      return isGood && true;
+
+    };
+
+    /*
      * Function to take starting options and add more options to it
      * without adding in dups
      */
     var getGitInfo = function() {
 
+      // Use our session if we can
       var session = pantheon.getSession();
       if (session && session.email && session.name) {
         return {
           email: session.email,
           name: session.name
+        };
+      }
+      // If we cant for whatever reason then so this instead
+      else {
+        return {
+          email: app.config.pluginConf[PLUGIN_NAME].account,
+          name: app.config.pluginConf[PLUGIN_NAME].account
         };
       }
 
@@ -185,6 +216,13 @@ module.exports = function(kbox) {
 
     };
 
+    // Do a basic validation of our install kalabox.json and throw
+    // and error with some advice before we continue
+    // @todo: better error message
+    if (!validateKalaboxJson()) {
+      throw new Error('Invalid kalabox.json. Look for missing properties!');
+    }
+
     // Grab framework from kalabox.json
     var framework = app.config.pluginConf[PLUGIN_NAME].framework;
 
@@ -220,19 +258,16 @@ module.exports = function(kbox) {
      */
     kbox.core.events.on('pre-engine-create', function(createOptions, done) {
 
-      var name = createOptions.name;
-
       // Only do this on named containers
-      if (name) {
+      if (createOptions.name) {
 
         // Don't add phpversion to db containers
         var split = createOptions.name.split('_');
         var type = (split[2]) ? split[2] : split[1];
 
-        // @todo: once https://github.com/pantheon-systems/cli/issues/431
-        // happens we want to change this back to userConf
+        // Set the PHP version from the config
         if (type !== 'db') {
-          var phpVar = 'PHP_VERSION=' + frameworkSpec[framework].php;
+          var phpVar = 'PHP_VERSION=' + app.config.pluginConf[PLUGIN_NAME].php;
           if (!_.includes(installEnv, phpVar)) {
             installEnv.push(phpVar);
           }
@@ -259,30 +294,17 @@ module.exports = function(kbox) {
       createOptions = addPush(createOptions, pantheonUser);
 
       // Make sure we have SSH keys
-      // @todo: we are assuming our temp containers are the only ones that
-      // need our pantheon ssh keys which may not be a good assumption
-      // @todo: this IS a bad assumption the git container gets name undefined
-      // we should change this or rework something
-      if (name === undefined || _.includes(name, 'kalabox_temp')) {
+      return pantheon.sshKeySetup(createOptions)
 
-        // @todo: two file reads and a request might not be great for perfomance
-        // here even with static caching
-        return pantheon.sshKeySetup()
+      // Stuff
+      .then(function(keySet) {
+        if (!keySet) {
+          // @todo: something helpful
+        }
+      })
 
-        .then(function(keySet) {
-          if (!keySet) {
-            // @todo: something helpful
-          }
-        })
-
-        .nodeify(done);
-
-      }
-      else {
-
-        done();
-
-      }
+      // Return
+      .nodeify(done);
 
     });
 
