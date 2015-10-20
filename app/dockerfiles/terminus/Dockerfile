@@ -49,6 +49,6 @@ RUN \
 RUN \
   cd /usr/share/drush/commands && \
   curl -L "http://ftp.drupal.org/files/projects/registry_rebuild-7.x-2.2.tar.gz" | tar -zvx && \
-  curl -O "https://raw.githubusercontent.com/drush-ops/config-extra/1.0.0/config_extra.drush.inc"
+  curl -O "https://raw.githubusercontent.com/drush-ops/config-extra/1.0.1/config_extra.drush.inc"
 
 ENTRYPOINT ["/usr/local/bin/kterminus"]
