@@ -8,7 +8,7 @@ By default Kalabox can pull apps from and push apps to Pantheon... but this is m
 This will spin up a Pantheon-on-Kalabox environment, set up relevant tools like `terminus`, `drush` and `wp-cli` and pull down the site and environment that you choose. 
 
 ```bash
-cd /dir/i/want/my/app/to/live (usually ~/Desktop/apps)
+cd ~/dir/i/want/my/app/to/live (usually ~/Desktop/apps)
 kbox create pantheon # and follow the prompts
 kbox start
 ```
@@ -16,10 +16,12 @@ kbox start
 Or you can run non-interactively
 
 ```bash
-cd /dir/i/want/my/app/to/live (usually ~/Desktop/apps)
+cd ~/dir/i/want/my/app/to/live (usually ~/Desktop/apps)
 kbox create pantheon -- --email=me@me.com --password=**** --site=pantheon-site --env=pantheon-env --name=myApp
 kbox start
 ```
+
+**NOTE:** You **must** issue your `kbox create pantheon` from somewhere inside your `HOME` directory.
 
 ## Tools and working with your code
 
