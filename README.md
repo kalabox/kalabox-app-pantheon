@@ -8,21 +8,28 @@ By default Kalabox can pull apps from and push apps to Pantheon... but this is m
 This will spin up a Pantheon-on-Kalabox environment, set up relevant tools like `terminus`, `drush` and `wp-cli` and pull down the site and environment that you choose. 
 
 ```bash
-cd /dir/i/want/my/app/to/live (usually ~/Desktop/apps)
-kbox create pantheon
-? Choose a Pantheon account. mike@kalamuna.com
-? Which site? kalabox-eight
-? Which environment? dev
-? What will you call this monster you have created: (kalabox-eight) eight
-cd eight
-kbox start # Site is available at http(s)://eight.kbox
+cd ~/dir/i/want/my/app/to/live (usually ~/Desktop/apps)
+kbox create pantheon # and follow the prompts
+kbox start
 ```
+
+Or you can run non-interactively
+
+```bash
+cd ~/dir/i/want/my/app/to/live (usually ~/Desktop/apps)
+kbox create pantheon -- --email=me@me.com --password=**** --site=pantheon-site --env=pantheon-env --name=myApp
+kbox start
+```
+
+**NOTE:** You **must** issue your `kbox create pantheon` from somewhere inside your `HOME` directory.
 
 ## Tools and working with your code
 
-You can run various Pantheon-helpful tools like terminus.
+You can run various Pantheon-helpful tools like terminus. To see a list of all the things run `kbox` from inside of your app directory.
 
 ```bash
+kbox
+
 Global commands that can be run from anywhere
   apps             Display list of apps.
   create       
@@ -52,29 +59,29 @@ Commands and tools this app can use
 
 ## Pulling from Pantheon
 
-You can refresh your local code and even your database and files by running `kbox pull` from inside of your Pantheon app. This will pull from the environment you specify during `kbox create`. 
+You can refresh your local code and even your database and files by running `kbox pull` from inside of your Pantheon app. 
 
 ```
 kbox pull -- -h
 Options:
-  -h, --help     Display help message.                                 [boolean]
-  -v, --verbose  Use verbose output.                                   [boolean]
-  --database     Import latest database backup.                        [boolean]
-  --files        Import latest files.                                  [boolean]
+  -h, --help     Display help message.                                 
+  -v, --verbose  Use verbose output.                                
+  --database     Pull DB from an env. Options are dev, test, live and none
+  --files        Pull files from an env. Options are dev, test, live and none
+  --newbackup    True to generate a new DB backup                      
 ```
 
 ## Pushing to Pantheon
 
-You can easily push up code and even your database and files by running `kbox push`. This will push to the environment you specified during `kbox create`.
+You can easily push up code and even your database and files by running `kbox push`. 
 
 ```bash
-kbox push -- -h
 Options:
   -h, --help     Display help message.                                 [boolean]
   -v, --verbose  Use verbose output.                                   [boolean]
-  --message      Tell us about your change                              [string]
-  --database     Push local database up.                               [boolean]
-  --files        Push local files up.                                  [boolean]
+  -m, --message  Tell us about your change                              [string]
+  --database     Push DB to specific env. Options are dev and none      [string]
+  --files        Push files to a spefic env. Options are dev and none   [string]
 ```
 
 ## SSL
@@ -90,7 +97,7 @@ Apache Solr comes in each local Pantheon environment. You can use it the exact s
 Just follow the same instructions from Pantheon to get redis to work locally.
 https://pantheon.io/docs/articles/sites/redis-as-a-caching-backend/
 
-The TL;DR for Drupal 7 here is
+The TL;DR for Drupal 7 (on php 5.3) here is
 
 1. Install the [redis module](http://drupal.org/project/redis).
 2. Use this code snippet in settings.php
