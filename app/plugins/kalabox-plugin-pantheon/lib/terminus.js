@@ -262,16 +262,46 @@ Terminus.prototype.getConnectionMode = function(site, env) {
 };
 
 /*
+ * Check for uncommitted changes
+ *
+ * terminus site code diffstat --site="$PANTHEON_SITE" --env="$PANTHEON_ENV")
+ */
+Terminus.prototype.hasChanges = function(site, env) {
+
+  // Grab the data
+  return this.__request(
+    ['kterminus'],
+    ['site', 'code', 'diffstat'],
+    ['--json', '--site=' + site, '--env=' + env]
+  )
+
+  // Return whether we have changes or not
+  .then(function(data) {
+
+    // Try to parse our json
+    try {
+      return typeof JSON.parse(data) === 'object' && !_.isEmpty(data);
+    }
+    catch (e) {
+      return false;
+    }
+
+  });
+
+};
+
+
+/*
  * Set connection mode
  *
  * terminus site connection-mode --site="$PANTHEON_SITE" --env="$PANTHEON_ENV" --set=git
  */
-Terminus.prototype.setConnectionMode = function(site, env) {
+Terminus.prototype.setConnectionMode = function(site, env, mode) {
 
   return this.__request(
     ['kterminus'],
     ['site', 'connection-mode'],
-    ['--json', '--site=' + site, '--env=' + env, '--set=git']
+    ['--json', '--site=' + site, '--env=' + env, '--set=' + mode]
   );
 
 };

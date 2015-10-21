@@ -305,6 +305,11 @@ module.exports = function(kbox) {
         var options = this.options;
         var questions = [
           {
+            type: 'string',
+            name: 'message',
+            message: 'Tell us about your changes'
+          },
+          {
             type: 'list',
             name: 'database',
             message: 'Which env do you want to push the DB to?',
