@@ -39,6 +39,7 @@ module.exports = function(kbox, app) {
     // the pantheon site UUID
     var siteid = null;
     var repo = null;
+    var connectionModeStart = null;
 
     // Check to see what our connection mode is
     return terminus.getConnectionMode(site, env)
@@ -47,17 +48,26 @@ module.exports = function(kbox, app) {
     // and then try again
     .then(function(connectionMode) {
 
+      // Set so we can use later
+      connectionModeStart = connectionMode.connection_mode;
+
       // If we are in SFTP mode set back to git
-      if (connectionMode.connection_mode !== 'git') {
+      if (connectionModeStart !== 'git') {
 
-        // @todo: actually test this part
-        return terminus.setConnectionMode(site, env)
-
-        // Try again after we set the connection mode correctly
-        .then(function(data) {
-          pushCode(site, env);
+        return terminus.hasChanges(site, env)
+        .then(function(hasChanges) {
+          // If we have uncommmited changes throw error
+          if (hasChanges) {
+            var msg = [
+              'Kalabox has detected you have uncommitted changes.',
+              'Please commit those changes and try kbox push again'
+            ];
+            throw new Error(msg.join(' '));
+          }
+          else {
+            return terminus.setConnectionMode(site, env, 'git');
+          }
         });
-
       }
     })
 
@@ -81,6 +91,11 @@ module.exports = function(kbox, app) {
       .then(function() {
         var branch = (env === 'dev') ? 'master' : env;
         return git.cmd(['push', 'origin', branch], []);
+      })
+
+      // Set our connection mode back to what we started with
+      .then(function() {
+        return terminus.setConnectionMode(site, env, connectionModeStart);
       });
 
     });
