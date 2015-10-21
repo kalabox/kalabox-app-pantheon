@@ -116,13 +116,21 @@ module.exports = function(kbox) {
       task.func = function(done) {
         var opts = drush.getOpts(this.options);
         var cmd = this.payload;
-        cmd.unshift('@dev');
+        // If no alias is specified then add our local one
+        if (!_.includes(cmd.join(''), '@')) {
+          cmd.unshift('@kbox');
+        }
+        // Need strict off for drush6
         if (opts['drush-version'] === '6') {
           cmd.push('--strict=0');
         }
+        // Need to set custom alias path for drush8
         if (opts['drush-version'] === '8') {
           cmd.push('--alias-path=/src/config/drush');
         }
+        // Specify the root, this will be overriden by our
+        // alias file so it helps for pantheon remote things
+        cmd.push('--root=.');
         drush.cmd(cmd, opts, done);
       };
     });

@@ -1,2 +1,7 @@
 Host *
   StrictHostKeyChecking no
+  User root
+Host *drush.in
+  StrictHostKeyChecking no
+  User root
+  IdentityFile /ssh/.ssh/pantheon.kalabox.id_rsa
