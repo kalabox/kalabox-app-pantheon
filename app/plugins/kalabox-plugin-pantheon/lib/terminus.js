@@ -418,7 +418,8 @@ Terminus.prototype.getExcludes = function() {
     'imagecache',
     'xmlsitemap',
     'backup_migrate',
-    'styles',
+    'php/twig/*',
+    'styles/*',
     'less'
   ];
 
