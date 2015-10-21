@@ -118,7 +118,7 @@ module.exports = function(kbox) {
         var cmd = this.payload;
         // If no alias is specified then add our local one
         if (!_.includes(cmd.join(''), '@')) {
-          cmd.unshift('@dev');
+          cmd.unshift('@kbox');
         }
         // Need strict off for drush6
         if (opts['drush-version'] === '6') {
