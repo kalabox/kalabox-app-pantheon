@@ -248,7 +248,7 @@ module.exports = function(kbox) {
           // Pull our files if selected
           .then(function() {
             if (choices.files !== 'none') {
-              return puller.pullFiles(pantheonConf.site, choices.database);
+              return puller.pullFiles(pantheonConf.site, choices.files);
             }
           })
 
