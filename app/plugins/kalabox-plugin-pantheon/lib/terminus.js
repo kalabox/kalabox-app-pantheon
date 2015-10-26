@@ -100,9 +100,12 @@ Terminus.prototype.__request = function(cmd, args, options) {
   // Set our session to be the new session
   .then(function(reAuthSession) {
 
-    return self.kbox.engine.use('terminus', createOpts, startOpts, function(container) {
+    // Util function just for CS stuff
+    var queryFunc = function(container) {
       return self.kbox.engine.queryData(container.id, query);
-    });
+    };
+
+    return self.kbox.engine.use('terminus', createOpts, startOpts, queryFunc);
 
   });
 
@@ -245,7 +248,6 @@ Terminus.prototype.hasChanges = function(site, env) {
   });
 
 };
-
 
 /*
  * Set connection mode
