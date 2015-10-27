@@ -9,6 +9,7 @@ var _ = require('lodash');
 
 // "Constants"
 var PLUGIN_NAME = 'kalabox-plugin-pantheon';
+var TERMINUS = 'terminus:t0.9.1';
 
 /*
  * Constructor.
@@ -83,7 +84,7 @@ Terminus.prototype.__request = function(cmd, args, options) {
   var createOpts = self.__getCreateOpts();
 
   // We need a special entry for this request
-  createOpts.entrypoint(['/bin/sh', '-c']);
+  createOpts.Entrypoint = ['/bin/sh', '-c'];
 
   // Get start options
   var startOpts = self.__getStartOpts();
@@ -105,7 +106,7 @@ Terminus.prototype.__request = function(cmd, args, options) {
       return self.kbox.engine.queryData(container.id, query);
     };
 
-    return self.kbox.engine.use('terminus', createOpts, startOpts, queryFunc);
+    return self.kbox.engine.use(TERMINUS, createOpts, startOpts, queryFunc);
 
   });
 
@@ -167,7 +168,7 @@ Terminus.prototype.cmd = function(cmd, opts, done) {
   var startOpts = this.__getStartOpts();
 
   // Image name.
-  var image = 'terminus';
+  var image = TERMINUS;
 
   // Grab a session to set up our auth
   var session = this.pantheon.getSession();
