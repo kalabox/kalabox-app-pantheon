@@ -265,13 +265,18 @@ Client.prototype.reAuthSession = function() {
   ];
 
   /*
-   * Helper method to promisigy inquiries
+   * Helper method to promisify inquiries
    */
   var askIt = function(questions) {
-    return new Promise(function(answers) {
-      console.log('Your Pantheon session has expired. We need to reauth!');
-      inquirer.prompt(questions, answers);
-    });
+    if (self.needsReauth(session)) {
+      return new Promise(function(answers) {
+        console.log('Your Pantheon session has expired. We need to reauth!');
+        inquirer.prompt(questions, answers);
+      });
+    }
+    else {
+      return Promise.resolve(false);
+    }
   };
 
   // Run the prompt and return the password
@@ -281,22 +286,21 @@ Client.prototype.reAuthSession = function() {
   .then(function(answers) {
 
     // Get the email
-    // @todo: eventually get this from app config when we switch to
-    // a multi user name jam
+    if (answers !== false) {
+      var session = self.getSessionFile();
+      var email;
 
-    var session = self.getSessionFile();
-    var email;
+      if (!session) {
+        var config = self.__getOpts();
+        email = config.account;
+      }
+      else {
+        email = session.email;
+      }
 
-    if (!session) {
-      var config = self.__getOpts();
-      email = config.account;
+      // Login
+      return self.auth(email, answers.password);
     }
-    else {
-      email = session.email;
-    }
-
-    // Login
-    return self.auth(email, answers.password);
 
   });
 

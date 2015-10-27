@@ -2,7 +2,7 @@
 /**
  * This file is automatically updated by kalabox-plugin-drush.
  */
-$aliases['dev'] = array(
+$aliases['kbox'] = array(
   'uri' => 'localhost',
   'root' => '/code',
   'databases' =>

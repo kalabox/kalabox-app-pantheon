@@ -9,6 +9,7 @@ var _ = require('lodash');
 
 // "Constants"
 var PLUGIN_NAME = 'kalabox-plugin-pantheon';
+var TERMINUS = 'terminus:t0.9.1';
 
 /*
  * Constructor.
@@ -83,10 +84,7 @@ Terminus.prototype.__request = function(cmd, args, options) {
   var createOpts = self.__getCreateOpts();
 
   // We need a special entry for this request
-  /* jshint ignore:start */
-  //jscs:disable
-  createOpts.Entrypoint = ["/bin/sh", "-c"];
-  /* jshint ignore:end */
+  createOpts.Entrypoint = ['/bin/sh', '-c'];
 
   // Get start options
   var startOpts = self.__getStartOpts();
@@ -98,30 +96,19 @@ Terminus.prototype.__request = function(cmd, args, options) {
   var session = this.pantheon.getSession();
 
   // Prompt the user to reauth if the session is invalid
-  // @todo: the mostly repeated conditional here is gross lets improve it
-  if (this.pantheon.needsReauth(session)) {
+  return this.pantheon.reAuthSession()
 
-    // Reuath attempt
-    return this.pantheon.reAuthSession()
+  // Set our session to be the new session
+  .then(function(reAuthSession) {
 
-    // Set our session to be the new session
-    .then(function(reAuthSession) {
-
-      return self.kbox.engine.use('terminus', createOpts, startOpts, function(container) {
-        return self.kbox.engine.queryData(container.id, query);
-      });
-
-    });
-
-  }
-
-  else {
-
-    return self.kbox.engine.use('terminus', createOpts, startOpts, function(container) {
+    // Util function just for CS stuff
+    var queryFunc = function(container) {
       return self.kbox.engine.queryData(container.id, query);
-    });
+    };
 
-  }
+    return self.kbox.engine.use(TERMINUS, createOpts, startOpts, queryFunc);
+
+  });
 
 };
 
@@ -160,11 +147,6 @@ Terminus.prototype.cmd = function(cmd, opts, done) {
   // Get create options.
   var createOpts = this.__getCreateOpts();
 
-  // Run the terminus command in the correct directory in the container if the
-  // user is somewhere inside the code directory on the host side.
-  // @todo: consider if this is better in the actual engine.run command
-  // vs here.
-
   // Get current working directory.
   var cwd = process.cwd();
 
@@ -186,33 +168,16 @@ Terminus.prototype.cmd = function(cmd, opts, done) {
   var startOpts = this.__getStartOpts();
 
   // Image name.
-  var image = 'terminus';
+  var image = TERMINUS;
 
   // Grab a session to set up our auth
   var session = this.pantheon.getSession();
 
   // Prompt the user to reauth if the session is invalid
-  // @todo: the mostly repeated conditional here is gross lets improve it
-  if (this.pantheon.needsReauth(session)) {
+  return this.pantheon.reAuthSession()
 
-    // Reuath attempt
-    return this.pantheon.reAuthSession()
-
-    // Set our session to be the new session
-    .then(function(reAuthSession) {
-
-      //@todo: validate session again?
-      // Perform a container run.
-      return engine.run(image, cmd, createOpts, startOpts)
-
-      // Return.
-      .nodeify(done);
-
-    });
-
-  }
-
-  else {
+  // Set our session to be the new session
+  .then(function(reAuthSession) {
 
     // Perform a container run.
     return engine.run(image, cmd, createOpts, startOpts)
@@ -220,8 +185,7 @@ Terminus.prototype.cmd = function(cmd, opts, done) {
     // Return.
     .nodeify(done);
 
-  }
-
+  });
 
 };
 
@@ -243,15 +207,15 @@ Terminus.prototype.wakeSite = function(site, env) {
 /*
  * Get connection mode
  *
- * terminus site connection-mode --site="$PANTHEON_SITE" --env="$PANTHEON_ENV")
+ * terminus site environment-info --field=connection_mode --site="$PANTHEON_SITE" --env="$PANTHEON_ENV")
  */
 Terminus.prototype.getConnectionMode = function(site, env) {
 
   // Grab the data
   return this.__request(
     ['kterminus'],
-    ['site', 'connection-mode'],
-    ['--json', '--site=' + site, '--env=' + env]
+    ['site', 'environment-info', '--field=connection_mode'],
+    [, '--format=json', '--site=' + site, '--env=' + env]
   )
 
   // Return a parsed json object
@@ -262,16 +226,41 @@ Terminus.prototype.getConnectionMode = function(site, env) {
 };
 
 /*
+ * Check for uncommitted changes
+ *
+ * terminus site code diffstat --site="$PANTHEON_SITE" --env="$PANTHEON_ENV")
+ */
+Terminus.prototype.hasChanges = function(site, env) {
+
+  // Grab the data
+  return this.__request(
+    ['kterminus'],
+    ['site', 'code', 'diffstat'],
+    ['--format=json', '--site=' + site, '--env=' + env]
+  )
+
+  // Return whether we have changes or not
+  .then(function(data) {
+
+    // Try to parse our json
+    var response = JSON.parse(data);
+    return response.message !== 'No changes on server.';
+
+  });
+
+};
+
+/*
  * Set connection mode
  *
- * terminus site connection-mode --site="$PANTHEON_SITE" --env="$PANTHEON_ENV" --set=git
+ * terminus site set-connection-mode --site="$PANTHEON_SITE" --env="$PANTHEON_ENV" --mode=git
  */
-Terminus.prototype.setConnectionMode = function(site, env) {
+Terminus.prototype.setConnectionMode = function(site, env, mode) {
 
   return this.__request(
     ['kterminus'],
-    ['site', 'connection-mode'],
-    ['--json', '--site=' + site, '--env=' + env, '--set=git']
+    ['site', 'set-connection-mode'],
+    ['--format=json', '--site=' + site, '--env=' + env, '--mode=' + mode]
   );
 
 };
@@ -296,7 +285,7 @@ Terminus.prototype.getUUID = function(site) {
   return self.__request(
     ['kterminus'],
     ['site', 'info'],
-    ['--json', '--site=' + site, '--field=id']
+    ['--format=json', '--site=' + site, '--field=id']
   )
 
   .then(function(uuid) {
@@ -309,11 +298,11 @@ Terminus.prototype.getUUID = function(site) {
 /*
  * Get site aliases
  *
- * terminus sites aliases --json
+ * terminus sites aliases --format=json
  */
 Terminus.prototype.getSiteAliases = function() {
 
-  return this.__request(['kterminus'], ['sites', 'aliases'], ['--json']);
+  return this.__request(['kterminus'], ['sites', 'aliases'], ['--format=json']);
 
 };
 
@@ -358,7 +347,7 @@ Terminus.prototype.createDBBackup = function(site, env) {
     ['kterminus'],
     ['site', 'backups', 'create'],
     [
-      '--json',
+      '--format=json',
       '--element=db',
       '--site=' + site,
       '--env=' + env
@@ -418,7 +407,8 @@ Terminus.prototype.getExcludes = function() {
     'imagecache',
     'xmlsitemap',
     'backup_migrate',
-    'styles',
+    'php/twig/*',
+    'styles/*',
     'less'
   ];
 

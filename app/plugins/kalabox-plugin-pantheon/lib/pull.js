@@ -47,43 +47,22 @@ module.exports = function(kbox, app) {
     var siteid = null;
     var repo = null;
 
-    // Check to see what our connection mode is
-    return terminus.getConnectionMode(site, env)
-
-    // Set the connection mode to git if needed
-    // and then try again
-    .then(function(connectionMode) {
-      if (connectionMode.connection_mode !== 'git') {
-        // @todo: actually test this part
-        return terminus.setConnectionMode(site, env)
-          .then(function(data) {
-            pullCode(site, env);
-          });
-      }
-    })
-
     // Grab the sites UUID from teh machinename
-    .then(function() {
-      return terminus.getUUID(site)
-      .then(function(uuid) {
-        siteid = uuid;
-      });
-    })
+    return terminus.getUUID(site)
 
     // Wake the site up
-    .then(function() {
+    .then(function(uuid) {
+      siteid = uuid;
       return terminus.wakeSite(site, env);
     })
 
     // Generate our code repo URL and CUT THAT MEAT!
     // errr PULL THAT CODE!
     .then(function() {
-      // @todo: better way to generate this?
-      // @todo: is 'dev' the only thing that
       var build = {
         protocol: 'ssh',
         slashes: true,
-        auth: ['codeserver', 'dev', siteid].join('.'),
+        auth: ['codeserver', env, siteid].join('.'),
         hostname: ['codeserver', 'dev', siteid, 'drush', 'in'].join('.'),
         port: 2222,
         pathname: ['~', 'repository.git'].join('/')

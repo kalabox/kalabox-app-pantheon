@@ -88,6 +88,19 @@ module.exports = function(kbox) {
 
     };
 
+    /*
+     * Set default choices if we need to
+     */
+    var setDefaultChoices = function(choices) {
+      if (_.isEmpty(choices.database)) {
+        choices.database = pantheonConf.env;
+      }
+      if (_.isEmpty(choices.files)) {
+        choices.files = pantheonConf.env;
+      }
+      return choices;
+    };
+
     // Tasks
     // kbox terminus COMMAND
     kbox.tasks.add(function(task) {
@@ -116,13 +129,21 @@ module.exports = function(kbox) {
       task.func = function(done) {
         var opts = drush.getOpts(this.options);
         var cmd = this.payload;
-        cmd.unshift('@dev');
+        // If no alias is specified then add our local one
+        if (!_.includes(cmd.join(''), '@')) {
+          cmd.unshift('@kbox');
+        }
+        // Need strict off for drush6
         if (opts['drush-version'] === '6') {
           cmd.push('--strict=0');
         }
+        // Need to set custom alias path for drush8
         if (opts['drush-version'] === '8') {
           cmd.push('--alias-path=/src/config/drush');
         }
+        // Specify the root, this will be overriden by our
+        // alias file so it helps for pantheon remote things
+        cmd.push('--root=.');
         drush.cmd(cmd, opts, done);
       };
     });
@@ -224,6 +245,9 @@ module.exports = function(kbox) {
           // Collect our answers
           var choices = _.merge({}, options, answers);
 
+          // Set defaults if user passed in legacy --database or --files
+          choices = setDefaultChoices(choices);
+
           // Grab pantheon aliases
           return terminus.getSiteAliases()
 
@@ -234,7 +258,7 @@ module.exports = function(kbox) {
 
           // Pull our DB if selected
           .then(function() {
-            if (choices.database !== 'none') {
+            if (choices.database && choices.database !== 'none') {
 
               // Get our args
               var site = pantheonConf.site;
@@ -247,8 +271,8 @@ module.exports = function(kbox) {
 
           // Pull our files if selected
           .then(function() {
-            if (choices.files !== 'none') {
-              return puller.pullFiles(pantheonConf.site, choices.database);
+            if (choices.files && choices.files !== 'none') {
+              return puller.pullFiles(pantheonConf.site, choices.files);
             }
           })
 
@@ -338,6 +362,11 @@ module.exports = function(kbox) {
         var options = this.options;
         var questions = [
           {
+            type: 'string',
+            name: 'message',
+            message: 'Tell us about your changes'
+          },
+          {
             type: 'list',
             name: 'database',
             message: 'Which env do you want to push the DB to?',
@@ -394,6 +423,9 @@ module.exports = function(kbox) {
           // Collect our choices
           var choices = _.merge({}, options, answers);
 
+          // Set defaults if user passed in legacy --database or --files
+          choices = setDefaultChoices(choices);
+
           // Grab pantheon site aliases
           return terminus.getSiteAliases()
 
@@ -408,14 +440,14 @@ module.exports = function(kbox) {
 
           // Push our DB is selected
           .then(function() {
-            if (choices.database !== 'none') {
+            if (choices.database && choices.database !== 'none') {
               return pusher.pushDB(pantheonConf.site, choices.database);
             }
           })
 
           // Push our files if selected
           .then(function() {
-            if (choices.files !== 'none') {
+            if (choices.files && choices.files !== 'none') {
               return pusher.pushFiles(pantheonConf.site, choices.files);
             }
           })
