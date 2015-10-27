@@ -313,7 +313,7 @@ module.exports = function(kbox) {
     kbox.core.events.on('post-install', function(app, done) {
       // Make sure we install the terminus container for this app
       var opts = {
-        name: 'terminus',
+        name: 'terminus:t0.9.1',
         srcRoot: path.resolve(__dirname, '..', '..', '..'),
       };
       // Install the terminus container and then do install things if
