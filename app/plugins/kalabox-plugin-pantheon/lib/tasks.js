@@ -324,6 +324,32 @@ module.exports = function(kbox) {
       });
     });
 
+    // Set the integrations push method.
+    kbox.integrations.get('pantheon').setMethod('push', function() {
+      var self = this;
+      return kbox.Promise.try(function() {
+        return terminus.getSiteAliases();
+      })
+      .then(function() {
+        return self.ask([
+          {
+            id: 'message'
+          }
+        ]);
+      })
+      .then(function(answers) {
+        self.update('Pushing code.');
+        return pusher.pushCode(
+          pantheonConf.site,
+          pantheonConf.env,
+          answers.message
+        );
+      })
+      .tap(function() {
+        self.update('Done pushing.');
+      });
+    });
+
     // kbox appname push
     kbox.tasks.add(function(task) {
 
