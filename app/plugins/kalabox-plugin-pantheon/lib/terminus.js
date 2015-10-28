@@ -215,7 +215,7 @@ Terminus.prototype.getConnectionMode = function(site, env) {
   return this.__request(
     ['kterminus'],
     ['site', 'environment-info', '--field=connection_mode'],
-    [, '--format=json', '--site=' + site, '--env=' + env]
+    ['--format=json', '--site=' + site, '--env=' + env]
   )
 
   // Return a parsed json object
