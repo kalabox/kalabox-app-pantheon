@@ -326,18 +326,30 @@ module.exports = function(kbox) {
 
     // Set the integrations push method.
     kbox.integrations.get('pantheon').setMethod('push', function() {
+      // Save reference for later.
       var self = this;
+      // Get plugin.
+      var pantheonConf = app.config.pluginConf['kalabox-plugin-pantheon'];
+      // Get site aliases.
       return kbox.Promise.try(function() {
         return terminus.getSiteAliases();
       })
+      // Ask questions.
       .then(function() {
         return self.ask([
           {
             id: 'message'
+          },
+          {
+            id: 'database'
+          },
+          {
+            id: 'files'
           }
         ]);
       })
-      .then(function(answers) {
+      // Push code.
+      .tap(function(answers) {
         self.update('Pushing code.');
         return pusher.pushCode(
           pantheonConf.site,
@@ -345,6 +357,21 @@ module.exports = function(kbox) {
           answers.message
         );
       })
+      // Push database.
+      .tap(function(answers) {
+        if (answers.database && answers.database !== 'none') {
+          self.update('Pushing database.');
+          return pusher.pushDB(pantheonConf.site, answers.database);
+        }
+      })
+      // Push files.
+      .tap(function(answers) {
+        if (answers.files && answers.files !== 'none') {
+          self.update('Pushing files.');
+          return pusher.pushFiles(pantheonConf.site, answers.files);
+        }
+      })
+      // Signal completion.
       .tap(function() {
         self.update('Done pushing.');
       });
