@@ -64,6 +64,13 @@ module.exports = function(kbox) {
       });
     };
 
+    // Set the logins method of api.
+    api.methods.logins = function() {
+      return kbox.Promise.try(function() {
+        return pantheon.getSessionFiles();
+      });
+    };
+
     // Set the sites method of the api.
     api.methods.sites = function() {
       var self = this;
