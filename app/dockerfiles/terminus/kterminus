@@ -27,4 +27,5 @@ cp -f /ssh/.kalabox/terminus/session/${PANTHEON_ACCOUNT} /src/config/terminus/ca
 source /root/.phpbrew/bashrc > /dev/null
 phpbrew -d switch ${PHP_VERSION} > /dev/null
 
-terminus "$@"
+terminus "$@" #1> /src/config/terminus/stdout 2> /src/config/terminus/stderr
+#echo $?

@@ -37,9 +37,7 @@ module.exports = function(kbox, app) {
   var pushCode = function(site, env, message) {
 
     // the pantheon site UUID
-    var siteid = null;
-    var repo = null;
-    var connectionModeStart = null;
+    var connectionModeStart;
 
     // Check to see what our connection mode is
     return terminus.getConnectionMode(site, env)
@@ -49,7 +47,7 @@ module.exports = function(kbox, app) {
     .then(function(connectionMode) {
 
       // Set so we can use later
-      connectionModeStart = connectionMode.connection_mode;
+      connectionModeStart = connectionMode;
 
       // If we are in SFTP mode set back to git
       if (connectionModeStart !== 'git') {
@@ -91,14 +89,15 @@ module.exports = function(kbox, app) {
       .then(function() {
         var branch = (env === 'dev') ? 'master' : env;
         return git.cmd(['push', 'origin', branch], []);
-      })
-
-      // Set our connection mode back to what we started with
-      .then(function() {
-        return terminus.setConnectionMode(site, env, connectionModeStart);
       });
 
+    })
+
+    // Set our connection mode back to what we started with
+    .then(function() {
+      return terminus.setConnectionMode(site, env, connectionModeStart);
     });
+
   };
 
   /*
