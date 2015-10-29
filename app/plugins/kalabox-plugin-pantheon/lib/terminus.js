@@ -372,8 +372,11 @@ Terminus.prototype.hasBackup = function(uuid, env, type) {
   return this.pantheon.getBackups(uuid, env)
 
   .then(function(backups) {
-    var keyString = _.keys(backups).join('');
-    return self.kbox.Promise.resolve(_.includes(keyString, 'backup_' + type));
+    var keys = _.keys(backups).join('');
+    var manual = 'backup_' + type;
+    var auto = 'automated_' + type;
+    var hasBackup = _.includes(keys, manual) || _.includes(keys, auto);
+    return self.kbox.Promise.resolve(hasBackup);
   });
 
 };
