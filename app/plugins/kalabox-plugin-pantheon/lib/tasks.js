@@ -208,7 +208,7 @@ module.exports = function(kbox) {
             name: 'newbackup',
             message: 'Create a new DB backup?',
             when: function(answers) {
-              return answers.database;
+              return answers.database !== 'none';
             }
           },
           {
