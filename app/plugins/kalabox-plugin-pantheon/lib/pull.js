@@ -136,39 +136,26 @@ module.exports = function(kbox, app) {
 
     // Check if site has a backup
     .then(function(uuid) {
-      return terminus.hasDBBackup(uuid, env);
+      return terminus.hasBackup(uuid, env, 'database');
     })
 
     // If no backup or for backup then MAKE THAT SHIT
     .then(function(hasBackup) {
       if (!hasBackup || newBackup) {
-        return terminus.createDBBackup(site, env);
+        return terminus.createBackup(site, env, 'db');
       }
     })
 
     // Download the backup
     .then(function() {
-      return terminus.downloadDBBackup(site, env);
+      return terminus.downloadBackup(site, env, 'db');
     })
 
     // Import the backup
-    .then(function(data) {
-      // @todo: waiting for resolution on
-      // https://github.com/kalabox/kalabox/issues/539
-      // For now we assume the download completed ok and we are looking
-      // for a hardcoded location
-      // Ultimately we want to parse data correctly to get the DB dump
-      // location
-      var dbFile = '/src/config/terminus/kalabox-import-db.sql.gz';
+    .then(function(importFile) {
       // Perform a container run.
-      var payload = ['import-mysql', 'localhost', null, '3306', dbFile];
+      var payload = ['import-mysql', 'localhost', null, '3306', importFile];
       return engine.queryData(dbID, payload);
-    })
-
-    // Seems worthless?
-    .then(function(data) {
-      // @todo: use real logger
-      console.log(data);
     })
 
     // Stop the DB container if that is how we found it initially
