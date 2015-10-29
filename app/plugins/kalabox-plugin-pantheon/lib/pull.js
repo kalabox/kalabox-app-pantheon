@@ -216,6 +216,8 @@ module.exports = function(kbox, app) {
     // If no backup or for backup then MAKE THAT SHIT
     .then(function(hasBackup) {
       if (!hasBackup || newBackup) {
+        // @todo: it might make more sense to default to
+        // rsync here?
         return terminus.createBackup(site, env, 'files');
       }
     })
