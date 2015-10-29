@@ -272,7 +272,13 @@ module.exports = function(kbox) {
           // Pull our files if selected
           .then(function() {
             if (choices.files && choices.files !== 'none') {
-              return puller.pullFiles(pantheonConf.site, choices.files);
+
+              // Get our args
+              var site = pantheonConf.site;
+              var files = choices.files;
+              var newBackup = choices.newbackup;
+
+              return puller.pullFiles(site, files, newBackup);
             }
           })
 
