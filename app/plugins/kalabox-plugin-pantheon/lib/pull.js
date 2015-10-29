@@ -32,20 +32,26 @@ module.exports = function(kbox, app) {
   var rsync = new Rsync(kbox, app);
 
   /*
+   * Check to see if this is the first time we are going to do a pull or not
+   * @todo: this is pretty weak for now
+   */
+  var firstTime = function() {
+    // @todo: this only works if you have started your app first
+    var gitFile = path.join(app.config.codeRoot, '.git');
+    return !fs.existsSync(gitFile);
+  };
+
+  /*
    * Pull down our sites code
    */
   var pullCode = function(site, env) {
 
-    // Handle the use case where someone destroys/builds and then
-    // wants to grab their site. Also coud help correct a botched
-    // first create
-    // @todo: this only works if you have started your app first
-    var gitFile = path.join(app.config.codeRoot, '.git');
-    var type = (fs.existsSync(gitFile)) ? 'pull' : 'clone';
+    // Determine correct operation
+    var type = (firstTime()) ? 'clone' : 'pull';
 
     // the pantheon site UUID
-    var siteid = null;
-    var repo = null;
+    var siteid;
+    var repo;
 
     // Grab the sites UUID from teh machinename
     return terminus.getUUID(site)
@@ -168,10 +174,9 @@ module.exports = function(kbox, app) {
   };
 
   /*
-   * Pull down our sites database
+   * Pull files via RSYNC
    */
-  var pullFiles = function(site, env) {
-
+  var pullFilesRsync = function(site, env) {
     // Get our UUID
     return terminus.getUUID(site)
 
@@ -193,6 +198,13 @@ module.exports = function(kbox, app) {
       return rsync.cmd([opts, fileBox, fileMount], true);
 
     });
+  };
+
+  /*
+   * Pull down our sites database
+   */
+  var pullFiles = function(site, env) {
+    return pullFilesRsync(site, env);
   };
 
   return {
