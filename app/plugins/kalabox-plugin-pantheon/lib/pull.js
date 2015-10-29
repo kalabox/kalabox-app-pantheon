@@ -201,10 +201,82 @@ module.exports = function(kbox, app) {
   };
 
   /*
+   * Pull files via an archive
+   */
+  var pullFilesArchive = function(site, env, newBackup) {
+
+    // Get our UUID
+    return terminus.getUUID(site)
+
+    // Check if site has a backup
+    .then(function(uuid) {
+      return terminus.hasBackup(uuid, env, 'files');
+    })
+
+    // If no backup or for backup then MAKE THAT SHIT
+    .then(function(hasBackup) {
+      if (!hasBackup || newBackup) {
+        return terminus.createBackup(site, env, 'files');
+      }
+    })
+
+    // Download the backup
+    .then(function() {
+      return terminus.downloadBackup(site, env, 'files');
+    })
+
+    // Extract the backup and remove
+    .then(function(importFile) {
+
+      // Image name
+      var image = 'kalabox/debian:stable';
+
+      // Build create options
+      var createOpts = {};
+
+      // Build start options
+      var startOpts = kbox.util.docker.StartOpts()
+        .bind(app.rootBind, '/src')
+        .volumeFrom(app.dataContainerName)
+        .json();
+
+      // CMD to extract our archive file to /media
+      var extractCmd = [
+        'tar',
+        '-zxvf',
+        importFile,
+        '--strip-components=1',
+        '--overwrite',
+        '--directory=/media'
+      ];
+
+      // Cmd to remove the archive
+      var rmCmd = ['rm', '-f', importFile];
+
+      // Extract the archive
+      return kbox.engine.run(image, extractCmd, createOpts, startOpts)
+
+      // Remove the archive
+      .then(function() {
+        return kbox.engine.run(image, rmCmd, createOpts, startOpts);
+      });
+
+    });
+  };
+
+  /*
    * Pull down our sites database
    */
-  var pullFiles = function(site, env) {
-    return pullFilesRsync(site, env);
+  var pullFiles = function(site, env, newBackup) {
+    // If this is the first time we want to grab the files from an archive
+    // since this will be way faster. subsequent pulls we will use rsync since
+    // this will be way faster
+    if (firstTime()) {
+      return pullFilesArchive(site, env, newBackup);
+    }
+    else {
+      return pullFilesRsync(site, env);
+    }
   };
 
   return {
