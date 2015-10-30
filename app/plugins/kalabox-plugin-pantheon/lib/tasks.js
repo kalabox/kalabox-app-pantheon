@@ -12,6 +12,7 @@ module.exports = function(kbox) {
 
   // "Constants"
   var PLUGIN_NAME = 'kalabox-plugin-pantheon';
+  var TERMINUS = 'terminus:t0.9.1';
 
   kbox.whenAppRegistered(function(app) {
 
@@ -25,7 +26,7 @@ module.exports = function(kbox) {
     var pathToRoot = path.resolve(__dirname, '..', '..', '..');
     var pathToNode = path.join(pathToRoot, 'node_modules');
     var Drush = require(pathToNode + '/kalabox-plugin-drush/lib/drush.js');
-    var drush = new Drush(kbox, app, 'terminus', PLUGIN_NAME);
+    var drush = new Drush(kbox, app, TERMINUS, PLUGIN_NAME);
 
     // Get our config
     var pantheonConf = app.config.pluginConf['kalabox-plugin-pantheon'];
@@ -208,7 +209,7 @@ module.exports = function(kbox) {
             name: 'newbackup',
             message: 'Create a new DB backup?',
             when: function(answers) {
-              return answers.database;
+              return answers.database !== 'none';
             }
           },
           {
@@ -272,7 +273,13 @@ module.exports = function(kbox) {
           // Pull our files if selected
           .then(function() {
             if (choices.files && choices.files !== 'none') {
-              return puller.pullFiles(pantheonConf.site, choices.files);
+
+              // Get our args
+              var site = pantheonConf.site;
+              var files = choices.files;
+              var newBackup = choices.newbackup;
+
+              return puller.pullFiles(site, files, newBackup);
             }
           })
 

@@ -7,6 +7,7 @@ var _ = require('lodash');
 
 // "Constants"
 var PLUGIN_NAME = 'kalabox-plugin-pantheon';
+var TERMINUS = 'terminus:t0.9.1';
 
 module.exports = function(kbox) {
 
@@ -61,9 +62,6 @@ module.exports = function(kbox) {
       var codeDir = globalConfig.codeDir;
       var workingDir = '/' + codeDir + workingDirExtra;
 
-      // Image name.
-      var image = 'terminus';
-
       // Build create options.
       var createOpts = kbox.util.docker.CreateOpts()
         .workingDir(workingDir)
@@ -83,7 +81,7 @@ module.exports = function(kbox) {
         .json();
 
       // Perform a container run.
-      return engine.run(image, cmd, createOpts, startOpts)
+      return engine.run(TERMINUS, cmd, createOpts, startOpts)
       // Return.
       .nodeify(done);
 

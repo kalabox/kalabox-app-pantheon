@@ -32,20 +32,26 @@ module.exports = function(kbox, app) {
   var rsync = new Rsync(kbox, app);
 
   /*
+   * Check to see if this is the first time we are going to do a pull or not
+   * @todo: this is pretty weak for now
+   */
+  var firstTime = function() {
+    // @todo: this only works if you have started your app first
+    var gitFile = path.join(app.config.codeRoot, '.git');
+    return !fs.existsSync(gitFile);
+  };
+
+  /*
    * Pull down our sites code
    */
   var pullCode = function(site, env) {
 
-    // Handle the use case where someone destroys/builds and then
-    // wants to grab their site. Also coud help correct a botched
-    // first create
-    // @todo: this only works if you have started your app first
-    var gitFile = path.join(app.config.codeRoot, '.git');
-    var type = (fs.existsSync(gitFile)) ? 'pull' : 'clone';
+    // Determine correct operation
+    var type = (firstTime()) ? 'clone' : 'pull';
 
     // the pantheon site UUID
-    var siteid = null;
-    var repo = null;
+    var siteid;
+    var repo;
 
     // Grab the sites UUID from teh machinename
     return terminus.getUUID(site)
@@ -136,39 +142,26 @@ module.exports = function(kbox, app) {
 
     // Check if site has a backup
     .then(function(uuid) {
-      return terminus.hasDBBackup(uuid, env);
+      return terminus.hasBackup(uuid, env, 'database');
     })
 
     // If no backup or for backup then MAKE THAT SHIT
     .then(function(hasBackup) {
       if (!hasBackup || newBackup) {
-        return terminus.createDBBackup(site, env);
+        return terminus.createBackup(site, env, 'db');
       }
     })
 
     // Download the backup
     .then(function() {
-      return terminus.downloadDBBackup(site, env);
+      return terminus.downloadBackup(site, env, 'db');
     })
 
     // Import the backup
-    .then(function(data) {
-      // @todo: waiting for resolution on
-      // https://github.com/kalabox/kalabox/issues/539
-      // For now we assume the download completed ok and we are looking
-      // for a hardcoded location
-      // Ultimately we want to parse data correctly to get the DB dump
-      // location
-      var dbFile = '/src/config/terminus/kalabox-import-db.sql.gz';
+    .then(function(importFile) {
       // Perform a container run.
-      var payload = ['import-mysql', 'localhost', null, '3306', dbFile];
+      var payload = ['import-mysql', 'localhost', null, '3306', importFile];
       return engine.queryData(dbID, payload);
-    })
-
-    // Seems worthless?
-    .then(function(data) {
-      // @todo: use real logger
-      console.log(data);
     })
 
     // Stop the DB container if that is how we found it initially
@@ -181,10 +174,9 @@ module.exports = function(kbox, app) {
   };
 
   /*
-   * Pull down our sites database
+   * Pull files via RSYNC
    */
-  var pullFiles = function(site, env) {
-
+  var pullFilesRsync = function(site, env) {
     // Get our UUID
     return terminus.getUUID(site)
 
@@ -206,6 +198,87 @@ module.exports = function(kbox, app) {
       return rsync.cmd([opts, fileBox, fileMount], true);
 
     });
+  };
+
+  /*
+   * Pull files via an archive
+   */
+  var pullFilesArchive = function(site, env, newBackup) {
+
+    // Get our UUID
+    return terminus.getUUID(site)
+
+    // Check if site has a backup
+    .then(function(uuid) {
+      return terminus.hasBackup(uuid, env, 'files');
+    })
+
+    // If no backup or for backup then MAKE THAT SHIT
+    .then(function(hasBackup) {
+      if (!hasBackup || newBackup) {
+        // @todo: it might make more sense to default to
+        // rsync here?
+        return terminus.createBackup(site, env, 'files');
+      }
+    })
+
+    // Download the backup
+    .then(function() {
+      return terminus.downloadBackup(site, env, 'files');
+    })
+
+    // Extract the backup and remove
+    .then(function(importFile) {
+
+      // Image name
+      var image = 'kalabox/debian:stable';
+
+      // Build create options
+      var createOpts = {};
+
+      // Build start options
+      var startOpts = kbox.util.docker.StartOpts()
+        .bind(app.rootBind, '/src')
+        .volumeFrom(app.dataContainerName)
+        .json();
+
+      // CMD to extract our archive file to /media
+      var extractCmd = [
+        'tar',
+        '-zxvf',
+        importFile,
+        '--strip-components=1',
+        '--overwrite',
+        '--directory=/media'
+      ];
+
+      // Cmd to remove the archive
+      var rmCmd = ['rm', '-f', importFile];
+
+      // Extract the archive
+      return kbox.engine.run(image, extractCmd, createOpts, startOpts)
+
+      // Remove the archive
+      .then(function() {
+        return kbox.engine.run(image, rmCmd, createOpts, startOpts);
+      });
+
+    });
+  };
+
+  /*
+   * Pull down our sites database
+   */
+  var pullFiles = function(site, env, newBackup) {
+    // If this is the first time we want to grab the files from an archive
+    // since this will be way faster. subsequent pulls we will use rsync since
+    // this will be way faster
+    if (firstTime()) {
+      return pullFilesArchive(site, env, newBackup);
+    }
+    else {
+      return pullFilesRsync(site, env);
+    }
   };
 
   return {

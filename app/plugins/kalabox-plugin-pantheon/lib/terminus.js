@@ -307,65 +307,76 @@ Terminus.prototype.getSiteAliases = function() {
 };
 
 /*
- * Get latest DB backup and save it in /other
+ * Get latest backup of given site, env and type and save it
  *
  * terminus site backups get
- * --element=database --site=<site> --env=<env> --to=$HOME/Desktop/ --latest
+ * --element=<type> --site=<site> --env=<env> --to=$HOME/Desktop/ --latest
  */
-Terminus.prototype.downloadDBBackup = function(site, env) {
+Terminus.prototype.downloadBackup = function(site, env, type) {
 
-  // Request the DB output
-  // @todo: waiting for resolution on
-  // https://github.com/kalabox/kalabox/issues/539
-  // For now we assume the download completed ok and we are looking
-  // for a hardcoded location
-  // Ultimately we want to parse data correctly to get the DB dump
-  // location
+  // @todo: validate type?
+
+  // Download the backup and return its location
   return this.__request(
     ['kterminus'],
     ['site', 'backups', 'get'],
     [
       '--site=' + site,
       '--env=' + env,
-      '--element=db',
-      '--to=/src/config/terminus/kalabox-import-db.sql.gz',
-      '--latest'
+      '--element=' + type,
+      '--to=/src/config/terminus/',
+      '--latest',
+      '--format=json'
     ]
-  );
+  )
+
+  // Parse the data to get the filename
+  .then(function(data) {
+    var dataz = _.dropRight(data.split('\n'), 1);
+    var response = JSON.parse(_.last(dataz));
+    return _.trim(_.last(response.message.split('Downloaded ')));
+  });
 
 };
 
 /*
- * Get latest DB backup and save it in /other
+ * Create a backup of given site, env and type
  *
  * terminus site backup create
  * --element=database --site=<site> --env=<env>
  */
-Terminus.prototype.createDBBackup = function(site, env) {
+Terminus.prototype.createBackup = function(site, env, type) {
+
+  // @todo: validate type?
 
   return this.__request(
     ['kterminus'],
     ['site', 'backups', 'create'],
     [
       '--format=json',
-      '--element=db',
+      '--element=' + type,
       '--site=' + site,
       '--env=' + env
     ]);
 };
 
 /*
- * Checks to see if there is a DB backup available
+ * Checks to see if there is a backup of given type available for site and env
  */
-Terminus.prototype.hasDBBackup = function(uuid, env) {
+Terminus.prototype.hasBackup = function(uuid, env, type) {
+
+  // @todo: validate type?
 
   var self = this;
 
   return this.pantheon.getBackups(uuid, env)
 
   .then(function(backups) {
-    var keyString = _.keys(backups).join('');
-    return self.kbox.Promise.resolve(_.includes(keyString, 'backup_database'));
+    var keys = _.keys(backups).join('');
+    var manual = 'backup_' + type;
+    var auto = 'automated_' + type;
+    var hasBackup = _.includes(keys, manual) || _.includes(keys, auto);
+    return self.kbox.Promise.resolve(hasBackup);
   });
 
 };
