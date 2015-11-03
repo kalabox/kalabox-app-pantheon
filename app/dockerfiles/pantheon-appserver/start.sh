@@ -62,5 +62,17 @@ if [ -f "${HOME}/.phpbrew/php/php-${PHP_VERSION}/var/db/opcache.ini" ]; then
   sed -i '$a opcache.memory_consumption = 256' ${HOME}/.phpbrew/php/php-${PHP_VERSION}/var/db/opcache.ini
 fi
 
+# Set up our cronfile here because we need access to PRESSFLOW_SETTINGS
+if [ ! -f "/etc/cron.hourly/drush-cron" ] && [ $FRAMEWORK != "wordpress" ]; then
+  touch /etc/cron.hourly/drush-cron
+  echo "#!/bin/bash" >> /etc/cron.hourly/drush-cron
+  echo "export PATH=${PATH}" >> /etc/cron.hourly/drush-cron
+  echo "export PRESSFLOW_SETTINGS='${PRESSFLOW_SETTINGS}'" >> /etc/cron.hourly/drush-cron
+  echo "export COLUMNS=72" >> /etc/cron.hourly/drush-cron
+  echo "/usr/local/src/drush8/drush @kbox --alias-path=/src/config/drush --quiet cron" >> /etc/cron.hourly/drush-cron
+  chmod +x /etc/cron.hourly/drush-cron
+fi
+
+cron
 /root/.phpbrew/php/php-${PHP_VERSION}/sbin/php-fpm -R
 nginx
