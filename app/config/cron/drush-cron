@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# Set env things we need for drush to work in cron
+export HOME=REPLACE_HOME
+export PATH=REPLACE_PATH
+export PRESSFLOW_SETTINGS='REPLACE_PRESSFLOW_SETTINGS'
+export COLUMNS=72
+export PHP_VERSION=REPLACE_PHP_VERSION
+export PHPBREW_PATH=REPLACE_PHPBREW_PATH
+
+# Drush 8 needs us to set the php bin and php ini eplicitly
+# for some reason DRUSH_PHP is not working here so we are doing this instead
+mv /usr/bin/php /usr/bin/php.old
+ln -s ${PHPBREW_PATH}/php /usr/bin/php
+# Export the php config
+export PHP_INI="{$HOME}/.phpbrew/php/php-${PHP_VERSION}/etc/php.ini"
+
+# Run the drush things
+/usr/local/src/drush8/drush @kbox \
+  --alias-path=/src/config/drush \
+  --quiet cron \
+  1> /var/log/drush-cron.stdout.log \
+  2> /var/log/drush-cron.stderr.log
+
+# Drush 8 needs us to set the php bin and php ini eplicitly
+mv /usr/bin/php.old /usr/bin/php
