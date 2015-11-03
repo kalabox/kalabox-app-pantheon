@@ -1,4 +1,8 @@
-#!/bin/sh
+#!/bin/bash
+
+# Set default PHP version for appserver
+source /root/.phpbrew/bashrc > /dev/null
+phpbrew -d switch ${PHP_VERSION} > /dev/null
 
 # Set up our solr certs
 # @todo: lots of clean up to do here
@@ -62,17 +66,19 @@ if [ -f "${HOME}/.phpbrew/php/php-${PHP_VERSION}/var/db/opcache.ini" ]; then
   sed -i '$a opcache.memory_consumption = 256' ${HOME}/.phpbrew/php/php-${PHP_VERSION}/var/db/opcache.ini
 fi
 
-# Set up our cronfile here because we need access to PRESSFLOW_SETTINGS
+# Inject dynamic ENV things for our crontab
 if [ ! -f "/etc/cron.hourly/drush-cron" ] && [ $FRAMEWORK != "wordpress" ]; then
-  touch /etc/cron.hourly/drush-cron
-  echo "#!/bin/bash" >> /etc/cron.hourly/drush-cron
-  echo "export PATH=${PATH}" >> /etc/cron.hourly/drush-cron
-  echo "export PRESSFLOW_SETTINGS='${PRESSFLOW_SETTINGS}'" >> /etc/cron.hourly/drush-cron
-  echo "export COLUMNS=72" >> /etc/cron.hourly/drush-cron
-  echo "/usr/local/src/drush8/drush @kbox --alias-path=/src/config/drush --quiet cron" >> /etc/cron.hourly/drush-cron
+  cp /src/config/cron/drush-cron /etc/cron.hourly/drush-cron
+  sed -i -e "s|REPLACE_HOME|$HOME|g" /etc/cron.hourly/drush-cron
+  sed -i -e "s|REPLACE_PATH|$PATH|g" /etc/cron.hourly/drush-cron
+  sed -i -e "s|REPLACE_PRESSFLOW_SETTINGS|$PRESSFLOW_SETTINGS|g" /etc/cron.hourly/drush-cron
+  sed -i -e "s|REPLACE_DRUSH_VERSION|$DRUSH_VERSION|g" /etc/cron.hourly/drush-cron
+  sed -i -e "s|REPLACE_PHP_VERSION|$PHP_VERSION|g" /etc/cron.hourly/drush-cron
+  sed -i -e "s|REPLACE_PHPBREW_PATH|$PHPBREW_PATH|g" /etc/cron.hourly/drush-cron
   chmod +x /etc/cron.hourly/drush-cron
 fi
 
+# Run all the services
 cron
 /root/.phpbrew/php/php-${PHP_VERSION}/sbin/php-fpm -R
 nginx
