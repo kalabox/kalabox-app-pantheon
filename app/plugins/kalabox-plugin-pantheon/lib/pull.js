@@ -62,13 +62,13 @@ module.exports = function(kbox, app) {
       return terminus.wakeSite(site, env);
     })
 
-    // Generate our code repo URL and CUT THAT MEAT!
-    // errr PULL THAT CODE!
+    // Generate our code repo URL
+    // NOTE: even multidev requies we use 'dev' instead of env
     .then(function() {
       var build = {
         protocol: 'ssh',
         slashes: true,
-        auth: ['codeserver', env, siteid].join('.'),
+        auth: ['codeserver', 'dev', siteid].join('.'),
         hostname: ['codeserver', 'dev', siteid, 'drush', 'in'].join('.'),
         port: 2222,
         pathname: ['~', 'repository.git'].join('/')
