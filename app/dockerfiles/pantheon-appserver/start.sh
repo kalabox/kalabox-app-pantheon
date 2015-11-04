@@ -5,11 +5,14 @@ source /root/.phpbrew/bashrc > /dev/null
 phpbrew -d switch ${PHP_VERSION} > /dev/null
 
 # Set up our solr certs
-# @todo: lots of clean up to do here
 if [ ! -f "/certs/binding.pem" ]; then
   openssl genrsa -out /certs/binding.key 2048 && \
   openssl req -new -x509 -key /certs/binding.key -out /certs/binding.crt -days 365 -subj "/C=US/ST=California/L=Oakland/O=Kalabox/OU=KB/CN=solr.${APPDOMAIN}" && \
-  cat /certs/binding.crt /certs/binding.key > /certs/binding.pem && \
+  cat /certs/binding.crt /certs/binding.key > /certs/binding.pem
+fi
+
+# Make sure our solr certs are whitelisted correctly
+if [ ! -d "/usr/share/ca-certificates/solr.${APPDOMAIN}" ]; then
   mkdir /usr/share/ca-certificates/solr.${APPDOMAIN} && \
   cp /certs/binding.crt /usr/share/ca-certificates/solr.${APPDOMAIN}/binding.crt && \
   echo "solr.${APPDOMAIN}/binding.crt" >> /etc/ca-certificates.conf && \
