@@ -24,6 +24,9 @@ RUN \
   cd /tmp && curl -O 'http://download.gna.org/wkhtmltopdf/0.12/0.12.2.1/wkhtmltox-0.12.2.1_linux-wheezy-amd64.deb' && \
   dpkg -i /tmp/wkhtmltox-0.12.2.1_linux-wheezy-amd64.deb && \
   mkdir -p /srv/bin && ln -s /usr/local/bin/wkhtmltopdf /srv/bin/wkhtmltopdf && \
+  cd /srv/bin && \
+  curl -L "http://github.com/kalabox/phantomjs/releases/download/2.0.0/phantomjs-2.0.0-debian.tar.gz" | tar -zvx && \
+  chmod +x /srv/bin/phantomjs && \
   apt-get -y update && \
   apt-get -y clean && \
   apt-get -y autoclean && \
