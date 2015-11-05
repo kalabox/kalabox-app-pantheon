@@ -22,9 +22,9 @@ IFS=$'\n' read -d '' -r -a IPS <<< "${BACKENDS}"
 IP1="${IPS[0]//.}"
 IP2="${IPS[1]//.}"
 if [ $IP1 -gt $IP2 ]; then
-  APPSERVER_BACKEND=$IP1
+  APPSERVER_BACKEND="${IPS[0]}"
 else
-  APPSERVER_BACKEND=$IP2
+  APPSERVER_BACKEND="${IPS[1]}"
 fi
 sed -i "s/.host =*/.host = \"${APPSERVER_BACKEND}\";/g" /etc/varnish/default.vcl
 
