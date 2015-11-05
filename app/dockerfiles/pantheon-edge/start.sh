@@ -17,7 +17,7 @@ fi
 # Varnish's backend should point to the appserver container
 # @todo: this bashfu is dark and full of peril we should probably fix the
 # underlying issues at some point
-BACKENDS=$(dig +short appserver.sandbox.kbox)
+BACKENDS=$(dig +short appserver.${APPDOMAIN}.${DOMAIN})
 IFS=$'\n' read -d '' -r -a IPS <<< "${BACKENDS}"
 IP1="${IPS[0]//.}"
 IP2="${IPS[1]//.}"
