@@ -24,9 +24,9 @@
     }
   },
   "appComponents": {
-    "appserver": {
+    "edge": {
       "image": {
-        "name": "pantheon-appserver",
+        "name": "pantheon-edge",
         "srcRoot": ":appRoot:"
       },
       "proxy": [
@@ -40,6 +40,12 @@
           "secure": true
         }
       ]
+    },
+    "appserver": {
+      "image": {
+        "name": "pantheon-appserver",
+        "srcRoot": ":appRoot:"
+      }
     },
     "db": {
       "image": {
