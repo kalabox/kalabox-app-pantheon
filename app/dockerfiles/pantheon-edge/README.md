@@ -13,7 +13,7 @@ RUN \
   apt-get -y update && \
   apt-get -y install apt-transport-https && \
   curl --silent https://repo.varnish-cache.org/ubuntu/GPG-key.txt | apt-key add - && \
-  echo "deb https://repo.varnish-cache.org/debian/ wheezy varnish-3.0" >> /etc/apt/sources.list.d/varnish-cache.list &&\
+  echo "deb https://repo.varnish-cache.org/debian/ wheezy varnish-4.0" >> /etc/apt/sources.list.d/varnish-cache.list &&\
   apt-get -y update && \
   apt-get -y install varnish && \
   apt-get -y clean && \
@@ -31,5 +31,6 @@ CMD ["/root/start.sh"]
 
 EXPOSE 80
 EXPOSE 443
+
 
 ```

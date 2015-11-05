@@ -15,7 +15,9 @@ if [ -f "/src/config/varnish/${FRAMEWORK}.vcl" ]; then
 fi
 
 # Varnish's backend should point to the appserver container
-sed -i "s/APPNAME/${APPNAME}/g" /etc/varnish/default.vcl
+# @todo: this seems dark and full of peril
+export APPSERVER_BACKEND=$(dig +short appserver.${APPNAME}.kbox | awk '{ print $1 ; exit }')
+sed -i "s/APPSERVERIP/${APPSERVER_BACKEND}/g" /etc/varnish/default.vcl
 
 # Copy the configuration for ssl termination with nginx to the correct place
 if [ -f "/src/config/nginx/ssl-termination.conf" ]; then
