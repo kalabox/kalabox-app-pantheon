@@ -1,7 +1,7 @@
 vcl 4.0;
 
 backend default {
-  .host = "APPSERVERIP";    # IP or Hostname of backend
+  .host =
   .port = "80";           # Port Apache or whatever is listening
 }
 

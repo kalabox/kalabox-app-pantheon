@@ -15,9 +15,18 @@ if [ -f "/src/config/varnish/${FRAMEWORK}.vcl" ]; then
 fi
 
 # Varnish's backend should point to the appserver container
-# @todo: this seems dark and full of peril
-export APPSERVER_BACKEND=$(dig +short appserver.${APPNAME}.kbox | awk '{ print $1 ; exit }')
-sed -i "s/APPSERVERIP/${APPSERVER_BACKEND}/g" /etc/varnish/default.vcl
+# @todo: this bashfu is dark and full of peril we should probably fix the
+# underlying issues at some point
+BACKENDS=$(dig +short appserver.sandbox.kbox)
+IFS=$'\n' read -d '' -r -a IPS <<< "${BACKENDS}"
+IP1="${IPS[0]//.}"
+IP2="${IPS[1]//.}"
+if [ $IP1 -gt $IP2 ]; then
+  APPSERVER_BACKEND=$IP1
+else
+  APPSERVER_BACKEND=$IP2
+fi
+sed -i "s/.host =*/.host = \"${APPSERVER_BACKEND}\";/g" /etc/varnish/default.vcl
 
 # Copy the configuration for ssl termination with nginx to the correct place
 if [ -f "/src/config/nginx/ssl-termination.conf" ]; then
