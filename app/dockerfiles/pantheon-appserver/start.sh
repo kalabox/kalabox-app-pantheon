@@ -19,14 +19,6 @@ if [ ! -d "/usr/share/ca-certificates/solr.${APPDOMAIN}" ]; then
   update-ca-certificates --fresh
 fi
 
-# Set up our appserver certs
-# @todo: lots of clean up to do here
-if [ ! -f "/certs/appserver.pem" ]; then
-  openssl genrsa -out /certs/appserver.key 2048 && \
-  openssl req -new -x509 -key /certs/appserver.key -out /certs/appserver.crt -days 365 -subj "/C=US/ST=California/L=Oakland/O=Kalabox/OU=KB/CN=${APPDOMAIN}" && \
-  cat /certs/appserver.crt /certs/appserver.key > /certs/appserver.pem
-fi
-
 # Use the correct site.conf for the framework
 # /src/config/nginx/site.conf /etc/nginx/sites-enabled/default
 if [ -f "/src/config/nginx/${FRAMEWORK}.conf" ]; then
