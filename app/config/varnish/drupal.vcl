@@ -2,7 +2,7 @@ vcl 4.0;
 
 backend default {
   .host =
-  .port = "80";           # Port Apache or whatever is listening
+  .port = "8888";
 }
 
 sub vcl_recv {

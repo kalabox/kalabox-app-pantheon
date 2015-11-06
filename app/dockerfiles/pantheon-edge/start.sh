@@ -19,12 +19,16 @@ fi
 # underlying issues at some point
 BACKENDS=$(dig +short appserver.${APPDOMAIN}.${DOMAIN})
 IFS=$'\n' read -d '' -r -a IPS <<< "${BACKENDS}"
-IP1="${IPS[0]//.}"
-IP2="${IPS[1]//.}"
-if [ $IP1 -gt $IP2 ]; then
-  APPSERVER_BACKEND="${IPS[0]}"
+if [ ${#IPS[@]} -eq 1 ]; then
+  APPSERVER_BACKEND=$(dig +short appserver.${APPDOMAIN}.${DOMAIN})
 else
-  APPSERVER_BACKEND="${IPS[1]}"
+  IP1="${IPS[0]//.}"
+  IP2="${IPS[1]//.}"
+  if [ $IP1 -gt $IP2 ]; then
+    APPSERVER_BACKEND="${IPS[0]}"
+  else
+    APPSERVER_BACKEND="${IPS[1]}"
+  fi
 fi
 sed -i "s/.host =*/.host = \"${APPSERVER_BACKEND}\";/g" /etc/varnish/default.vcl
 
