@@ -11,7 +11,7 @@ RUN \
   curl -sS https://getcomposer.org/installer | php && \
   mv composer.phar /usr/local/bin/composer && \
   ln -s /usr/local/bin/composer /usr/bin/composer && \
-  git clone --depth 1 --branch 8.0.0-rc2 https://github.com/drush-ops/drush.git /usr/local/src/drush8 && \
+  git clone --depth 1 --branch 8.0.0-rc3 https://github.com/drush-ops/drush.git /usr/local/src/drush8 && \
   cd /tmp && \
   curl -L -O https://github.com/phpbrew/phpbrew/raw/master/phpbrew && \
   chmod +x /tmp/phpbrew && \
