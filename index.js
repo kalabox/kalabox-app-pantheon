@@ -91,11 +91,24 @@ module.exports = function(kbox) {
       .then(function() {
         return pantheon.getSites()
         .then(function(sites) {
-          return _.map(sites, function(val, key) {
-            return {
+          var sitesArray = _.transform(sites, function(acc, val, key) {
+            acc.push({
               name: val.information.name,
               id: key
-            };
+            });
+            return acc;
+          }, []);
+          return kbox.Promise.map(sitesArray, function(site) {
+            return pantheon.getEnvironments(site.id)
+            .then(function(envs) {
+              delete envs.live;
+              delete envs.test;
+              site.environments = _.map(envs, function(val, key) {
+                return key;
+              });
+              site.environments.sort();
+              return site;
+            });
           });
         });
       });
