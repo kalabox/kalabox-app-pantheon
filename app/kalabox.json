@@ -28,18 +28,7 @@
       "image": {
         "name": "pantheon-appserver",
         "srcRoot": ":appRoot:"
-      },
-      "proxy": [
-        {
-          "port": "80/tcp",
-          "default": true
-        },
-        {
-          "port": "443/tcp",
-          "default": true,
-          "secure": true
-        }
-      ]
+      }
     },
     "db": {
       "image": {
@@ -58,6 +47,23 @@
         "name": "pantheon-redis",
         "srcRoot": ":appRoot:"
       }
+    },
+    "edge": {
+      "image": {
+        "name": "pantheon-edge",
+        "srcRoot": ":appRoot:"
+      },
+      "proxy": [
+        {
+          "port": "80/tcp",
+          "default": true
+        },
+        {
+          "port": "443/tcp",
+          "default": true,
+          "secure": true
+        }
+      ]
     }
   }
 }

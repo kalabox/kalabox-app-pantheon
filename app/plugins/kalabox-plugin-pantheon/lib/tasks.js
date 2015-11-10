@@ -12,7 +12,7 @@ module.exports = function(kbox) {
 
   // "Constants"
   var PLUGIN_NAME = 'kalabox-plugin-pantheon';
-  var TERMINUS = 'terminus:t0.9.1';
+  var TERMINUS = 'terminus:t0.9.2';
 
   kbox.whenAppRegistered(function(app) {
 
@@ -249,8 +249,13 @@ module.exports = function(kbox) {
           // Set defaults if user passed in legacy --database or --files
           choices = setDefaultChoices(choices);
 
+          // Report to metrics.
+          return kbox.metrics.reportAction('pull')
+
           // Grab pantheon aliases
-          return terminus.getSiteAliases()
+          .then(function() {
+            return terminus.getSiteAliases();
+          })
 
           // Pull our code
           .then(function() {
@@ -486,8 +491,13 @@ module.exports = function(kbox) {
           // Set defaults if user passed in legacy --database or --files
           choices = setDefaultChoices(choices);
 
+          // Report to metrics.
+          return kbox.metrics.reportAction('push')
+
           // Grab pantheon site aliases
-          return terminus.getSiteAliases()
+          .then(function() {
+            return terminus.getSiteAliases();
+          })
 
           // Push our code
           .then(function() {

@@ -1,5 +1,11 @@
 <?php
 
+if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https') {
+  // Let drupal know when to generate absolute links as https.
+  // Used in drupal_settings_initialize()
+  $_SERVER['HTTPS'] = 'on';
+}
+
 // @todo: We need a better ENV loader
 define('PANTHEON_INFRASTRUCTURE_ENVIRONMENT', getenv('PANTHEON_INFRASTRUCTURE_ENVIRONMENT'));
 define('PANTHEON_SITE', getenv('PANTHEON_SITE'));

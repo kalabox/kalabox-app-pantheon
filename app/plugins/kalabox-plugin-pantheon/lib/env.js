@@ -12,7 +12,7 @@ module.exports = function(kbox) {
 
   // Constants
   var PLUGIN_NAME = 'kalabox-plugin-pantheon';
-  var TERMINUS = 'terminus:t0.9.1';
+  var TERMINUS = 'terminus:t0.9.2';
 
   kbox.ifApp(function(app) {
 
@@ -372,7 +372,13 @@ module.exports = function(kbox) {
         // Emulate /srv/bindings
         var cmd = ['mkdir', '-p', '/srv/bindings'];
         return kbox.engine.queryData(component.containerId, cmd)
-
+        // If on drops8 make sure styles dir exists
+        .then(function() {
+          if (framework === 'drupal8') {
+            var cmd = ['mkdir', '-p', '/media/styles'];
+            return kbox.engine.queryData(component.containerId, cmd);
+          }
+        })
         // Emulate /srv/bindings
         .then(function() {
           var cmd = ['ln', '-nsf', '/', '/srv/bindings/kalabox'];

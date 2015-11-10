@@ -1,23 +1,22 @@
-#!/bin/sh
+#!/bin/bash
+
+# Set default PHP version for appserver
+source /root/.phpbrew/bashrc > /dev/null
+phpbrew -d switch ${PHP_VERSION} > /dev/null
 
 # Set up our solr certs
-# @todo: lots of clean up to do here
 if [ ! -f "/certs/binding.pem" ]; then
   openssl genrsa -out /certs/binding.key 2048 && \
   openssl req -new -x509 -key /certs/binding.key -out /certs/binding.crt -days 365 -subj "/C=US/ST=California/L=Oakland/O=Kalabox/OU=KB/CN=solr.${APPDOMAIN}" && \
-  cat /certs/binding.crt /certs/binding.key > /certs/binding.pem && \
+  cat /certs/binding.crt /certs/binding.key > /certs/binding.pem
+fi
+
+# Make sure our solr certs are whitelisted correctly
+if [ ! -d "/usr/share/ca-certificates/solr.${APPDOMAIN}" ]; then
   mkdir /usr/share/ca-certificates/solr.${APPDOMAIN} && \
   cp /certs/binding.crt /usr/share/ca-certificates/solr.${APPDOMAIN}/binding.crt && \
   echo "solr.${APPDOMAIN}/binding.crt" >> /etc/ca-certificates.conf && \
   update-ca-certificates --fresh
-fi
-
-# Set up our appserver certs
-# @todo: lots of clean up to do here
-if [ ! -f "/certs/appserver.pem" ]; then
-  openssl genrsa -out /certs/appserver.key 2048 && \
-  openssl req -new -x509 -key /certs/appserver.key -out /certs/appserver.crt -days 365 -subj "/C=US/ST=California/L=Oakland/O=Kalabox/OU=KB/CN=${APPDOMAIN}" && \
-  cat /certs/appserver.crt /certs/appserver.key > /certs/appserver.pem
 fi
 
 # Use the correct site.conf for the framework
@@ -62,5 +61,19 @@ if [ -f "${HOME}/.phpbrew/php/php-${PHP_VERSION}/var/db/opcache.ini" ]; then
   sed -i '$a opcache.memory_consumption = 256' ${HOME}/.phpbrew/php/php-${PHP_VERSION}/var/db/opcache.ini
 fi
 
+# Inject dynamic ENV things for our crontab
+if [ ! -f "/etc/cron.hourly/drush-cron" ] && [ $FRAMEWORK != "wordpress" ]; then
+  cp /src/config/cron/drush-cron /etc/cron.hourly/drush-cron
+  sed -i -e "s|REPLACE_HOME|$HOME|g" /etc/cron.hourly/drush-cron
+  sed -i -e "s|REPLACE_PATH|$PATH|g" /etc/cron.hourly/drush-cron
+  sed -i -e "s|REPLACE_PRESSFLOW_SETTINGS|$PRESSFLOW_SETTINGS|g" /etc/cron.hourly/drush-cron
+  sed -i -e "s|REPLACE_DRUSH_VERSION|$DRUSH_VERSION|g" /etc/cron.hourly/drush-cron
+  sed -i -e "s|REPLACE_PHP_VERSION|$PHP_VERSION|g" /etc/cron.hourly/drush-cron
+  sed -i -e "s|REPLACE_PHPBREW_PATH|$PHPBREW_PATH|g" /etc/cron.hourly/drush-cron
+  chmod +x /etc/cron.hourly/drush-cron
+fi
+
+# Run all the services
+cron
 /root/.phpbrew/php/php-${PHP_VERSION}/sbin/php-fpm -R
 nginx

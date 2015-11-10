@@ -254,8 +254,7 @@ Client.prototype.reAuthSession = function() {
 
   var session = this.getSession();
 
-  // Prompt questions
-  // @todo: display the account for the PW
+  // Prompt question
   var questions = [
     {
       name: 'password',
@@ -267,7 +266,7 @@ Client.prototype.reAuthSession = function() {
   /*
    * Helper method to promisify inquiries
    */
-  var askIt = function(questions) {
+  var askIt = function(questions, session) {
     if (self.needsReauth(session)) {
       return new Promise(function(answers) {
         console.log('Your Pantheon session has expired. We need to reauth!');
@@ -280,26 +279,20 @@ Client.prototype.reAuthSession = function() {
   };
 
   // Run the prompt and return the password
-  return askIt(questions)
+  return askIt(questions, session)
 
   // Get my answers
   .then(function(answers) {
 
     // Get the email
     if (answers !== false) {
-      var session = self.getSessionFile();
-      var email;
 
-      if (!session) {
-        var config = self.__getOpts();
-        email = config.account;
-      }
-      else {
-        email = session.email;
-      }
+      // Grab the session again
+      // @todo: what happens if we can't do this?
+      var session = self.getSession();
 
       // Login
-      return self.auth(email, answers.password);
+      return self.auth(session.email, answers.password);
     }
 
   });
