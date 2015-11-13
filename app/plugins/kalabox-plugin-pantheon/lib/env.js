@@ -14,6 +14,9 @@ module.exports = function(kbox) {
   var PLUGIN_NAME = 'kalabox-plugin-pantheon';
   var TERMINUS = 'terminus:t0.9.2';
 
+  // Kbox modules
+  var events = kbox.core.events.context('cc8e0202-4c28-467b-8bae-433bae435f08');
+
   kbox.ifApp(function(app) {
 
     // Terminus node client
@@ -234,7 +237,7 @@ module.exports = function(kbox) {
     /*
      * Inject every app component with the install environment
      */
-    kbox.core.events.on('pre-install-component', function(component, done) {
+    events.on('pre-install-component', function(component, done) {
 
       // Set our install options
       component.installOptions = addPush(component.installOptions, installEnv);
@@ -245,7 +248,7 @@ module.exports = function(kbox) {
     /*
      * Add in the bind mount to the shared cert directory
      */
-    kbox.core.events.on('pre-start-component', function(component, done) {
+    events.on('pre-start-component', function(component, done) {
 
       // Cert bind
       var certs =  '/certs:/srv/certs:rw';
@@ -257,7 +260,7 @@ module.exports = function(kbox) {
     /*
      * Inject ENV and PHP version to named non-app containers as well
      */
-    kbox.core.events.on('pre-engine-create', function(createOptions, done) {
+    events.on('pre-engine-create', function(createOptions, done) {
 
       // Only do this on named containers
       if (createOptions.name) {
@@ -311,7 +314,7 @@ module.exports = function(kbox) {
 
     // Install the terminus container for our things and also
     // pull down a site or create a new site
-    kbox.core.events.on('post-install', function(app, done) {
+    events.on('post-install', function(app, done) {
       // Make sure we install the terminus container for this app
       var opts = {
         name: TERMINUS,
@@ -326,7 +329,7 @@ module.exports = function(kbox) {
     /*
      * Updates kalabox aliases when app is started and symlinks some things
      */
-    kbox.core.events.on('post-start-component', function(component, done) {
+    events.on('post-start-component', function(component, done) {
 
       // Image name
       var image = 'kalabox/debian:stable';

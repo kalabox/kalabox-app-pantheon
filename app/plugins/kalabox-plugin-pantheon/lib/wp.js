@@ -12,7 +12,6 @@ var TERMINUS = 'terminus:t0.9.2';
 module.exports = function(kbox) {
 
   var globalConfig = kbox.core.deps.get('globalConfig');
-  var events = kbox.core.events;
   var engine = kbox.engine;
   var Promise = kbox.Promise;
 
