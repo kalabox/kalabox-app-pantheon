@@ -3,7 +3,6 @@
 module.exports = function(kbox, app) {
 
   // Grab some kalabox modules
-  var events = kbox.core.events;
   var engine = kbox.engine;
   var Promise = kbox.Promise;
   Promise.longStackTraces();

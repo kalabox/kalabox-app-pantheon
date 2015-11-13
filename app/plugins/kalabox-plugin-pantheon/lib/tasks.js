@@ -14,6 +14,9 @@ module.exports = function(kbox) {
   var PLUGIN_NAME = 'kalabox-plugin-pantheon';
   var TERMINUS = 'terminus:t0.9.2';
 
+  // Kbox modules
+  var events = kbox.core.events.context('6e086c59-20d2-46b5-84ce-44d2de1f58b6');
+
   kbox.whenAppRegistered(function(app) {
 
     // Get our push and pull stuff
@@ -531,7 +534,7 @@ module.exports = function(kbox) {
 
     // Events
     // Build the site after post-create happens
-    kbox.core.events.on('post-create-app', function(app, done) {
+    events.on('post-create-app', function(app, done) {
 
       // Our pantheon config for later on
       var pantheonConf = app.config.pluginConf[PLUGIN_NAME];
