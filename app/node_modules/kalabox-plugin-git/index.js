@@ -16,7 +16,7 @@ module.exports = function(kbox) {
     }
   };
 
-  var events = kbox.core.events;
+  var events = kbox.core.events.context('8a227c39-60b6-4568-9c6b-a1035fcc163f');
   var engine = kbox.engine;
 
   kbox.ifApp(function(app) {

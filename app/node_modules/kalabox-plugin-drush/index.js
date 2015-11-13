@@ -18,7 +18,7 @@ module.exports = function(kbox) {
   };
 
   var globalConfig = kbox.core.deps.get('globalConfig');
-  var events = kbox.core.events;
+  var events = kbox.core.events.context('bff70713-19f0-4fe2-90d9-371fc303508c');
   var engine = kbox.engine;
   var Promise = kbox.Promise;
 

@@ -7,7 +7,7 @@ var PLUGIN_NAME = 'kalabox-plugin-rsync';
 
 module.exports = function(kbox) {
 
-  var events = kbox.core.events;
+  var events = kbox.core.events.context('67543535-178f-440a-969d-825fd4d1f303');
   var engine = kbox.engine;
   var globalConfig = kbox.core.deps.lookup('globalConfig');
 
