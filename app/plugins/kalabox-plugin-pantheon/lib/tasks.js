@@ -177,6 +177,11 @@ module.exports = function(kbox) {
         kind: 'boolean',
         description: 'True to generate a new DB backup'
       });
+      task.options.push({
+        name: 'latestbackup',
+        kind: 'boolean',
+        description: 'Use latest DB backup'
+      });
 
       // This is what we run yo!
       task.func = function(done) {
@@ -212,7 +217,10 @@ module.exports = function(kbox) {
             name: 'newbackup',
             message: 'Create a new DB backup?',
             when: function(answers) {
-              return answers.database !== 'none';
+              var optDb = options.database;
+              var anDb = answers.database;
+              var pullDb = optDb !== 'none' && anDb !== 'none';
+              return !options.latestbackup && pullDb;
             }
           },
           {

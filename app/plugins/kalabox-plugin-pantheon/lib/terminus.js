@@ -3,6 +3,7 @@
 // Intrinsic modules.
 var util = require('util');
 var path = require('path');
+var fs = require('fs');
 
 // Npm modulez
 var _ = require('lodash');
@@ -320,27 +321,60 @@ Terminus.prototype.getSiteAliases = function() {
  */
 Terminus.prototype.downloadBackup = function(site, env, type) {
 
-  // @todo: validate type?
+  // need this for all the other things
+  var self = this;
 
   // Download the backup and return its location
-  return this.__request(
-    ['kterminus'],
-    ['site', 'backups', 'get'],
-    [
-      '--site=' + site,
-      '--env=' + env,
-      '--element=' + type,
-      '--to=/src/config/terminus/',
-      '--latest',
-      '--format=json'
-    ]
-  )
+  // retry if needed
+  return this.kbox.Promise.retry(function() {
+    return self.__request(
+      ['kterminus'],
+      ['site', 'backups', 'get'],
+      [
+        '--site=' + site,
+        '--env=' + env,
+        '--element=' + type,
+        '--to=/src/config/terminus/',
+        '--latest',
+        '--format=json'
+      ]
+    )
 
-  // Parse the data to get the filename
-  .then(function(data) {
-    var dataz = _.dropRight(data.split('\n'), 1);
-    var response = JSON.parse(_.last(dataz));
-    return _.trim(_.last(response.message.split('Downloaded ')));
+    // Catch the error and see if we need to remove an old failed backup
+    // first and then retry
+    .catch(function(err) {
+      // Extract messages from error and array them
+      var msgs  = err.message.substring(err.message.indexOf('{')).split('\n');
+      var exists = _.find(msgs, function(msg) {
+        var obj = JSON.parse(_.trim(msg));
+        return _.includes(obj.message, 'already exists');
+      });
+
+      // If target file already exists then extract its name, delete and retry
+      if (exists !== undefined) {
+        // Extract the path
+        var getRight = JSON.parse(exists).message.split('(');
+        var getLeft = getRight[1].split(')');
+        var containerPath = getLeft[0];
+
+        // Get path on host filesystem
+        var filename = path.basename(containerPath);
+        var filePath = path.join(self.app.root, 'config', 'terminus', filename);
+
+        // Remove the offending file
+        fs.unlinkSync(filePath);
+      }
+
+      // And finally throw the error
+      throw new Error(err);
+    })
+
+    // Parse the data to get the filename
+    .then(function(data) {
+      var dataz = _.dropRight(data.split('\n'), 1);
+      var response = JSON.parse(_.last(dataz));
+      return _.trim(_.last(response.message.split('Downloaded ')));
+    });
   });
 
 };
@@ -370,8 +404,6 @@ Terminus.prototype.createBackup = function(site, env, type) {
  * Checks to see if there is a backup of given type available for site and env
  */
 Terminus.prototype.hasBackup = function(uuid, env, type) {
-
-  // @todo: validate type?
 
   var self = this;
 

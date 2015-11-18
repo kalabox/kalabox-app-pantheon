@@ -151,7 +151,7 @@ module.exports = function(kbox, app) {
       }
     })
 
-    // Download the backup
+    // Download our backup
     .then(function() {
       return terminus.downloadBackup(site, env, 'db');
     })
