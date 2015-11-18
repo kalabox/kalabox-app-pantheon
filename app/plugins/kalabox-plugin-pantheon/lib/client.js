@@ -17,9 +17,6 @@ var rest = require('restler');
 var fingerprint = require('ssh-fingerprint');
 var keygen = require('ssh-keygen');
 var inquirer = require('inquirer');
-var Promise = require('bluebird');
-var retry = require('retry-bluebird');
-Promise.longStackTraces();
 
 /*
  * Constructor.
@@ -37,6 +34,7 @@ function Client(kbox, app) {
 
   // Load in our kbox object and some relevant things
   this.kbox = kbox;
+  this.Promise = kbox.Promise;
   var globalConfig = this.kbox.core.deps.lookup('globalConfig');
   var homeDir = globalConfig.home;
   this.cacheDir = path.join(homeDir, '.kalabox', 'terminus', 'session');
@@ -268,13 +266,13 @@ Client.prototype.reAuthSession = function() {
    */
   var askIt = function(questions, session) {
     if (self.needsReauth(session)) {
-      return new Promise(function(answers) {
+      return new self.Promise(function(answers) {
         console.log('Your Pantheon session has expired. We need to reauth!');
         inquirer.prompt(questions, answers);
       });
     }
     else {
-      return Promise.resolve(false);
+      return self.Promise.resolve(false);
     }
   };
 
@@ -360,7 +358,7 @@ Client.prototype.__request = function(verb, pathname, data) {
   }
 
   // Format our URL
-  return Promise.try(function() {
+  return self.Promise.try(function() {
 
     // Build the URL object
     var obj = _.extend(self.target, {pathname: self.__url(pathname)});
@@ -374,9 +372,9 @@ Client.prototype.__request = function(verb, pathname, data) {
   // @todo: clean this code up
   .then(function(url) {
 
-    return retry({max: 7}, function() {
+    return self.Promise.retry(function() {
       // Send REST request.
-      return new Promise(function(fulfill, reject) {
+      return new self.Promise(function(fulfill, reject) {
         rest[verb](url, data)
         .on('success', fulfill)
         .on('fail', function(data, resp) {
@@ -398,7 +396,7 @@ Client.prototype.auth = function(email, password) {
 
   // Check static cache
   if (this.session !== undefined) {
-    return Promise.resolve(this.session);
+    return this.Promise.resolve(this.session);
   }
 
   // Save this for later
@@ -500,7 +498,7 @@ Client.prototype.sshKeySetup = function(opts) {
 
   // Check static cache
   if (this.keySet === true) {
-    return Promise.resolve(true);
+    return this.Promise.resolve(true);
   }
 
   /*
@@ -535,7 +533,7 @@ Client.prototype.sshKeySetup = function(opts) {
 
   // Resolve if this container does not need sshKeys
   if (!needsSshKeys(opts)) {
-    return Promise.resolve(true);
+    return this.Promise.resolve(true);
   }
 
   // @todo: switch this and constants when we start injection kbox into this
@@ -564,7 +562,7 @@ Client.prototype.sshKeySetup = function(opts) {
    * Helper method to promisigy fs.exists
    */
   var existsAsync = function(path) {
-    return new Promise(function(exists) {
+    return new this.Promise(function(exists) {
       fs.exists(path, exists);
     });
   };
@@ -610,7 +608,7 @@ Client.prototype.sshKeySetup = function(opts) {
       };
 
       // Generate our key if needed
-      return Promise.fromNode(function(callback) {
+      return self.Promise.fromNode(function(callback) {
         keygen(keyOpts, callback);
       });
     }
@@ -658,7 +656,7 @@ Client.prototype.getSites = function() {
   // Just grab the cached sites if we already have
   // made a request this process
   if (this.sites !== undefined) {
-    return Promise.resolve(this.sites);
+    return this.Promise.resolve(this.sites);
   }
 
   // Some things to use later

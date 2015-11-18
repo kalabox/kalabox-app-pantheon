@@ -151,40 +151,45 @@ module.exports = function(kbox, app) {
       }
     })
 
-    // Download the backup
+    // Download our backup
     .then(function() {
-      return terminus.downloadBackup(site, env, 'db');
-    })
 
-    // If there is an error we need to purge the bad DB
-    .catch(function(err) {
-      // Extract messages from error and array them
-      var msgs  = err.message.substring(err.message.indexOf('{')).split('\n');
-      var exists = _.find(msgs, function(msg) {
-        var obj = JSON.parse(_.trim(msg));
-        return _.includes(obj.message, 'already exists');
+      // And retry a few times if needed
+      return Promise.retry(function() {
+
+        // Download the backup
+        return terminus.downloadBackup(site, env, 'db')
+
+        // If there is an error we need to purge the bad DB
+        .catch(function(err) {
+          // Extract messages from error and array them
+          var errMess = err.message;
+          var msgs  = errMess.substring(err.message.indexOf('{')).split('\n');
+          var exists = _.find(msgs, function(msg) {
+            var obj = JSON.parse(_.trim(msg));
+            return _.includes(obj.message, 'already exists');
+          });
+
+          // If target file already exists then extract its name, delete and retry
+          if (exists !== undefined) {
+            // Extract the path
+            var getRight = JSON.parse(exists).message.split('(');
+            var getLeft = getRight[1].split(')');
+            var containerPath = getLeft[0];
+
+            // Get path on host filesystem
+            var filename = path.basename(containerPath);
+            var filePath = path.join(app.root, 'config', 'terminus', filename);
+
+            // Remove the offending file
+            fs.unlinkSync(filePath);
+          }
+
+          // And finally throw the error
+          throw new Error(err);
+
+        });
       });
-
-      // If target file already exists then extract its name, delete and retry
-      if (exists !== undefined) {
-        // Extract the path
-        var getRight = JSON.parse(exists).message.split('(');
-        var getLeft = getRight[1].split(')');
-        var containerPath = getLeft[0];
-
-        // Get path on host filesystem
-        var filename = path.basename(containerPath);
-        var filePath = path.join(app.root, 'config', 'terminus', filename);
-
-        // Remove the offending file
-        fs.unlinkSync(filePath);
-      }
-
-      // else throw an error
-      else {
-        throw new Error(err);
-      }
-
     })
 
     // Import the backup

@@ -25,12 +25,10 @@
     }
   },
   "dependencies": {
-    "bluebird": "^2.9.32",
     "fs-extra": "^0.18.2",
     "inquirer": "^0.9.0",
     "lodash": "^3.9.3",
     "restler": "^3.3.0",
-    "retry-bluebird": "^0.1.1",
     "ssh-fingerprint": "0.0.1",
     "ssh-keygen": "^0.2.1"
   },
