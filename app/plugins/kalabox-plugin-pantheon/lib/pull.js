@@ -156,6 +156,37 @@ module.exports = function(kbox, app) {
       return terminus.downloadBackup(site, env, 'db');
     })
 
+    // If there is an error we need to purge the bad DB
+    .catch(function(err) {
+      // Extract messages from error and array them
+      var msgs  = err.message.substring(err.message.indexOf('{')).split('\n');
+      var exists = _.find(msgs, function(msg) {
+        var obj = JSON.parse(_.trim(msg));
+        return _.includes(obj.message, 'already exists');
+      });
+
+      // If target file already exists then extract its name, delete and retry
+      if (exists !== undefined) {
+        // Extract the path
+        var getRight = JSON.parse(exists).message.split('(');
+        var getLeft = getRight[1].split(')');
+        var containerPath = getLeft[0];
+
+        // Get path on host filesystem
+        var filename = path.basename(containerPath);
+        var filePath = path.join(app.root, 'config', 'terminus', filename);
+
+        // Remove the offending file
+        fs.unlinkSync(filePath);
+      }
+
+      // else throw an error
+      else {
+        throw new Error(err);
+      }
+
+    })
+
     // Import the backup
     .then(function(importFile) {
       // Perform a container run.
