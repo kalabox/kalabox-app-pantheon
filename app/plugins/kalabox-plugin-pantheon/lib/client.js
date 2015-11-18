@@ -501,6 +501,9 @@ Client.prototype.sshKeySetup = function(opts) {
     return this.Promise.resolve(true);
   }
 
+  // for later
+  var self = this;
+
   /*
    * Determines whether a container needs SSH keys or not
    * @todo: this is better than what we had but probably still needs
@@ -562,13 +565,10 @@ Client.prototype.sshKeySetup = function(opts) {
    * Helper method to promisigy fs.exists
    */
   var existsAsync = function(path) {
-    return new this.Promise(function(exists) {
+    return new self.Promise(function(exists) {
       fs.exists(path, exists);
     });
   };
-
-  // Some things to use later
-  var self = this;
 
   // Now check to see whether we have a pantheon SSH key already
   // @todo: we shouldnt assume that because a private key exists that a
