@@ -30,7 +30,9 @@ else
     APPSERVER_BACKEND="${IPS[1]}"
   fi
 fi
-sed -i "s/.host =*/.host = \"${APPSERVER_BACKEND}\";/g" /etc/varnish/default.vcl
+
+# Set the varnish backend correctly
+sed -i "s/.host =.*/.host = \"${APPSERVER_BACKEND}\";/g" /etc/varnish/default.vcl
 
 # Copy the configuration for ssl termination with nginx to the correct place
 if [ -f "/src/config/nginx/ssl-termination.conf" ]; then
