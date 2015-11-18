@@ -242,8 +242,14 @@ Terminus.prototype.hasChanges = function(site, env) {
   // Return whether we have changes or not
   .then(function(data) {
 
-    // Try to parse our json
-    var response = JSON.parse(data);
+    // Split into an array of messages
+    var messages = data.split('\n');
+    // Last message is empty
+    messages.pop();
+    var last = _.last(messages);
+
+    // Parse the last message
+    var response = JSON.parse(_.trim(last));
     return response.message !== 'No changes on server.';
 
   });
