@@ -8,13 +8,6 @@ if [ ! -f "/certs/edge-ssl-termination.pem" ]; then
   cat /certs/edge-ssl-termination.crt /certs/edge-ssl-termination.key > /certs/edge-ssl-termination.pem
 fi
 
-# Use the correct VCL for the framework
-# Right now we default to drupal.vcl but we need to get other vcl here
-if [ -f "/src/config/varnish/${FRAMEWORK}.vcl" ]; then
-  rm /etc/varnish/default.vcl
-  cp /src/config/varnish/${FRAMEWORK}.vcl /etc/varnish/default.vcl
-fi
-
 # Varnish's backend should point to the appserver container
 # @todo: this bashfu is dark and full of peril we should probably fix the
 # underlying issues at some point
