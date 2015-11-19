@@ -10,6 +10,13 @@ sub vcl_recv {
   # Return (pass) instructs Varnish not to cache the request
   # when the condition is met.
 
+  ## GOOGLE ANALYTICS
+
+  # Strip out Google Analytics variables
+  if (req.url ~ "(\?|&)(__+|gclid|cx|ie|cof|siteurl|zanpid|origin|utm_[a-z]+|mr:[A-z]+)=") {
+    set req.url = regsuball(req.url, "(__+gclid|cx|ie|cof|siteurl|zanpid|origin|utm_[a-z]+|mr:[A-z]+)=[%\._A-z0-9-]+&?", "");
+  }
+
   ## ADMIN PAGES ##
 
   # Here we filter out all URLs containing Drupal administrative sections
@@ -21,7 +28,10 @@ sub vcl_recv {
     req.url ~ "^/user/.*$" ||
     req.url ~ "^/flag/.*$" ||
     req.url ~ "^.*/ajax/.*$" ||
-    req.url ~ "^.*/ahah/.*$") {
+    req.url ~ "^.*/ahah/.*$" ||
+    req.url ~ ".*fbconnect.*" ||
+    req.url ~ ".*facebook.*" ||
+    req.url ~ ".*fblink.*") {
       return (pass);
   }
 
@@ -53,21 +63,40 @@ sub vcl_recv {
   # The method for filtering unnecessary cookies has been adopted from:
   # https://fourkitchens.atlassian.net/wiki/display/TECH/Configure+Varnish+3+for+Drupal+7
   if (req.http.Cookie) {
+
     # 1. We add ; to the beginning of cookie header
     set req.http.Cookie = ";" + req.http.Cookie;
+
     # 2. We remove spaces following each occurence of ";". After this operation
     # all cookies are delimited with no spaces.
     set req.http.Cookie = regsuball(req.http.Cookie, "; +", ";");
+
     # 3. We replace ";" INTO "; " (adding the space we have previously removed) in cookies
     # named SESS..., SSESS... and NO_CACHE. After this operation those cookies will be
     # easy to differentiate from the others, because those will be the only one with space
     # after ";"
     set req.http.Cookie = regsuball(req.http.Cookie, ";(SESS[a-z0-9]+|SSESS[a-z0-9]+|NO_CACHE)=", "; \1=");
+
     # 4. We remove all cookies with no space after ";", so basically we remove all cookies other
     # than those above.
     set req.http.Cookie = regsuball(req.http.Cookie, ";[^ ][^;]*", "");
+
     # 5. We strip leading and trailing whitespace and semicolons.
     set req.http.Cookie = regsuball(req.http.Cookie, "^[; ]+|[; ]+$", "");
+
+    # 6. We whitelist some other useful cookies
+    set req.http.Cookie = regsuball(req.http.Cookie, ";(fbs[a-z0-9_]+)=", "; \1=");
+    set req.http.Cookie = regsuball(req.http.Cookie, ";(SimpleSAML[A-Za-z]+)=", "; \1=");
+    set req.http.Cookie = regsuball(req.http.Cookie, ";(PHPSESSID)=", "; \1=");
+    set req.http.Cookie = regsuball(req.http.Cookie, ";(wordpress[A-Za-z0-9_]*)=", "; \1=");
+    set req.http.Cookie = regsuball(req.http.Cookie, ";(wp-[A-Za-z0-9_]+)=", "; \1=");
+    set req.http.Cookie = regsuball(req.http.Cookie, ";(comment_author_[a-z0-9_]+)=", "; \1=");
+    set req.http.Cookie = regsuball(req.http.Cookie, ";(duo_wordpress_auth_cookie)=", "; \1=");
+    set req.http.Cookie = regsuball(req.http.Cookie, ";(duo_secure_wordpress_auth_cookie)=", "; \1=");
+    set req.http.Cookie = regsuball(req.http.Cookie, ";(bp_completed_create_steps)=", "; \1=");
+    set req.http.Cookie = regsuball(req.http.Cookie, ";(bp_new_group_id)=", "; \1=");
+    set req.http.Cookie = regsuball(req.http.Cookie, ";(wp-resetpass-[A-Za-z0-9_]+)=", "; \1=");
+    set req.http.Cookie = regsuball(req.http.Cookie, ";((wp_)?woocommerce[A-Za-z0-9_-]+)=", "; \1=");
 
     # If there are no cookies after our striping procedure, we remove the header altogether,
     # thus allowing Varnish to cache this page
