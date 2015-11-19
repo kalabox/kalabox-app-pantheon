@@ -9,6 +9,7 @@ if [ ! -f "/certs/edge-ssl-termination.pem" ]; then
 fi
 
 # Use the correct VCL for the framework
+# Right now we default to drupal.vcl but we need to get other vcl here
 if [ -f "/src/config/varnish/${FRAMEWORK}.vcl" ]; then
   rm /etc/varnish/default.vcl
   cp /src/config/varnish/${FRAMEWORK}.vcl /etc/varnish/default.vcl
@@ -31,7 +32,7 @@ else
   fi
 fi
 
-# Set the varnish backend correctly
+# Set the varnish backend ip and port correctly
 sed -i "s/.host =.*/.host = \"${APPSERVER_BACKEND}\";/g" /etc/varnish/default.vcl
 
 # Copy the configuration for ssl termination with nginx to the correct place
