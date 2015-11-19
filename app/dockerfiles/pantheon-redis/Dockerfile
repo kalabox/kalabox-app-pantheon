@@ -14,4 +14,4 @@ COPY ./redis.conf /root/redis.conf
 
 EXPOSE 8161
 
-CMD ["/usr/bin/redis-server", "/root/redis.conf"]
+CMD ["/usr/local/bin/redis-server", "/root/redis.conf"]
