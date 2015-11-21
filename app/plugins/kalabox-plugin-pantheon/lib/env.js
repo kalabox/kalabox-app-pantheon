@@ -12,7 +12,7 @@ module.exports = function(kbox) {
 
   // Constants
   var PLUGIN_NAME = 'kalabox-plugin-pantheon';
-  var TERMINUS = 'terminus:t0.9.2';
+  var TERMINUS = 'terminus:t0.9.3';
 
   // Kbox modules
   var events = kbox.core.events.context('cc8e0202-4c28-467b-8bae-433bae435f08');
