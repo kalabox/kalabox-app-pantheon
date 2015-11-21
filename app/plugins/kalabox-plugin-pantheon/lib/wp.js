@@ -7,7 +7,7 @@ var _ = require('lodash');
 
 // "Constants"
 var PLUGIN_NAME = 'kalabox-plugin-pantheon';
-var TERMINUS = 'terminus:t0.9.2';
+var TERMINUS = 'terminus:t0.9.3';
 
 module.exports = function(kbox) {
 

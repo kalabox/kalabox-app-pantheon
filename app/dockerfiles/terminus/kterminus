@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Terminus requires 5.5.24 now
+PHP_VERSION=5.5.24
+
 # Use our custom terminus php.ini We want to use a custom ini here so we can
 # set error reporting so that notices are not reported to stderr
 if [ -f "/src/config/terminus/php.ini" ]; then
