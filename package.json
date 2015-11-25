@@ -7,7 +7,7 @@
     "drupal",
     "wordpress"
   ],
-  "version": "0.10.7",
+  "version": "0.10.8",
   "repository": {
     "type": "git",
     "url": "https://github.com/kalabox/kalabox-app-pantheon.git"
