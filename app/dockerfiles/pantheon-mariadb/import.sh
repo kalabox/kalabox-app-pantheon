@@ -19,11 +19,15 @@ fi
 MYSQL_OPTS="-u pantheon ${OPT_DB_PASSWORD}-h ${DB_HOST} -P ${DB_PORT} pantheon"
 
 # "Switch" on file extension
-# @todo: Handle different formats?
 if [[ $ARCHIVE == *gz ]]; then
   gzip -cd "${ARCHIVE}" | mysql $MYSQL_OPTS
+elif [[ $ARCHIVE == *zip ]]; then
+  unzip -p "${ARCHIVE}" | mysql $MYSQL_OPTS
 elif [[ $ARCHIVE == *sql ]]; then
   mysql $MYSQL_OPTS < "${ARCHIVE}"
+else
+  >&2 echo "ERROR Unsupported input format: ${ARCHIVE}"
+  exit 1
 fi
 
 rm -f "${ARCHIVE}"
