@@ -1,6 +1,9 @@
 # docker build -t kalabox/terminus .
 FROM kalabox/pantheon-appserver:v0.10.0
 
+# Remove once terminus 0.9.4 is out
+COPY install-terminus.sh /usr/local/bin/install-terminus.sh
+
 # Install all the CLI magic
 RUN \
   git clone --depth 1 --branch 5.11.0 https://github.com/drush-ops/drush.git /usr/local/src/drush5 && \
@@ -9,8 +12,11 @@ RUN \
   ln -s /usr/local/src/drush6/drush /usr/bin/drush6 && \
   curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
   chmod +x wp-cli.phar && mv wp-cli.phar /usr/local/bin/wp && \
-  curl https://github.com/pantheon-systems/cli/releases/download/0.9.3/terminus.phar -L -o /usr/local/bin/terminus && \
-  chmod +x /usr/local/bin/terminus && \
+  # We are going to roll our own terminus until 0.9.4 is out.
+  # curl https://github.com/pantheon-systems/cli/releases/download/0.9.3/terminus.phar -L -o /usr/local/bin/terminus && \
+  # chmod +x /usr/local/bin/terminus && \
+  chmod +x /usr/local/bin/install-terminus.sh && sleep 5 && \
+  /usr/local/bin/install-terminus.sh && \
   apt-get -y clean && \
   apt-get -y autoclean && \
   apt-get -y autoremove && \
