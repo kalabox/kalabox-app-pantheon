@@ -30,7 +30,7 @@ COPY ssh-config /root/.ssh/config
 
 # Set default env
 ENV PHP_VERSION 5.3.29
-ENV DRUSH_VERSION drush6
+ENV DRUSH_VERSION drush7
 ENV SSH_KEY id_rsa
 
 # Set up and link our roots for persistence
