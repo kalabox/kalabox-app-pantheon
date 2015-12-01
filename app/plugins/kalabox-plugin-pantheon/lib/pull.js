@@ -15,9 +15,6 @@ module.exports = function(kbox, app) {
   // NPM modules
   var _ = require('lodash');
 
-  // "Constants"
-  var PLUGIN_NAME = 'kalabox-plugin-pantheon';
-
   // Grab the terminus client
   var Terminus = require('./terminus.js');
   var terminus = new Terminus(kbox, app);

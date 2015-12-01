@@ -9,7 +9,6 @@
 var fs = require('fs-extra');
 var path = require('path');
 var urls = require('url');
-var util = require('util');
 
 // Npm modulez
 var _ = require('lodash');
@@ -57,7 +56,7 @@ function Client(kbox, app) {
 /**
  * Gets plugin conf from the appconfig or from CLI arg
  **/
-Client.prototype.__getOpts = function(options) {
+Client.prototype.__getOpts = function() {
 
   var opts;
 
@@ -377,7 +376,7 @@ Client.prototype.__request = function(verb, pathname, data) {
       return new self.Promise(function(fulfill, reject) {
         rest[verb](url, data)
         .on('success', fulfill)
-        .on('fail', function(data, resp) {
+        .on('fail', function(data) {
           var err = new Error(data);
           reject(err);
         })

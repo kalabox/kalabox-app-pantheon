@@ -1,7 +1,6 @@
 'use strict';
 
 // Intrinsic modules.
-var util = require('util');
 var path = require('path');
 var fs = require('fs');
 
@@ -93,14 +92,11 @@ Terminus.prototype.__request = function(cmd, args, options) {
   // Start a terminus container and run a terminus command against it
   var query = self.__buildQuery(cmd, args, options);
 
-  // Grab a session to set up our auth
-  var session = this.pantheon.getSession();
-
   // Prompt the user to reauth if the session is invalid
   return this.pantheon.reAuthSession()
 
   // Set our session to be the new session
-  .then(function(reAuthSession) {
+  .then(function() {
 
     // Util function just for CS stuff
     var queryFunc = function(container) {
@@ -171,14 +167,11 @@ Terminus.prototype.cmd = function(cmd, opts, done) {
   // Image name.
   var image = TERMINUS;
 
-  // Grab a session to set up our auth
-  var session = this.pantheon.getSession();
-
   // Prompt the user to reauth if the session is invalid
   return this.pantheon.reAuthSession()
 
   // Set our session to be the new session
-  .then(function(reAuthSession) {
+  .then(function() {
 
     // Perform a container run.
     return engine.run(image, cmd, createOpts, startOpts)

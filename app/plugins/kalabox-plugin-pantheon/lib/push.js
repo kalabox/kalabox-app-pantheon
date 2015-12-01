@@ -8,15 +8,10 @@ module.exports = function(kbox, app) {
   Promise.longStackTraces();
 
   // Intrinsic modules.
-  var url = require('url');
-  var fs = require('fs');
   var path = require('path');
 
   // NPM modules
   var _ = require('lodash');
-
-  // "Constants"
-  var PLUGIN_NAME = 'kalabox-plugin-pantheon';
 
   // Grab the terminus client
   var Terminus = require('./terminus.js');

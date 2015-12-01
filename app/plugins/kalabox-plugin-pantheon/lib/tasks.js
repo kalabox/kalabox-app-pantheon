@@ -4,7 +4,6 @@ module.exports = function(kbox) {
 
   // Modules
   var path = require('path');
-  var fs = require('fs');
   var _ = require('lodash');
 
   // Nobody expects the Spanish Inquisition!
@@ -193,7 +192,7 @@ module.exports = function(kbox) {
             type: 'list',
             name: 'database',
             message: 'Which database do you want to use?',
-            choices: function(answers) {
+            choices: function() {
 
               // Get approved choices
               var choices = getEnvPullChoices();
@@ -208,7 +207,7 @@ module.exports = function(kbox) {
               return choices;
 
             },
-            default: function(answers) {
+            default: function() {
               return pantheonConf.env;
             }
           },
@@ -227,7 +226,7 @@ module.exports = function(kbox) {
             type: 'list',
             name: 'files',
             message: 'Which files do you want to use?',
-            choices: function(answers) {
+            choices: function() {
 
               // Get approved choices
               var choices = getEnvPullChoices();
@@ -446,7 +445,7 @@ module.exports = function(kbox) {
             type: 'list',
             name: 'database',
             message: 'Which env do you want to push the DB to?',
-            choices: function(answers) {
+            choices: function() {
 
               // Get approved choices
               var choices = getEnvPushChoices();
@@ -461,7 +460,7 @@ module.exports = function(kbox) {
               return choices;
 
             },
-            default: function(answers) {
+            default: function() {
               return pantheonConf.env;
             }
           },
@@ -469,7 +468,7 @@ module.exports = function(kbox) {
             type: 'list',
             name: 'files',
             message: 'Which env do you want to push the files to?',
-            choices: function(answers) {
+            choices: function() {
 
               // Get approved choices
               var choices = getEnvPushChoices();

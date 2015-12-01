@@ -1,19 +1,17 @@
 'use strict';
 
-// Modules
-var path = require('path');
-var fs = require('fs');
-var _ = require('lodash');
-
-// "Constants"
-var PLUGIN_NAME = 'kalabox-plugin-pantheon';
-var TERMINUS = 'terminus:t0.9.3';
-
 module.exports = function(kbox) {
 
+  // Modules
+  var _ = require('lodash');
+
+  // "Constants"
+  var PLUGIN_NAME = 'kalabox-plugin-pantheon';
+  var TERMINUS = 'terminus:t0.9.3';
+
+  // Kbox modules
   var globalConfig = kbox.core.deps.get('globalConfig');
   var engine = kbox.engine;
-  var Promise = kbox.Promise;
 
   kbox.ifApp(function(app) {
 

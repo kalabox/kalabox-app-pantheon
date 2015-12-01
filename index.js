@@ -44,7 +44,7 @@ module.exports = function(kbox) {
   kbox.integrations.create('pantheon', function(api) {
 
     // Authorize login.
-    api.methods.auth = function(email, password) {
+    api.methods.auth = function(/*email, password*/) {
       var self = this;
       return kbox.Promise.try(function() {
         return self.ask([

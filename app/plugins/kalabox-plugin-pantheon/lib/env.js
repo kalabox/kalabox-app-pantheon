@@ -352,7 +352,7 @@ module.exports = function(kbox) {
         .then(function(data) {
           var key = '3306/tcp';
           if (data && data.NetworkSettings.Ports[key]) {
-            var port = data.NetworkSettings.Ports[key][0].HostPort;
+            //var port = data.NetworkSettings.Ports[key][0].HostPort;
             var cmd = [
               'sed',
               '-i',

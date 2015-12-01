@@ -234,16 +234,7 @@ var writeInternetFile = function(project, location, callback) {
 
 // Downlaod our files and put them in their place
 _.forEach(assets, function(files, project) {
-  _.forEach(files, function(file, purpose) {
-
-    var options = {
-      hostname: 'api.github.com',
-      port: 443,
-      path: '/repos/kalabox/' + project + '/tags',
-      method: 'GET',
-      json: true,
-      headers: {'User-Agent': 'Kalabox'}
-    };
+  _.forEach(files, function(file) {
 
     writeInternetFile(project, file, function(url, loc) {
       var msg;
