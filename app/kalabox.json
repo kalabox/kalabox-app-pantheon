@@ -15,7 +15,7 @@
   "pluginConf": {
     "kalabox-plugin-pantheon": {
       "account": "",
-      "drush-version": "6",
+      "drush-version": "7",
       "env": "",
       "framework": "",
       "php": "",
