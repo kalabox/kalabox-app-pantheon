@@ -136,8 +136,9 @@ module.exports = function(kbox) {
         if (!_.includes(cmd.join(''), '@')) {
           cmd.unshift('@kbox');
         }
-        // Need to set custom alias path for drush8
+        // Need to set strict & custom alias path for drush8
         if (opts['drush-version'] === '8') {
+          cmd.push('--strict=0');
           cmd.push('--alias-path=/src/config/drush');
         }
         // Specify the root, this will be overriden by our

@@ -6,9 +6,6 @@ COPY install-terminus.sh /usr/local/bin/install-terminus.sh
 
 # Install all the CLI magic
 RUN \
-  git clone --depth 1 --branch 7.1.0 https://github.com/drush-ops/drush.git /usr/local/src/drush7 && \
-  ln -s /usr/local/src/drush7/drush /usr/bin/drush7 && \
-  cd /usr/local/src/drush7 && composer update && composer install --no-dev && \
   curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
   chmod +x wp-cli.phar && mv wp-cli.phar /usr/local/bin/wp && \
   # We are going to roll our own terminus until 0.9.4 is out.
@@ -29,7 +26,6 @@ COPY ssh-config /root/.ssh/config
 
 # Set default env
 ENV PHP_VERSION 5.3.29
-ENV DRUSH_VERSION drush7
 ENV SSH_KEY id_rsa
 
 # Set up and link our roots for persistence
