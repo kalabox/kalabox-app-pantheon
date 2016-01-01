@@ -7,25 +7,27 @@ DB_PASSWORD="$2"
 DB_PORT="$3"
 ARCHIVE="$4"
 
-# @todo: Handle difference formats?
-# [[ $a == z* ]]
-if [[ $ARCHIVE == *gz ]]; then
-  echo "Extracting ${ARCHIVE}"
-  gunzip -df "${ARCHIVE}"
-  SUFFIX=".gz"
-  SQL=${ARCHIVE%$SUFFIX}
-elif [[ $ARCHIVE == *sql ]]; then
-  echo "USING EXISTING ${ARCHIVE}"
-  SQL=${ARCHIVE}
-fi
-
 # @todo: Handle different DBs?
+echo "Importing ${ARCHIVE} to ${DB_HOST}"
 
-echo "Importing ${SQL} to ${DB_HOST}"
-if [ -z "$DB_PASSWORD" ]; then
-  mysql -u pantheon -h "${DB_HOST}" -P "${DB_PORT}" pantheon < "${SQL}"
-else
-  mysql -u pantheon -p"${DB_PASSWORD}" -h "${DB_HOST}" -P "${DB_PORT}" pantheon < "${SQL}"
+# Use password option if password is specified.
+OPT_DB_PASSWORD=""
+if [ ! -z "$DB_PASSWORD" ]; then
+  OPT_DB_PASSWORD="-p${DB_PASSWORD} "
 fi
 
-rm -f "${SQL}"
+MYSQL_OPTS="-u pantheon ${OPT_DB_PASSWORD}-h ${DB_HOST} -P ${DB_PORT} pantheon"
+
+# "Switch" on file extension
+if [[ $ARCHIVE == *gz ]]; then
+  gzip -cd "${ARCHIVE}" | mysql $MYSQL_OPTS
+elif [[ $ARCHIVE == *zip ]]; then
+  unzip -p "${ARCHIVE}" | mysql $MYSQL_OPTS
+elif [[ $ARCHIVE == *sql ]]; then
+  mysql $MYSQL_OPTS < "${ARCHIVE}"
+else
+  >&2 echo "ERROR Unsupported input format: ${ARCHIVE}"
+  exit 1
+fi
+
+rm -f "${ARCHIVE}"
