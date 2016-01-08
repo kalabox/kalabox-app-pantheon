@@ -24,7 +24,7 @@ before-install() {
   if [ $TRAVIS_PULL_REQUEST == "false" ] &&
     [ -z "$TRAVIS_TAG" ] &&
     [ $TRAVIS_REPO_SLUG == $PLUGIN_REPO ] &&
-    [ $TRAVIS_NODE_VERSION == "0.12" ]; then
+    [ $TRAVIS_NODE_VERSION == "4.2" ]; then
     openssl aes-256-cbc -K $encrypted_a3de5a85a96e_key -iv $encrypted_a3de5a85a96e_iv -in ci/travis.id_rsa.enc -out $HOME/.ssh/travis.id_rsa -d
   fi
 }
@@ -69,7 +69,7 @@ after-success() {
   if [ $TRAVIS_PULL_REQUEST == "false" ] &&
     [ -z "$TRAVIS_TAG" ] &&
     [ $TRAVIS_REPO_SLUG == $PLUGIN_REPO ] &&
-    [ $TRAVIS_NODE_VERSION == "0.12" ]; then
+    [ $TRAVIS_NODE_VERSION == "4.2" ]; then
 
     # Try to grab our git tag
     DISCO_TAG=$(git describe --contains HEAD)
