@@ -13,3 +13,7 @@ terminal:
 terminus:
   service: terminus
   entrypoint: bash --login -c
+wp:
+  service: terminus
+  entrypoint: wp
+  precmdopts: --allow-root
