@@ -1,12 +1,11 @@
 name: pantheon
 type: pantheon
-appPlugins:
+plugins:
   - kalabox-plugin-pantheon
 pluginconfig:
   cli: on
   syncthing:
     share: appserver:/code
-    codeDir: code
     ignore:
       - "sites/default/files"
       - "files"
@@ -20,9 +19,3 @@ pluginconfig:
       - port: "443/tcp"
         default: true
         secure: true
-  pantheon:
-    account:
-    env:
-    framework: drupal
-    site:
-    upstream:

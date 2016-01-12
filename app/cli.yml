@@ -6,6 +6,6 @@ rysnc:
   description: Run a rsync command on your codebase
 terminal:
   binary: appserver:/bin/bash
-  description: Bash into your codebase
+  description: \"ssh\" into your appserver
 vim:
   binary: cli:vim
