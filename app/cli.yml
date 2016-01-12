@@ -1,11 +1,15 @@
 git:
-  binary: cli:git
+  service: cli
+  entrypoint: git
   description: Run a git command on your codebase
 rysnc:
-  binary: cli:/bin/rsync
+  service: cli
+  entrypoint: rsync
   description: Run a rsync command on your codebase
 terminal:
-  binary: appserver:/bin/bash
-  description: \"ssh\" into your appserver
-vim:
-  binary: cli:vim
+  service: appserver
+  entrypoint: bash
+  description: Exec into your appserver
+terminus:
+  service: terminus
+  entrypoint: bash --login -c
