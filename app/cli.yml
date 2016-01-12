@@ -1,6 +1,6 @@
 git:
   service: cli
-  entrypoint: git
+  entrypoint: kgit
   description: Run a git command on your codebase
 rysnc:
   service: cli
