@@ -23,6 +23,7 @@ RUN \
 
 # Set up our kalabox specific stuff
 COPY bashrc /root/.bashrc
+COPY ssh-config /root/.ssh/config
 
 ENTRYPOINT ["/bin/bash"]
 CMD ["true"]
