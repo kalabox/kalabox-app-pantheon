@@ -38,12 +38,12 @@ module.exports = function(kbox) {
 
     // Pull our DB
     .then(function() {
-      return puller.pullDB(pantheonConf.site, pantheonConf.env);
+      //return puller.pullDB(pantheonConf.site, pantheonConf.env);
     })
 
     // Get our files
     .then(function() {
-      return puller.pullFiles(pantheonConf.site, pantheonConf.env);
+      //return puller.pullFiles(pantheonConf.site, pantheonConf.env);
     })
 
     .nodeify(done);

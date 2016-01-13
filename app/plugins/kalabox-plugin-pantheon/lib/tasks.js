@@ -10,16 +10,8 @@ module.exports = function(kbox) {
 
   kbox.whenAppRegistered(function(app) {
 
-    // Get our push and pull stuff
-    var puller = require('./pull.js')(kbox, app);
-    var pusher = require('./push.js')(kbox, app);
-
-    // Grab the needed clients
-    var Terminus = require('./terminus.js');
-    var terminus = new Terminus(kbox, app);
-
     // Get our config
-    var pantheonConf = app.config.pluginConf.pantheon;
+    var pantheonConf = app.config.pluginconfig.pantheon;
 
     // Supports pull env
     var supportedPullEnvs = [pantheonConf.env, 'test', 'live'];
@@ -207,6 +199,9 @@ module.exports = function(kbox) {
         // Launch the inquiry
         inquirer.prompt(questions, function(answers) {
 
+          // Get our pull module
+          var puller = require('./pull.js')(kbox, app);
+
           // Collect our answers
           var choices = _.merge({}, options, answers);
 
@@ -215,11 +210,6 @@ module.exports = function(kbox) {
 
           // Report to metrics.
           return kbox.metrics.reportAction('pull')
-
-          // Grab pantheon aliases
-          .then(function() {
-            return terminus.getSiteAliases();
-          })
 
           // Pull our code
           .then(function() {
@@ -352,6 +342,9 @@ module.exports = function(kbox) {
         // Launch the inquiry
         inquirer.prompt(questions, function(answers) {
 
+          // Get our push module
+          var pusher = require('./push.js')(kbox, app);
+
           // Collect our choices
           var choices = _.merge({}, options, answers);
 
@@ -360,11 +353,6 @@ module.exports = function(kbox) {
 
           // Report to metrics.
           return kbox.metrics.reportAction('push')
-
-          // Grab pantheon site aliases
-          .then(function() {
-            return terminus.getSiteAliases();
-          })
 
           // Push our code
           .then(function() {

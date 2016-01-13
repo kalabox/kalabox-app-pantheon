@@ -2,12 +2,7 @@
 
 module.exports = function(kbox, app) {
 
-  // Grab some kalabox modules
-  var engine = kbox.engine;
-  var Promise = kbox.Promise;
-  Promise.longStackTraces();
-
-  // Intrinsic modules.
+  // Node modules.
   var path = require('path');
 
   // NPM modules
@@ -17,13 +12,9 @@ module.exports = function(kbox, app) {
   var Terminus = require('./terminus.js');
   var terminus = new Terminus(kbox, app);
 
-  // Grab delegated helpers
-  var pathToRoot = path.resolve(__dirname, '..', '..', '..');
-  var pathToNode = path.join(pathToRoot, 'node_modules');
-  var Git = require(pathToNode + '/kalabox-plugin-git/lib/git.js');
-  var git = new Git(kbox, app);
-  var Rsync = require(pathToNode + '/kalabox-plugin-rsync/lib/rsync.js');
-  var rsync = new Rsync(kbox, app);
+  // Grab some kalabox modules
+  var engine = kbox.engine;
+  var Promise = kbox.Promise;
 
   /*
    * Push up our sites code

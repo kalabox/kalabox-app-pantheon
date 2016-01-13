@@ -2,12 +2,7 @@
 
 module.exports = function(kbox, app) {
 
-  // Grab some kalabox modules
-  var engine = kbox.engine;
-  var Promise = kbox.Promise;
-  Promise.longStackTraces();
-
-  // Intrinsic modules.
+  // Node modules.
   var url = require('url');
   var fs = require('fs');
   var path = require('path');
@@ -15,17 +10,12 @@ module.exports = function(kbox, app) {
   // NPM modules
   var _ = require('lodash');
 
+  // Grab some kalabox modules
+  var engine = kbox.engine;
+
   // Grab the terminus client
   var Terminus = require('./terminus.js');
   var terminus = new Terminus(kbox, app);
-
-  // Grab delegated helpers
-  var pathToRoot = path.resolve(__dirname, '..', '..', '..');
-  var pathToNode = path.join(pathToRoot, 'node_modules');
-  var Git = require(pathToNode + '/kalabox-plugin-git/lib/git.js');
-  var git = new Git(kbox, app);
-  var Rsync = require(pathToNode + '/kalabox-plugin-rsync/lib/rsync.js');
-  var rsync = new Rsync(kbox, app);
 
   /*
    * Check to see if this is the first time we are going to do a pull or not
@@ -33,7 +23,7 @@ module.exports = function(kbox, app) {
    */
   var firstTime = function() {
     // @todo: this only works if you have started your app first
-    var gitFile = path.join(app.config.codeRoot, '.git');
+    var gitFile = path.join(app.config.syncthing.codeRoot, '.git');
     return !fs.existsSync(gitFile);
   };
 
@@ -45,51 +35,56 @@ module.exports = function(kbox, app) {
     // Determine correct operation
     var type = (firstTime()) ? 'clone' : 'pull';
 
-    // the pantheon site UUID
-    var siteid;
-    var repo;
+    // Grab pantheon aliases
+    return terminus.getSiteAliases()
 
     // Grab the sites UUID from teh machinename
-    return terminus.getUUID(site)
+    .then(function() {
+      return terminus.getUUID(site);
+    })
 
     // Wake the site up
-    .then(function(uuid) {
-      siteid = uuid;
+    .tap(function(uuid) {
       return terminus.wakeSite(site, env);
     })
 
     // Generate our code repo URL
-    // NOTE: even multidev requies we use 'dev' instead of env
-    .then(function() {
+    // NOTE: even multidev requires we use 'dev' instead of env
+    .then(function(uuid) {
+
+      // Grab the git client
+      var git = require('./cmd.js')(kbox, app).git;
+
+      // Build the repo
       var build = {
         protocol: 'ssh',
         slashes: true,
-        auth: ['codeserver', 'dev', siteid].join('.'),
-        hostname: ['codeserver', 'dev', siteid, 'drush', 'in'].join('.'),
+        auth: ['codeserver', 'dev', uuid].join('.'),
+        hostname: ['codeserver', 'dev', uuid, 'drush', 'in'].join('.'),
         port: 2222,
         pathname: ['~', 'repository.git'].join('/')
       };
 
       // Format our metadata into a url
-      repo = url.format(build);
+      var repo = url.format(build);
 
       // Do this if we are gitting for the first time
       if (type === 'clone') {
 
         // Clone the repo
-        return git.cmd(['clone', repo, './'], [])
+        return git(['clone', repo, './'])
 
         // Grab branches if we need more than master
         .then(function() {
           if (env !== 'dev') {
-            return git.cmd(['fetch', 'origin'], []);
+            return git(['fetch', 'origin']);
           }
         })
 
         // Checkout correct branch if needed
         .then(function() {
           if (env !== 'dev') {
-            return git.cmd(['checkout', env], []);
+            return git(['checkout', env]);
           }
         });
       }
@@ -97,7 +92,7 @@ module.exports = function(kbox, app) {
       // If we already have da git then just pull down the correct branch
       else {
         var branch = (env === 'dev') ? 'master' : env;
-        return git.cmd(['pull', 'origin', branch], []);
+        return git(['pull', 'origin', branch]);
       }
 
     });

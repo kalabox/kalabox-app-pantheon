@@ -7,10 +7,6 @@ var fs = require('fs');
 // Npm modulez
 var _ = require('lodash');
 
-// "Constants"
-var PLUGIN_NAME = 'kalabox-plugin-pantheon';
-var TERMINUS = 'terminus:t0.9.3';
-
 /*
  * Constructor.
  */
@@ -32,79 +28,62 @@ function Terminus(kbox, app) {
 }
 
 /*
- * Builds a query for use in a terminus container
- */
-Terminus.prototype.__buildQuery = function(cmd, args, options) {
-
-  return cmd.concat(args).concat(options);
-
-};
-
-/*
- * Returns default terminus container start options
- */
-Terminus.prototype.__getStartOpts = function() {
-
-  // Grab the path of the home dir inside the VM
-  var homeBind = this.app.config.homeBind;
-  return this.kbox.util.docker.StartOpts()
-    .bind(homeBind, '/ssh')
-    .bind(this.app.rootBind, '/src')
-    .json();
-
-};
-
-/*
- * Returns default terminus container create options
- */
-Terminus.prototype.__getCreateOpts = function() {
-
-  // Grab some deps
-  var idObj = this.kbox.util.docker.containerName.createTemp();
-  var id = this.kbox.util.docker.containerName.format(idObj);
-  var globalConfig = this.kbox.core.deps.lookup('globalConfig');
-
-  // Build create options
-  return this.kbox.util.docker.CreateOpts(id)
-    .workingDir('/' + globalConfig.codeDir)
-    .volumeFrom(this.app.dataContainerName)
-    .json();
-
-};
-
-/*
  * Send a request to a terminus container.
  */
-Terminus.prototype.__request = function(cmd, args, options) {
+Terminus.prototype.__request = function(entrypoint, cmd, options) {
 
-  // Save for later.
+  // Mimicry
   var self = this;
 
-  // Get create options.
-  var createOpts = self.__getCreateOpts();
-
-  // We need a special entry for this request
-  createOpts.Entrypoint = ['/bin/sh', '-c'];
-
-  // Get start options
-  var startOpts = self.__getStartOpts();
-
-  // Start a terminus container and run a terminus command against it
-  var query = self.__buildQuery(cmd, args, options);
-
-  // Prompt the user to reauth if the session is invalid
-  return this.pantheon.reAuthSession()
-
-  // Set our session to be the new session
-  .then(function() {
-
-    // Util function just for CS stuff
-    var queryFunc = function(container) {
-      return self.kbox.engine.queryData(container.id, query);
+  /*
+   * Cli container def
+   */
+  var terminusContainer = function() {
+    return {
+      compose: self.app.composeCore,
+      project: self.app.name,
+      opts: {
+        service: 'terminus',
+        collect: true,
+        stdio: [process.stdin, 'pipe', process.stderr]
+      }
     };
+  };
 
-    return self.kbox.engine.use(TERMINUS, createOpts, startOpts, queryFunc);
+  // Build run definition
+  var runDef = terminusContainer();
+  runDef.opts.entrypoint = 'bash --login -c';
+  cmd.unshift(entrypoint);
+  cmd = cmd.concat(options);
+  runDef.opts.cmd = cmd;
 
+  // Log
+  var log = this.kbox.core.log.make('TERMINUS');
+  log.debug('Run definition: ', runDef);
+
+  // Run the command
+  return this.kbox.engine.run(runDef)
+
+  // We can assume we only need the first response here since
+  // we are only running one terminus command at a time
+  .then(function(responses) {
+    return responses[0];
+  })
+
+  // Parse to json
+  .map(function(response) {
+    return JSON.parse(response);
+  })
+
+  // Filter out meta messages
+  .filter(function(response) {
+    return !response.date && !response.level && !response.message;
+  })
+
+  // We can assume we only need the first response here
+  .then(function(result) {
+    log.info('Run returned: ', result);
+    return result;
   });
 
 };
@@ -112,76 +91,6 @@ Terminus.prototype.__request = function(cmd, args, options) {
 /*
  * TERMINUS COMMANDS
  */
-
-/**
- * Gets plugin conf from the appconfig or from CLI arg
- **/
-Terminus.prototype.getOpts = function(options) {
-
-  // Grab our options from config
-  var defaults = this.app.config.pluginConf[PLUGIN_NAME];
-
-  // Override any config coming in on the CLI
-  _.each(Object.keys(defaults), function(key) {
-    if (_.has(options, key) && options[key]) {
-      defaults[key] = options[key];
-    }
-  });
-
-  return defaults;
-};
-
-/*
- * Run an interactive terminus command
- * @todo: do we want to auth at all here?
- */
-Terminus.prototype.cmd = function(cmd, opts, done) {
-
-  // Get engine and global config
-  var engine = this.kbox.engine;
-  var globalConfig = this.kbox.core.deps.lookup('globalConfig');
-
-  // Get create options.
-  var createOpts = this.__getCreateOpts();
-
-  // Get current working directory.
-  var cwd = process.cwd();
-
-  // Get code root.
-  var codeRoot = this.app.config.codeRoot;
-
-  // Build correct WD
-  var workingDirExtra = '';
-  if (_.startsWith(cwd, codeRoot)) {
-    workingDirExtra = cwd.replace(codeRoot, '');
-  }
-  var codeDir = globalConfig.codeDir;
-  var workingDir = '/' + codeDir + workingDirExtra;
-
-  // Override working directory
-  createOpts.WorkingDir = workingDir;
-
-  // Get start options.
-  var startOpts = this.__getStartOpts();
-
-  // Image name.
-  var image = TERMINUS;
-
-  // Prompt the user to reauth if the session is invalid
-  return this.pantheon.reAuthSession()
-
-  // Set our session to be the new session
-  .then(function() {
-
-    // Perform a container run.
-    return engine.run(image, cmd, createOpts, startOpts)
-
-    // Return.
-    .nodeify(done);
-
-  });
-
-};
 
 /*
  * Wake the site
@@ -191,9 +100,9 @@ Terminus.prototype.cmd = function(cmd, opts, done) {
 Terminus.prototype.wakeSite = function(site, env) {
 
   return this.__request(
-    ['kterminus'],
+    ['terminus'],
     ['site', 'wake'],
-    ['--site=' + site, '--env=' + env]
+    ['--site=' + site, '--env=' + env, '--format=json']
   );
 
 };
@@ -207,7 +116,7 @@ Terminus.prototype.getConnectionMode = function(site, env) {
 
   // Grab the data
   return this.__request(
-    ['kterminus'],
+    ['terminus'],
     ['site', 'environment-info', '--field=connection_mode'],
     ['--format=json', '--site=' + site, '--env=' + env]
   )
@@ -228,7 +137,7 @@ Terminus.prototype.hasChanges = function(site, env) {
 
   // Grab the data
   return this.__request(
-    ['kterminus'],
+    ['terminus'],
     ['site', 'code', 'diffstat'],
     ['--format=json', '--site=' + site, '--env=' + env]
   )
@@ -258,7 +167,7 @@ Terminus.prototype.hasChanges = function(site, env) {
 Terminus.prototype.setConnectionMode = function(site, env, mode) {
 
   return this.__request(
-    ['kterminus'],
+    ['terminus'],
     ['site', 'set-connection-mode'],
     ['--format=json', '--site=' + site, '--env=' + env, '--mode=' + mode]
   );
@@ -283,13 +192,13 @@ Terminus.prototype.getUUID = function(site) {
 
   // Make a request
   return self.__request(
-    ['kterminus'],
+    ['terminus'],
     ['site', 'info'],
-    ['--format=json', '--site=' + site, '--field=id']
+    ['--format=json', '--site=' + site]
   )
 
-  .then(function(uuid) {
-    self.uuid = JSON.parse(uuid);
+  .then(function(data) {
+    self.uuid = data[0].id;
     return self.kbox.Promise.resolve(self.uuid);
   });
 
@@ -302,7 +211,7 @@ Terminus.prototype.getUUID = function(site) {
  */
 Terminus.prototype.getSiteAliases = function() {
 
-  return this.__request(['kterminus'], ['sites', 'aliases'], ['--format=json']);
+  return this.__request(['terminus'], ['sites', 'aliases'], ['--format=json']);
 
 };
 
@@ -321,7 +230,7 @@ Terminus.prototype.downloadBackup = function(site, env, type) {
   // retry if needed
   return this.kbox.Promise.retry(function() {
     return self.__request(
-      ['kterminus'],
+      ['terminus'],
       ['site', 'backups', 'get'],
       [
         '--site=' + site,
@@ -383,7 +292,7 @@ Terminus.prototype.createBackup = function(site, env, type) {
   // @todo: validate type?
 
   return this.__request(
-    ['kterminus'],
+    ['terminus'],
     ['site', 'backups', 'create'],
     [
       '--format=json',

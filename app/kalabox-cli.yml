@@ -1,13 +1,13 @@
 cli:
   image: kalabox/cli:dev
   volumes:
-    - $KALABOX_ENGINE_HOME:/src:rw
+    - $KALABOX_ENGINE_HOME:/user
   volumes_from:
     - appserver
   environment:
     WEBROOT: /code
     TERM: xterm-color
-    GIT_SSH_COMMAND: ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o IdentityFile=/src/.ssh/pantheon.kalabox.id_rsa
+    GIT_SSH_COMMAND: ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o IdentityFile=/user/.ssh/pantheon.kalabox.id_rsa
     GIT_AUTHOR_NAME: $KALABOX_APP_PANTHEON_CONFIG_NAME
     GIT_AUTHOR_EMAIL: $KALABOX_APP_PANTHEON_CONFIG_EMAIL
     GIT_COMMITTER_NAME: $KALABOX_APP_PANTHEON_CONFIG_NAME
@@ -21,7 +21,9 @@ terminus:
   #image: kalabox/terminus:$KALABOX_IMG_VERSION
   build: ./dockerfiles/terminus
   volumes:
-    - $KALABOX_ENGINE_HOME:/src:rw
+    - $KALABOX_ENGINE_HOME:/user
+    - $KALABOX_APP_ROOT:/src
+    - $KALABOX_ENGINE_HOME/.kalabox/pantheon/session/$KALABOX_APP_PANTHEON_CONFIG_EMAIL:/root/.terminus/cache/session
   environment:
     PHP_VERSION: 55
     TERM: xterm-color
