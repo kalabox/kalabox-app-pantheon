@@ -44,7 +44,7 @@ module.exports = function(kbox, app) {
     })
 
     // Wake the site up
-    .tap(function(uuid) {
+    .tap(function(/*uuid*/) {
       return terminus.wakeSite(site, env);
     })
 
@@ -168,6 +168,10 @@ module.exports = function(kbox, app) {
    * Pull files via RSYNC
    */
   var pullFilesRsync = function(site, env) {
+
+    // Grab the rsync client
+    var rsync = require('./cmd.js')(kbox, app).rsync;
+
     // Get our UUID
     return terminus.getUUID(site)
 
@@ -186,7 +190,7 @@ module.exports = function(kbox, app) {
       var opts = [connect, terminus.getExcludes()].join(' ');
 
       // Rysnc our files
-      return rsync.cmd([opts, fileBox, fileMount], true);
+      return rsync([opts, fileBox, fileMount], true);
 
     });
   };

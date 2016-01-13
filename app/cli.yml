@@ -9,6 +9,7 @@ rysnc:
   description: Run a rsync command on your codebase
 terminal:
   service: appserver
+  stripfirst: true
   entrypoint: bash
   description: Exec into your appserver
 terminus:
@@ -18,3 +19,11 @@ wp:
   service: terminus
   entrypoint: wp
   precmdopts: --allow-root
+drush:
+  service: terminus
+  stripfirst: true
+  entrypoint: drush8
+  postcmdopts: --root=.
+bash:
+  service: terminus
+  entrypoint: bash

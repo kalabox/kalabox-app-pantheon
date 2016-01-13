@@ -2,7 +2,6 @@ appserver:
   #image: kalabox/pantheon-appserver:$KALABOX_IMG_VERSION
   build: ./dockerfiles/pantheon-appserver
   hostname: $KALABOX_APP_HOSTNAME
-  working_dir: /src
   ports:
     - "8888"
   volumes:

@@ -1,99 +1,9 @@
-'use strict';
 
-module.exports = function(kbox) {
-
-  // Intrinsic modules
-  var crypto = require('crypto');
-  var path = require('path');
-  var fs = require('fs');
-
-  // NPM modules
-  var _ = require('lodash');
-
-  // Constants
-  var PLUGIN_NAME = 'kalabox-plugin-pantheon';
-  var TERMINUS = 'terminus:t0.9.3';
-
-  // Kbox modules
-  var events = kbox.core.events.context('cc8e0202-4c28-467b-8bae-433bae435f08');
-
-  kbox.ifApp(function(app) {
-
-    /*
-     * Basic kalabox.json validation function
-     * @todo: this is pretty weak for now
-     */
-    var validateKalaboxJson = function() {
-
-      // Path to kbox json
-      var kjPath = path.join(app.root, 'kalabox.json');
-
-      // Check to see if we even have a kalabox.json
-      if (!fs.existsSync(kjPath))  {
-        return false;
-      }
-
-      // Objectify
-      var kj = require(kjPath);
-      var pantheonConfig = kj.pluginConf[PLUGIN_NAME];
-
-      // Do a quick scan to make sure our pantheon plugin has all non-empty
-      // values
-      var isGood = _.reduce(pantheonConfig, function(current, now) {
-        return current && !_.isEmpty(now);
-      });
-
-      // Looks like we good! WE CNA DO THIS!
-      return isGood && true;
-
-    };
-
-    /*
-     * Updates kalabox aliases when app is started and symlinks some things
-     */
-    events.on('post-start-component', function(component, done) {
-
-      // Image name
-      var image = 'kalabox/debian:stable';
-
-      // Build create options
-      var createOpts = {};
-
-      // Build start options
-      var startOpts = kbox.util.docker.StartOpts()
-        .bind(app.rootBind, '/src')
-        .volumeFrom(component.dataContainerName)
-        .json();
-
-      // Only run on the db container
-      // This allows for both kbox drush to be used
-      // and local drush to be used via: drush @<appname> status
-      if (component.name === 'db') {
-
-        kbox.engine.inspect(component.containerId)
-        .then(function(data) {
-          var key = '3306/tcp';
-          if (data && data.NetworkSettings.Ports[key]) {
-            //var port = data.NetworkSettings.Ports[key][0].HostPort;
-            var cmd = [
-              'sed',
-              '-i',
-              's/\'host\'.*/\'host\' => \'' + app.domain + '\',/g',
-              '/src/config/drush/aliases.drushrc.php'
-            ];
-
-            return kbox.engine.run(image, cmd, createOpts, startOpts);
-          }
-        })
-
-        .nodeify(done);
-
-      }
+/*
 
       // Only run on the appserver container
       // Symlinks
       else if (component.name === 'appserver') {
-
         // Emulate /srv/bindings
         var cmd = ['mkdir', '-p', '/srv/bindings'];
         return kbox.engine.queryData(component.containerId, cmd)
@@ -137,14 +47,4 @@ module.exports = function(kbox) {
         .nodeify(done);
 
       }
-
-      // Just finish
-      else {
-        done();
-      }
-
-    });
-
-  });
-
-};
+      */

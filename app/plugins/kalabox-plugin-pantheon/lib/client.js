@@ -314,7 +314,6 @@ Client.prototype.reAuthSession = function() {
 
 };
 
-
 /*
  * Auth with pantheon
  */
@@ -366,8 +365,6 @@ Client.prototype.auth = function(email, password) {
   });
 
 };
-
-
 
 /*
  * Get users profile

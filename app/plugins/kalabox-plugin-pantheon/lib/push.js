@@ -2,9 +2,6 @@
 
 module.exports = function(kbox, app) {
 
-  // Node modules.
-  var path = require('path');
-
   // NPM modules
   var _ = require('lodash');
 
@@ -62,18 +59,21 @@ module.exports = function(kbox, app) {
     // Push up our code
     .then(function() {
 
+      // Grab the git client
+      var git = require('./cmd.js')(kbox, app).git;
+
       // Add in all our changes
-      return git.cmd(['add', '--all'], [])
+      return git(['add', '--all'], [])
 
       // Commit our changes
       .then(function() {
-        return git.cmd(['commit', '--allow-empty', '-m', message], []);
+        return git(['commit', '--allow-empty', '-m', message], []);
       })
 
       // Push our changes
       .then(function() {
         var branch = (env === 'dev') ? 'master' : env;
-        return git.cmd(['push', 'origin', branch], []);
+        return git(['push', 'origin', branch], []);
       });
 
     })
@@ -170,6 +170,9 @@ module.exports = function(kbox, app) {
    * Pull down our sites database
    */
   var pushFiles = function(site, env) {
+
+    // Grab the rsync client
+    var rsync = require('./cmd.js')(kbox, app).rsync;
 
     // Get panthoen site UUID
     return terminus.getUUID(site)
