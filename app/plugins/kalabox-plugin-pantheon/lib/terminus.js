@@ -63,7 +63,7 @@ Terminus.prototype.__request = function(entrypoint, cmd, options) {
 
     // Filter out empties
     .filter(function(response) {
-      return !_.isEmpty(response)
+      return !_.isEmpty(response);
     })
 
     // Return objects

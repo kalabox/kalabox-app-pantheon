@@ -161,13 +161,19 @@ module.exports = function(kbox, app) {
       var envSite = [env, uuid].join('.');
       var fileBox = envSite + '@appserver.' + envSite + '.drush.in:files/';
       var fileMount = '/media';
-      var connect = ['-rlvz', '--size-only', '--ipv4', '--progress', '-e', "ssh -p 2222 -i /user/.ssh/pantheon.kalabox.id_rsa -o StrictHostKeyChecking=no"];
+      var connect = [
+        '-rlvz',
+        '--size-only',
+        '--ipv4',
+        '--progress',
+        '-e',
+        'ssh\ -p\ 2222\ -i\ /user/.ssh/pantheon.kalabox.id_rsa\ -o\ ' +
+          'StrictHostKeyChecking=no'];
       connect.push(fileBox);
       connect.push(fileMount);
-      var opts = [connect, terminus.getExcludes()].join(' ');
+      //var opts = [connect, terminus.getExcludes()].join(' ');
 
       // Rysnc our files
-      // rsync -rlvz --size-only --ipv4 --progress -e 'ssh -p 2222 -i /user/.ssh/pantheon.kalabox.id_rsa -o StrictHostKeyChecking=no' dev.f0072597-f475-4513-af94-13a33b630923@appserver.dev.f0072597-f475-4513-af94-13a33b630923.drush.in:files/ /media
       return rsync(connect);
 
     });

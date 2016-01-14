@@ -26,10 +26,6 @@ module.exports = function(kbox) {
       // Get our push and pull stuff
       var puller = require('./pull.js')(kbox, app);
 
-      // Grab the needed clients
-      var Terminus = require('./terminus.js');
-      var terminus = new Terminus(kbox, app);
-
       // Our pantheon config for later on
       var pantheonConf = app.config.pluginconfig.pantheon;
 
