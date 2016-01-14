@@ -154,22 +154,21 @@ module.exports = function(kbox, app) {
     // Get our UUID
     return terminus.getUUID(site)
 
-    // Generate our code repo URL and CUT THAT MEAT!
-    // errr PULL THAT CODE!
+    // Generate our rsync command
     .then(function(uuid) {
-      // This can have a newline in it that F's everything
-      var siteid = uuid;
 
-      // @todo: lots of cleanup here
       // Hack together an rsync command
-      var envSite = [env, siteid].join('.');
+      var envSite = [env, uuid].join('.');
       var fileBox = envSite + '@appserver.' + envSite + '.drush.in:files/';
       var fileMount = '/media';
-      var connect = '-rlvz --size-only --ipv4 --progress -e \'ssh -p 2222\'';
+      var connect = ['-rlvz', '--size-only', '--ipv4', '--progress', '-e', "ssh -p 2222 -i /user/.ssh/pantheon.kalabox.id_rsa -o StrictHostKeyChecking=no"];
+      connect.push(fileBox);
+      connect.push(fileMount);
       var opts = [connect, terminus.getExcludes()].join(' ');
 
       // Rysnc our files
-      return rsync([opts, fileBox, fileMount], true);
+      // rsync -rlvz --size-only --ipv4 --progress -e 'ssh -p 2222 -i /user/.ssh/pantheon.kalabox.id_rsa -o StrictHostKeyChecking=no' dev.f0072597-f475-4513-af94-13a33b630923@appserver.dev.f0072597-f475-4513-af94-13a33b630923.drush.in:files/ /media
+      return rsync(connect);
 
     });
   };
@@ -179,19 +178,12 @@ module.exports = function(kbox, app) {
    */
   var pullFilesArchive = function(site, env, newBackup) {
 
-    // Get our UUID
-    return terminus.getUUID(site)
-
     // Check if site has a backup
-    .then(function(uuid) {
-      return terminus.hasBackup(uuid, env, 'files');
-    })
+    return terminus.hasBackup(site, env, 'files')
 
     // If no backup or for backup then MAKE THAT SHIT
     .then(function(hasBackup) {
       if (!hasBackup || newBackup) {
-        // @todo: it might make more sense to default to
-        // rsync here?
         return terminus.createBackup(site, env, 'files');
       }
     })

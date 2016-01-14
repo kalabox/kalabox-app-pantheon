@@ -5,6 +5,7 @@ data:
     - /certs
     - /sql
     - /code
+    - /backups
 appserver:
   #image: kalabox/pantheon-appserver:$KALABOX_IMG_VERSION
   build: ./dockerfiles/pantheon-appserver

@@ -33,13 +33,8 @@ module.exports = function(kbox) {
       // Our pantheon config for later on
       var pantheonConf = app.config.pluginconfig.pantheon;
 
-      // Get our pantheon site aliases
-      return terminus.getSiteAliases()
-
       // Pull our code for the first time
-      .then(function() {
-        return puller.pullCode(pantheonConf.site, pantheonConf.env);
-      })
+      return puller.pullCode(pantheonConf.site, pantheonConf.env)
 
       // Pull our DB
       .then(function() {

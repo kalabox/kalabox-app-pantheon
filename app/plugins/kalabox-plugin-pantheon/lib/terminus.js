@@ -61,7 +61,12 @@ Terminus.prototype.__request = function(entrypoint, cmd, options) {
       return responses[0].split('\r\n');
     })
 
-    // Parse to json
+    // Filter out empties
+    .filter(function(response) {
+      return !_.isEmpty(response)
+    })
+
+    // Return objects
     .map(function(response) {
       return JSON.parse(response);
     })
@@ -222,7 +227,7 @@ Terminus.prototype.downloadBackup = function(site, env, type) {
       '--site=' + site,
       '--env=' + env,
       '--element=' + type,
-      '--to=/sql',
+      '--to=/backups',
       '--latest',
       '--format=json'
     ]
