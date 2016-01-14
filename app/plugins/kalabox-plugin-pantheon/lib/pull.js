@@ -161,7 +161,7 @@ module.exports = function(kbox, app) {
       var envSite = [env, uuid].join('.');
       var fileBox = envSite + '@appserver.' + envSite + '.drush.in:files/';
       var fileMount = '/media';
-      var connect = [
+      var cmd = [
         '-rlvz',
         '--size-only',
         '--ipv4',
@@ -169,12 +169,12 @@ module.exports = function(kbox, app) {
         '-e',
         'ssh\ -p\ 2222\ -i\ /user/.ssh/pantheon.kalabox.id_rsa\ -o\ ' +
           'StrictHostKeyChecking=no'];
-      connect.push(fileBox);
-      connect.push(fileMount);
-      //var opts = [connect, terminus.getExcludes()].join(' ');
+      cmd = cmd.concat(terminus.getExcludes());
+      cmd.push(fileBox);
+      cmd.push(fileMount);
 
       // Rysnc our files
-      return rsync(connect);
+      return rsync(cmd);
 
     });
   };
@@ -200,39 +200,45 @@ module.exports = function(kbox, app) {
     })
 
     // Extract the backup and remove
-    .then(function(importFile) {
+    .then(function(filesDump) {
 
-      // Image name
-      var image = 'kalabox/debian:stable';
+      /*
+       * Helper to get a DB run def template
+       */
+      var getFilesRunner = function() {
+        return {
+          compose: app.composeCore,
+          project: app.name,
+          opts: {
+            services: ['appserver'],
+            stdio: 'inherit'
+          }
+        };
+      };
 
-      // Build create options
-      var createOpts = {};
-
-      // Build start options
-      var startOpts = kbox.util.docker.StartOpts()
-        .bind(app.rootBind, '/src')
-        .volumeFrom(app.dataContainerName)
-        .json();
-
-      // CMD to extract our archive file to /media
-      var extractCmd = [
-        'tar',
+      // Construct our extract definition
+      var extractRun = getFilesRunner();
+      extractRun.opts.entrypoint = 'tar';
+      extractRun.opts.cmd = [
         '-zxvf',
-        importFile,
+        filesDump,
         '--strip-components=1',
         '--overwrite',
         '--directory=/media'
       ];
 
-      // Cmd to remove the archive
-      var rmCmd = ['rm', '-f', importFile];
+      // Construct our remove definition
+      var removeRun = getFilesRunner();
+      removeRun.opts.entrypoint = 'rm';
+      removeRun.opts.cmd = [
+        '-f',
+        filesDump
+      ];
 
-      // Extract the archive
-      return kbox.engine.run(image, extractCmd, createOpts, startOpts)
-
-      // Remove the archive
+      // Extract and then remove the archive
+      return kbox.engine.run(extractRun)
       .then(function() {
-        return kbox.engine.run(image, rmCmd, createOpts, startOpts);
+        return kbox.engine.run(removeRun);
       });
 
     });

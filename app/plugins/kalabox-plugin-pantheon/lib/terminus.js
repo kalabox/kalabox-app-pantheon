@@ -307,7 +307,7 @@ Terminus.prototype.getExcludes = function() {
    * a rsync exclusion string
    */
   var exclude = function(dir) {
-    return ['--exclude', '\'' + dir + '\''].join(' ');
+    return ['--exclude', dir];
   };
 
   // Generic list of dirs to exclude
@@ -323,8 +323,8 @@ Terminus.prototype.getExcludes = function() {
     'less'
   ];
 
-  // Return exclude string
-  return _.map(dirs, exclude).join(' ');
+  // Return exclude array
+  return _.flatten(_.map(dirs, exclude));
 
 };
 
