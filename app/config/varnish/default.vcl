@@ -6,7 +6,7 @@ vcl 4.0;
 import std;
 
 backend styxgo {
-  .host = "127.0.0.1";
+  .host = "web";
   .port = "8888";
   .connect_timeout = 600s;
   .first_byte_timeout = 600s;

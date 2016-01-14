@@ -20,6 +20,7 @@ appserver:
     - db:database
   environment:
     TERM: xterm
+    DOMAIN: $KALABOX_DOMAIN
     FRAMEWORK: $KALABOX_APP_PANTHEON_FRAMEWORK
     PHP_VERSION: 53
     DOCROOT: $KALABOX_APP_PANTHEON_DOCROOT
@@ -56,12 +57,25 @@ db:
     - $KALABOX_APP_ROOT_BIND:/src:rw
   volumes_from:
     - data
+edge:
+  #image: kalabox/pantheon-edge:$KALABOX_IMG_VERSION
+  build: dockerfiles/pantheon-edge
+  links:
+    - appserver:web
+  volumes:
+    - $KALABOX_APP_ROOT_BIND:/src:rw
+  volumes_from:
+    - data
+  environment:
+    DOMAIN: $KALABOX_DOMAIN
+  ports:
+    - "80"
+    - "443"
+
 #redis:
   #image: kalabox/pantheon-redis:$KALABOX_IMG_VERSION
-#  build: dockerfiles/pantheon-redis
-#edge:
-  #image: kalabox/pantheon-edge:$KALABOX_IMG_VERSION
-#  build: dockerfiles/pantheon-edge
+  #build: dockerfiles/pantheon-redis
+
 #solr:
   #image: kalabox/pantheon-solr:$KALABOX_IMG_VERSION
 #  build: dockerfiles/pantheon-solr
