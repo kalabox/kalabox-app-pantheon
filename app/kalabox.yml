@@ -5,17 +5,16 @@ plugins:
 pluginconfig:
   cli: on
   syncthing:
-    share: appserver:/code
+    share: data:/code
     ignore:
       - "sites/default/files"
       - "files"
       - "wp-content/uploads"
       - "!*modules*"
   services:
-    expose:
-      appserver:
-      - port: "8888/tcp"
+    appserver:
+      - port: 8888/tcp
         default: true
-      - port: "443/tcp"
+      - port: 443/tcp
         default: true
         secure: true

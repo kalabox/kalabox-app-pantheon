@@ -1,3 +1,10 @@
+data:
+  image: busybox
+  volumes:
+    - /media
+    - /certs
+    - /sql
+    - /code
 appserver:
   #image: kalabox/pantheon-appserver:$KALABOX_IMG_VERSION
   build: ./dockerfiles/pantheon-appserver
@@ -6,7 +13,8 @@ appserver:
     - "8888"
   volumes:
     - $KALABOX_APP_ROOT_BIND:/src:rw
-    - /certs
+  volumes_from:
+    - data
   links:
     - db:database
   environment:
@@ -44,7 +52,9 @@ db:
   #image: kalabox/pantheon-mariadb:$KALABOX_IMG_VERSION
   build: ./dockerfiles/pantheon-mariadb
   volumes:
-   - $KALABOX_APP_ROOT_BIND:/src:rw
+    - $KALABOX_APP_ROOT_BIND:/src:rw
+  volumes_from:
+    - data
 #redis:
   #image: kalabox/pantheon-redis:$KALABOX_IMG_VERSION
 #  build: dockerfiles/pantheon-redis

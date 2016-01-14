@@ -3,7 +3,7 @@ cli:
   volumes:
     - $KALABOX_ENGINE_HOME:/user
   volumes_from:
-    - appserver
+    - data
   environment:
     WEBROOT: /code
     TERM: xterm-color
@@ -26,7 +26,7 @@ terminus:
     - $KALABOX_ENGINE_HOME/.kalabox/pantheon/session/$KALABOX_APP_PANTHEON_CONFIG_EMAIL:/root/.terminus/cache/session
     - $KALABOX_APP_ROOT/config/drush:/root/.drush
   volumes_from:
-    - appserver
+    - data
   environment:
     FRAMEWORK: $KALABOX_APP_PANTHEON_FRAMEWORK
     PHP_VERSION: 55

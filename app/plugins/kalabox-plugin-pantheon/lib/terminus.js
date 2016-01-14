@@ -12,12 +12,6 @@ var _ = require('lodash');
  */
 function Terminus(kbox, app) {
 
-  // Terminus node clients
-  // for some things it is better to use the node client because we dont have
-  // to worry about an error we need to handle killing the whole damn thing
-  var Client = require('./client.js');
-  this.pantheon = new Client(kbox, app);
-
   // Kbox things
   this.app = app;
   this.kbox = kbox;
@@ -43,9 +37,9 @@ Terminus.prototype.__request = function(entrypoint, cmd, options) {
       compose: self.app.composeCore,
       project: self.app.name,
       opts: {
-        service: 'terminus',
+        services: ['terminus'],
         collect: true,
-        stdio: [process.stdin, 'pipe', process.stderr]
+        stdio: ['inherit', 'pipe', 'inherit']
       }
     };
   };
@@ -309,6 +303,7 @@ Terminus.prototype.hasBackup = function(uuid, env, type) {
 
   var self = this;
 
+  // @todo: terminus site backups list
   return this.pantheon.getBackups(uuid, env)
 
   .then(function(backups) {
@@ -328,6 +323,7 @@ Terminus.prototype.hasBackup = function(uuid, env, type) {
  */
 Terminus.prototype.getBindings = function(uuid) {
 
+  // @todo: terminus site connection-info
   return this.pantheon.getBindings(uuid);
 
 };

@@ -25,5 +25,5 @@ drush:
   entrypoint: drush8
   postcmdopts: --strict=0
 bash:
-  service: terminus
+  service: appserver
   entrypoint: bash
