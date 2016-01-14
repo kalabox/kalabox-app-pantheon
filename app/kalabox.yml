@@ -12,9 +12,9 @@ pluginconfig:
       - "wp-content/uploads"
       - "!*modules*"
   services:
-    #appserver:
-    #  - port: 8888/tcp
-    #    default: true
+    appserver:
+      - port: 8888/tcp
+        hostname: appserver
     edge:
       - port: 80/tcp
         default: true

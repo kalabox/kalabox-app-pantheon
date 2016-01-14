@@ -71,10 +71,9 @@ edge:
   ports:
     - "80"
     - "443"
-
-#redis:
+redis:
   #image: kalabox/pantheon-redis:$KALABOX_IMG_VERSION
-  #build: dockerfiles/pantheon-redis
+  build: dockerfiles/pantheon-redis
 
 #solr:
   #image: kalabox/pantheon-solr:$KALABOX_IMG_VERSION
