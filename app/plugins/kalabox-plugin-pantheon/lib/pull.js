@@ -7,9 +7,6 @@ module.exports = function(kbox, app) {
   var fs = require('fs');
   var path = require('path');
 
-  // NPM modules
-  var _ = require('lodash');
-
   // Grab some kalabox modules
   var engine = kbox.engine;
 
@@ -102,39 +99,22 @@ module.exports = function(kbox, app) {
    * Pull down our sites database
    */
   var pullDB = function(site, env, newBackup) {
-    // Get the cid of this apps database
-    // @todo: this looks gross
-    var dbID = _.result(_.find(app.components, function(cmp) {
-      return cmp.name === 'db';
-    }), 'containerId');
 
-    // Set some default things
-    var wasRunning = null;
-    var defaults = {
-      PublishAllPorts: true,
-      Binds: [app.rootBind + ':/src:rw']
+    /*
+     * Helper to get a DB run def template
+     */
+    var getDbRun = function() {
+      return {
+        compose: app.composeCore,
+        project: app.name,
+        opts: {
+          services: ['db'],
+        }
+      };
     };
 
-    // Check if the DB container is already running
-    return engine.isRunning(dbID)
-
-    // If not running START IT UP
-    .then(function(status) {
-      wasRunning = status;
-      if (!wasRunning) {
-        return engine.start(dbID, defaults);
-      }
-    })
-
-    // GEt the UUID for this site
-    .then(function() {
-      return terminus.getUUID(site);
-    })
-
     // Check if site has a backup
-    .then(function(uuid) {
-      return terminus.hasBackup(uuid, env, 'database');
-    })
+    return terminus.hasBackup(site, env, 'db')
 
     // If no backup or for backup then MAKE THAT SHIT
     .then(function(hasBackup) {
@@ -149,17 +129,16 @@ module.exports = function(kbox, app) {
     })
 
     // Import the backup
-    .then(function(importFile) {
-      // Perform a container run.
-      var payload = ['import-mysql', 'localhost', null, '3306', importFile];
-      return engine.queryData(dbID, payload);
-    })
+    .tap(function(sqlDump) {
 
-    // Stop the DB container if that is how we found it initially
-    .then(function() {
-      if (!wasRunning) {
-        return engine.stop(dbID);
-      }
+      // Construct our import definition
+      var importRun = getDbRun();
+      importRun.opts.entrypoint = 'import-mysql';
+      importRun.opts.cmd = sqlDump;
+
+      // Perform the run.
+      return engine.run(importRun);
+
     });
 
   };
