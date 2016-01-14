@@ -3,7 +3,6 @@
 module.exports = function(kbox) {
 
   // Node modules
-  var path = require('path');
   var _ = require('lodash');
 
   // Kbox modules
@@ -32,7 +31,7 @@ module.exports = function(kbox) {
       var terminus = new Terminus(kbox, app);
 
       // Our pantheon config for later on
-      var pantheonConf = app.config.pluginConf.pantheon;
+      var pantheonConf = app.config.pluginconfig.pantheon;
 
       // Get our pantheon site aliases
       return terminus.getSiteAliases()
@@ -64,11 +63,26 @@ module.exports = function(kbox) {
      * to target exactly what we want
      */
     events.on('pre-app-rebuild', function(app) {
-      //app.composeCore = _.remove(app.composeCore, function(file) {
-      //  return file !== dataCompose;
-      //});
-    });
 
+      // We want to edit our engine remove things
+      events.on('pre-engine-destroy', function(data) {
+
+        // Get our services
+        var services = _.flatten(_.map(app.composeCore, function(file)  {
+          return _.keys(kbox.util.yaml.toJson(file));
+        }));
+
+        // Remove the data element
+        var withoutData = _.remove(services, function(service) {
+          return service !== 'data';
+        });
+
+        // Update data to note remove data services on rebuilds
+        data.opts = {services: withoutData};
+
+      });
+
+    });
 
   });
 
