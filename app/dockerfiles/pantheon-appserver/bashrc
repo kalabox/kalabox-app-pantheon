@@ -1,5 +1,15 @@
 #!/bin/bash
 
+# Drupal8 needs /media/styles to exist for Drops8
+# @todo: is this still true?
+if [ $FRAMEWORK == "drupal8" ]; then
+  mkdir -p /media/styles
+fi
+
+# /srv/binding emulation
+mkdir -p /srv/bindings
+ln -nsf / /srv/bindings/kalabox
+
 # Load our phpbrew things
 [[ -e ~/.phpbrew/bashrc ]] && source ~/.phpbrew/bashrc
 

@@ -7,6 +7,9 @@ module.exports = function(kbox, app) {
   var fs = require('fs');
   var path = require('path');
 
+  // Npm modules
+  var _ = require('lodash');
+
   // Grab some kalabox modules
   var engine = kbox.engine;
 
@@ -18,11 +21,10 @@ module.exports = function(kbox, app) {
    * Check to see if this is the first time we are going to do a pull or not
    * @todo: this is pretty weak for now
    */
-  var firstTime = function() {
-    // @todo: this only works if you have started your app first
+  var firstTime = _.once(function() {
     var gitFile = path.join(app.config.syncthing.codeRoot, '.git');
     return !fs.existsSync(gitFile);
-  };
+  });
 
   /*
    * Pull down our sites code
@@ -32,41 +34,42 @@ module.exports = function(kbox, app) {
     // Determine correct operation
     var type = (firstTime()) ? 'clone' : 'pull';
 
-    // Grab pantheon aliases
-    return terminus.getSiteAliases()
+    // Grab the git client
+    var git = require('./cmd.js')(kbox, app).git;
 
-    // Grab the sites UUID from teh machinename
-    .then(function() {
-      return terminus.getUUID(site);
-    })
+    // Do this if we are gitting for the first time
+    if (type === 'clone') {
 
-    // Wake the site up
-    .tap(function(/*uuid*/) {
-      return terminus.wakeSite(site, env);
-    })
+      // Grab pantheon aliases
+      return terminus.getSiteAliases()
 
-    // Generate our code repo URL
-    // NOTE: even multidev requires we use 'dev' instead of env
-    .then(function(uuid) {
+      // Grab the sites UUID from teh machinename
+      .then(function() {
+        return terminus.getUUID(site);
+      })
 
-      // Grab the git client
-      var git = require('./cmd.js')(kbox, app).git;
+      // Wake the site up
+      // @todo: is this needed?
+      .tap(function(/*uuid*/) {
+        return terminus.wakeSite(site, env);
+      })
 
-      // Build the repo
-      var build = {
-        protocol: 'ssh',
-        slashes: true,
-        auth: ['codeserver', 'dev', uuid].join('.'),
-        hostname: ['codeserver', 'dev', uuid, 'drush', 'in'].join('.'),
-        port: 2222,
-        pathname: ['~', 'repository.git'].join('/')
-      };
+      // Generate our code repo URL
+      // NOTE: even multidev requires we use 'dev' instead of env
+      .then(function(uuid) {
 
-      // Format our metadata into a url
-      var repo = url.format(build);
+        // Build the repo
+        var build = {
+          protocol: 'ssh',
+          slashes: true,
+          auth: ['codeserver', 'dev', uuid].join('.'),
+          hostname: ['codeserver', 'dev', uuid, 'drush', 'in'].join('.'),
+          port: 2222,
+          pathname: ['~', 'repository.git'].join('/')
+        };
 
-      // Do this if we are gitting for the first time
-      if (type === 'clone') {
+        // Format our metadata into a url
+        var repo = url.format(build);
 
         // Clone the repo
         return git(['clone', repo, './'])
@@ -83,16 +86,46 @@ module.exports = function(kbox, app) {
           if (env !== 'dev') {
             return git(['checkout', env]);
           }
+        })
+
+        // Symlink our files directory to media
+        .then(function() {
+
+          /*
+           * Helper to get a appserver run def template
+           */
+          var getAppRunner = function() {
+            return {
+              compose: app.composeCore,
+              project: app.name,
+              opts: {
+                services: ['appserver']
+              }
+            };
+          };
+
+          // Construct our extract definition
+          var linkRun = getAppRunner();
+          linkRun.opts.entrypoint = 'ln';
+          linkRun.opts.cmd = [
+            '-nsf',
+            '/media',
+            '/code/' + process.env.KALABOX_APP_PANTHEON_FILEMOUNT
+          ];
+
+          // Do the linking
+          return engine.run(linkRun);
+
         });
-      }
+      });
+    }
 
-      // If we already have da git then just pull down the correct branch
-      else {
-        var branch = (env === 'dev') ? 'master' : env;
-        return git(['pull', 'origin', branch]);
-      }
+    // If we already have da git then just pull down the correct branch
+    else {
+      var branch = (env === 'dev') ? 'master' : env;
+      return git(['pull', 'origin', branch]);
+    }
 
-    });
   };
 
   /*
@@ -203,7 +236,7 @@ module.exports = function(kbox, app) {
     .then(function(filesDump) {
 
       /*
-       * Helper to get a DB run def template
+       * Helper to get a cli run def template
        */
       var getFilesRunner = function() {
         return {

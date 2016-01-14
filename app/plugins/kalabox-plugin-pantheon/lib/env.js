@@ -102,7 +102,7 @@ module.exports = function(kbox) {
         dbUser: 'pantheon',
         dbPassword: '',
         dbName: 'pantheon',
-        pantheonAccount: getConfig().account,
+        pantheonAccount: getConfig().email,
         pantheonSite: 'UUID',
         pantheonSiteName: app.name,
         pantheonEnvironment: 'kalabox',
