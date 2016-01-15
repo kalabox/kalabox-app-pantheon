@@ -39,8 +39,7 @@ Terminus.prototype.__request = function(entrypoint, cmd, options) {
       project: self.app.name,
       opts: {
         services: ['terminus'],
-        collect: true,
-        stdio: ['inherit', 'pipe', 'inherit']
+        mode: 'collect'
       }
     };
   };

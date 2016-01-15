@@ -238,7 +238,7 @@ module.exports = function(kbox, app) {
           project: app.name,
           opts: {
             services: ['appserver'],
-            stdio: 'inherit'
+            mode: 'attach'
           }
         };
       };

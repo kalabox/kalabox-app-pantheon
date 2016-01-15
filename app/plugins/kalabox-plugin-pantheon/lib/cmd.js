@@ -10,7 +10,7 @@ module.exports = function(kbox, app) {
       compose: app.composeCore,
       project: app.name,
       opts: {
-        stdio: 'inherit',
+        mode: 'attach',
         services: ['cli']
       }
     };
