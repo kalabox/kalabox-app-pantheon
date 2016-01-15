@@ -3,7 +3,6 @@
 module.exports = function(kbox, app) {
 
   // Node modules.
-  var url = require('url');
   var fs = require('fs');
   var path = require('path');
 
@@ -43,33 +42,27 @@ module.exports = function(kbox, app) {
       // Grab pantheon aliases
       return terminus.getSiteAliases()
 
-      // Grab the sites UUID from teh machinename
-      .then(function() {
-        return terminus.getUUID(site);
-      })
-
       // Wake the site up
       // @todo: is this needed?
-      .tap(function(/*uuid*/) {
+      .then(function() {
         return terminus.wakeSite(site, env);
+      })
+
+      // Get connection info
+      .then(function() {
+        return terminus.connectionInfo(site, env);
       })
 
       // Generate our code repo URL
       // NOTE: even multidev requires we use 'dev' instead of env
-      .then(function(uuid) {
+      .then(function(bindings) {
 
-        // Build the repo
-        var build = {
-          protocol: 'ssh',
-          slashes: true,
-          auth: ['codeserver', 'dev', uuid].join('.'),
-          hostname: ['codeserver', 'dev', uuid, 'drush', 'in'].join('.'),
-          port: 2222,
-          pathname: ['~', 'repository.git'].join('/')
-        };
-
-        // Format our metadata into a url
-        var repo = url.format(build);
+        // jshint camelcase:false
+        // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
+        // Get the repo from bindings
+        var repo = bindings.git_url;
+        // jshint camelcase:true
+        // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
 
         // Clone the repo
         return git(['clone', repo, './'])
@@ -201,7 +194,8 @@ module.exports = function(kbox, app) {
         '--progress',
         '-e',
         'ssh\ -p\ 2222\ -i\ /user/.ssh/pantheon.kalabox.id_rsa\ -o\ ' +
-          'StrictHostKeyChecking=no'];
+          'StrictHostKeyChecking=no'
+      ];
       cmd = cmd.concat(terminus.getExcludes());
       cmd.push(fileBox);
       cmd.push(fileMount);

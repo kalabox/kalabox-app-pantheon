@@ -62,6 +62,130 @@ module.exports = function(kbox) {
       return choices;
     };
 
+    /*
+     * Helper to get pull questions
+     */
+    var getPullQuestions = function(options) {
+      return [
+        {
+          type: 'list',
+          name: 'database',
+          message: 'Which database do you want to use?',
+          choices: function() {
+
+            // Get approved choices
+            var choices = getEnvPullChoices();
+
+            // Add none choice
+            choices.push({
+              name: 'Do not pull a database',
+              value: 'none'
+            });
+
+            // Return our choices
+            return choices;
+
+          },
+          default: function() {
+            return pantheonConf.env;
+          }
+        },
+        {
+          type: 'confirm',
+          name: 'newbackup',
+          message: 'Create a new DB backup?',
+          when: function(answers) {
+            var optDb = options.database;
+            var anDb = answers.database;
+            var pullDb = optDb !== 'none' && anDb !== 'none';
+            return !options.latestbackup && pullDb;
+          }
+        },
+        {
+          type: 'list',
+          name: 'files',
+          message: 'Which files do you want to use?',
+          choices: function() {
+
+            // Get approved choices
+            var choices = getEnvPullChoices();
+
+            // Add none choice
+            choices.push({
+              name: 'Do not pull files',
+              value: 'none'
+            });
+
+            // Return our choices
+            return choices;
+
+          },
+          default: function(answers) {
+            return answers.database || pantheonConf.env;
+          }
+        }
+      ];
+    };
+
+    /*
+     * Helper to get push questions
+     */
+    var getPushQuestions = function() {
+      return [
+        {
+          type: 'string',
+          name: 'message',
+          message: 'Tell us about your changes'
+        },
+        {
+          type: 'list',
+          name: 'database',
+          message: 'Which env do you want to push the DB to?',
+          choices: function() {
+
+            // Get approved choices
+            var choices = getEnvPushChoices();
+
+            // Add none choice
+            choices.push({
+              name: 'Do not push the database',
+              value: 'none'
+            });
+
+            // Return our choices
+            return choices;
+
+          },
+          default: function() {
+            return pantheonConf.env;
+          }
+        },
+        {
+          type: 'list',
+          name: 'files',
+          message: 'Which env do you want to push the files to?',
+          choices: function() {
+
+            // Get approved choices
+            var choices = getEnvPushChoices();
+
+            // Add none choice
+            choices.push({
+              name: 'Do not push the files',
+              value: 'none'
+            });
+
+            // Return our choices
+            return choices;
+
+          },
+          default: function(answers) {
+            return answers.database || pantheonConf.env;
+          }
+        }
+      ];
+    };
+
     // kbox pull
     kbox.tasks.add(function(task) {
 
@@ -98,65 +222,7 @@ module.exports = function(kbox) {
 
         // Grab the CLI options that are available
         var options = this.options;
-        var questions = [
-          {
-            type: 'list',
-            name: 'database',
-            message: 'Which database do you want to use?',
-            choices: function() {
-
-              // Get approved choices
-              var choices = getEnvPullChoices();
-
-              // Add none choice
-              choices.push({
-                name: 'Do not pull a database',
-                value: 'none'
-              });
-
-              // Return our choices
-              return choices;
-
-            },
-            default: function() {
-              return pantheonConf.env;
-            }
-          },
-          {
-            type: 'confirm',
-            name: 'newbackup',
-            message: 'Create a new DB backup?',
-            when: function(answers) {
-              var optDb = options.database;
-              var anDb = answers.database;
-              var pullDb = optDb !== 'none' && anDb !== 'none';
-              return !options.latestbackup && pullDb;
-            }
-          },
-          {
-            type: 'list',
-            name: 'files',
-            message: 'Which files do you want to use?',
-            choices: function() {
-
-              // Get approved choices
-              var choices = getEnvPullChoices();
-
-              // Add none choice
-              choices.push({
-                name: 'Do not pull files',
-                value: 'none'
-              });
-
-              // Return our choices
-              return choices;
-
-            },
-            default: function(answers) {
-              return answers.database || pantheonConf.env;
-            }
-          }
-        ];
+        var questions = getPullQuestions();
 
         // Filter out interactive questions based on passed in options
         questions = kbox.util.cli.filterQuestions(questions, options);
@@ -247,59 +313,7 @@ module.exports = function(kbox) {
 
         // Grab the CLI options that are available
         var options = this.options;
-        var questions = [
-          {
-            type: 'string',
-            name: 'message',
-            message: 'Tell us about your changes'
-          },
-          {
-            type: 'list',
-            name: 'database',
-            message: 'Which env do you want to push the DB to?',
-            choices: function() {
-
-              // Get approved choices
-              var choices = getEnvPushChoices();
-
-              // Add none choice
-              choices.push({
-                name: 'Do not push the database',
-                value: 'none'
-              });
-
-              // Return our choices
-              return choices;
-
-            },
-            default: function() {
-              return pantheonConf.env;
-            }
-          },
-          {
-            type: 'list',
-            name: 'files',
-            message: 'Which env do you want to push the files to?',
-            choices: function() {
-
-              // Get approved choices
-              var choices = getEnvPushChoices();
-
-              // Add none choice
-              choices.push({
-                name: 'Do not push the files',
-                value: 'none'
-              });
-
-              // Return our choices
-              return choices;
-
-            },
-            default: function(answers) {
-              return answers.database || pantheonConf.env;
-            }
-          }
-        ];
+        var questions = getPushQuestions(options);
 
         // Filter out interactive questions based on passed in options
         questions = kbox.util.cli.filterQuestions(questions, options);

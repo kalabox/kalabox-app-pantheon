@@ -14,6 +14,7 @@ function Terminus(kbox, app) {
 
   // @todo: more caching?
   this.uuid = undefined;
+  this.bindings = undefined;
 
 }
 
@@ -115,12 +116,7 @@ Terminus.prototype.getConnectionMode = function(site, env) {
     ['terminus'],
     ['site', 'environment-info', '--field=connection_mode'],
     ['--format=json', '--site=' + site, '--env=' + env]
-  )
-
-  // Return a parsed json object
-  .then(function(connectionMode) {
-    return JSON.parse(connectionMode);
-  });
+  );
 
 };
 
@@ -140,17 +136,7 @@ Terminus.prototype.hasChanges = function(site, env) {
 
   // Return whether we have changes or not
   .then(function(data) {
-
-    // Split into an array of messages
-    var messages = data.split('\n');
-    // Last message is empty
-    messages.pop();
-    var last = _.last(messages);
-
-    // Parse the last message
-    var response = JSON.parse(_.trim(last));
-    return response.message !== 'No changes on server.';
-
+    return !_.isEmpty(data);
   });
 
 };
@@ -285,10 +271,33 @@ Terminus.prototype.hasBackup = function(site, env, type) {
  *
  * https://dashboard.getpantheon.com/api/sites/UUID/bindings
  */
-Terminus.prototype.getBindings = function(uuid) {
+Terminus.prototype.connectionInfo = function(site, env) {
 
-  // @todo: terminus site connection-info
-  return this.pantheon.getBindings(uuid);
+  // More of this sort of thing
+  var self = this;
+
+  // We run this a lot so lets cache per run and do a lookup before we
+  // make a request
+  if (self.bindings !== undefined) {
+    return self.kbox.Promise.resolve(self.bindings);
+  }
+
+  // Make a request
+  return this.__request(
+    ['terminus'],
+    ['site', 'connection-info'],
+    [
+      '--format=json',
+      '--site=' + site,
+      '--env=' + env
+    ]
+  )
+
+  // Set cache and return
+  .then(function(data) {
+    self.bindings = data[0];
+    return self.kbox.Promise.resolve(self.bindings);
+  });
 
 };
 

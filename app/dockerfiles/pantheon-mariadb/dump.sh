@@ -1,3 +1,6 @@
 #!/bin/bash
 
-mysqldump -u pantheon pantheon > /src/config/terminus/pantheon.sql
+# Grab arguments
+DUMPFILE="$1"
+
+mysqldump -h db -u pantheon pantheon > ${DUMPFILE}

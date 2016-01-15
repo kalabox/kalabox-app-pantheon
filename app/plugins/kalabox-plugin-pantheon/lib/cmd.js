@@ -30,7 +30,9 @@ module.exports = function(kbox, app) {
     var log = kbox.core.log.make(entrypoint.toUpperCase());
     log.info(runDef);
 
-    return kbox.engine.run(runDef);
+    kbox.Promise.retry(function() {
+      return kbox.engine.run(runDef);
+    });
   };
 
   /*
