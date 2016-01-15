@@ -11,6 +11,9 @@ function Terminus(kbox, app) {
   // Kbox things
   this.app = app;
   this.kbox = kbox;
+  this.email = app.config.pluginconfig.pantheon.email;
+  // Kalabox session helper module
+  this.session = require('./reauth.js')(kbox);
 
   // @todo: more caching?
   this.uuid = undefined;
@@ -25,6 +28,7 @@ Terminus.prototype.__request = function(entrypoint, cmd, options) {
 
   // Mimicry
   var self = this;
+  var log = self.kbox.core.log.make('TERMINUS');
 
   /*
    * Cli container def
@@ -41,53 +45,104 @@ Terminus.prototype.__request = function(entrypoint, cmd, options) {
     };
   };
 
-  // Build run definition
-  var runDef = terminusContainer();
-  runDef.opts.entrypoint = 'bash --login -c';
-  cmd.unshift(entrypoint);
-  cmd = cmd.concat(options);
-  runDef.opts.cmd = cmd;
+  // Do a check to see if we need to reauth
+  return self.kbox.Promise.try(function() {
+    return self.session.reAuthCheck(self.email)
 
-  // Log
-  var log = this.kbox.core.log.make('TERMINUS');
-  log.info('Run definition: ', runDef);
+    // If we have answers then we need to reauth we are going to call the
+    // reauth method directly here otherwise we request ourselves and
+    // have to enter our password indefinitely
+    .then(function(answers) {
+      if (answers && answers.password) {
 
-  // Run the command
-  return this.kbox.Promise.retry(function() {
-    return self.kbox.engine.run(runDef)
+        // Cmd & opts
+        var loginCmd = ['auth', 'login', self.email];
+        var loginOptions = ['--password=' + answers.password];
 
-    // We can assume we only need the first response here since
-    // we are only running one terminus command at a time
-    .then(function(responses) {
-      return responses[0].split('\r\n');
-    })
+        // Build run definition
+        var loginDef = terminusContainer();
+        loginDef.opts.entrypoint = 'bash --login -c';
+        loginCmd.unshift('terminus');
+        loginCmd = loginCmd.concat(loginOptions);
+        loginDef.opts.cmd = loginCmd;
 
-    // Filter out empties
-    .filter(function(response) {
-      return !_.isEmpty(response);
-    })
+        // Log
+        log.info('Reauthenticating...', self.email);
 
-    // Return objects
-    .map(function(response) {
-      return JSON.parse(response);
-    })
+        // Run the thing
+        return self.kbox.engine.run(loginDef);
+      }
+    });
+  })
 
-    // Filter out meta messages
-    .filter(function(response) {
-      return !response.date && !response.level && !response.message;
-    })
+  // We shoudl be good to run terminus commands now!
+  .then(function() {
 
-    // We can assume we only need the first response here
-    .then(function(result) {
-      log.info('Run returned: ', result);
-      return result;
+    // Run the command
+    return self.kbox.Promise.retry(function() {
+
+      // Build run definition
+      var runDef = terminusContainer();
+      runDef.opts.entrypoint = 'bash --login -c';
+      cmd.unshift(entrypoint);
+      cmd = cmd.concat(options);
+      runDef.opts.cmd = cmd;
+
+      // Log
+      log.info('Run definition: ', runDef);
+
+      // Run the thing
+      return self.kbox.engine.run(runDef)
+
+      // We can assume we only need the first response here since
+      // we are only running one terminus command at a time
+      .then(function(responses) {
+        return responses[0].split('\r\n');
+      })
+
+      // Filter out empties
+      .filter(function(response) {
+        return !_.isEmpty(response);
+      })
+
+      // Return objects
+      .map(function(response) {
+        return JSON.parse(response);
+      })
+
+      // Filter out meta messages
+      .filter(function(response) {
+        return !response.date && !response.level && !response.message;
+      })
+
+      // We can assume we only need the first response here
+      .then(function(result) {
+        log.info('Run returned: ', result);
+        return result;
+      });
     });
   });
+
 };
 
 /*
  * TERMINUS COMMANDS
  */
+
+/*
+ * Auth
+ *
+ * terminus auth login EMAIL --password="password"
+ */
+Terminus.prototype.auth = function(email, password) {
+
+  return this.__request(
+    ['terminus'],
+    ['auth', 'login', email],
+    ['--password=' + password, '--format=json']
+  );
+
+};
 
 /*
  * Wake the site
