@@ -13,6 +13,9 @@ module.exports = function(kbox) {
   var path = require('path');
   var _ = require('lodash');
 
+  // Kalabox mods
+  var Promise = kbox.Promise;
+
   /*
    * Helper function for reading specific file cache.
    */
