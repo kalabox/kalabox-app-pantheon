@@ -24,7 +24,7 @@ function Terminus(kbox, app) {
 /*
  * Send a request to a terminus container.
  */
-Terminus.prototype.__request = function(entrypoint, cmd, options) {
+Terminus.prototype.__request = function(cmd, options) {
 
   // Mimicry
   var self = this;
@@ -63,7 +63,7 @@ Terminus.prototype.__request = function(entrypoint, cmd, options) {
         loginDef.opts.entrypoint = 'bash --login -c';
         loginCmd.unshift('terminus');
         loginCmd = loginCmd.concat(loginOptions);
-        loginDef.opts.cmd = loginCmd;
+        loginDef.opts.cmd = _.uniq(loginCmd);
 
         // Log
         log.info('Reauthenticating...', self.email);
@@ -83,9 +83,9 @@ Terminus.prototype.__request = function(entrypoint, cmd, options) {
       // Build run definition
       var runDef = terminusContainer();
       runDef.opts.entrypoint = 'bash --login -c';
-      cmd.unshift(entrypoint);
+      cmd.unshift('terminus');
       cmd = cmd.concat(options);
-      runDef.opts.cmd = cmd;
+      runDef.opts.cmd = _.uniq(cmd);
 
       // Log
       log.info('Run definition: ', runDef);
@@ -136,7 +136,6 @@ Terminus.prototype.__request = function(entrypoint, cmd, options) {
 Terminus.prototype.auth = function(email, password) {
 
   return this.__request(
-    ['terminus'],
     ['auth', 'login', email],
     ['--password=' + password, '--format=json']
   );
@@ -151,7 +150,6 @@ Terminus.prototype.auth = function(email, password) {
 Terminus.prototype.wakeSite = function(site, env) {
 
   return this.__request(
-    ['terminus'],
     ['site', 'wake'],
     ['--site=' + site, '--env=' + env, '--format=json']
   );
@@ -167,7 +165,6 @@ Terminus.prototype.getConnectionMode = function(site, env) {
 
   // Grab the data
   return this.__request(
-    ['terminus'],
     ['site', 'environment-info', '--field=connection_mode'],
     ['--format=json', '--site=' + site, '--env=' + env]
   );
@@ -183,7 +180,6 @@ Terminus.prototype.hasChanges = function(site, env) {
 
   // Grab the data
   return this.__request(
-    ['terminus'],
     ['site', 'code', 'diffstat'],
     ['--format=json', '--site=' + site, '--env=' + env]
   )
@@ -203,7 +199,6 @@ Terminus.prototype.hasChanges = function(site, env) {
 Terminus.prototype.setConnectionMode = function(site, env, mode) {
 
   return this.__request(
-    ['terminus'],
     ['site', 'set-connection-mode'],
     ['--format=json', '--site=' + site, '--env=' + env, '--mode=' + mode]
   );
@@ -227,11 +222,7 @@ Terminus.prototype.getUUID = function(site) {
   }
 
   // Make a request
-  return self.__request(
-    ['terminus'],
-    ['site', 'info'],
-    ['--format=json', '--site=' + site]
-  )
+  return self.__request(['site', 'info'], ['--format=json', '--site=' + site])
 
   .then(function(data) {
     self.uuid = data[0].id;
@@ -247,7 +238,7 @@ Terminus.prototype.getUUID = function(site) {
  */
 Terminus.prototype.getSiteAliases = function() {
 
-  return this.__request(['terminus'], ['sites', 'aliases'], ['--format=json']);
+  return this.__request(['sites', 'aliases'], ['--format=json']);
 
 };
 
@@ -261,7 +252,6 @@ Terminus.prototype.downloadBackup = function(site, env, type) {
 
   // Download the backup and return its location
   return this.__request(
-    ['terminus'],
     ['site', 'backups', 'get'],
     [
       '--site=' + site,
@@ -286,7 +276,6 @@ Terminus.prototype.createBackup = function(site, env, type) {
   // @todo: validate type?
 
   return this.__request(
-    ['terminus'],
     ['site', 'backups', 'create'],
     [
       '--format=json',
@@ -304,7 +293,6 @@ Terminus.prototype.createBackup = function(site, env, type) {
 Terminus.prototype.hasBackup = function(site, env, type) {
 
   return this.__request(
-    ['terminus'],
     ['site', 'backups', 'list'],
     [
       '--format=json',
@@ -338,7 +326,6 @@ Terminus.prototype.connectionInfo = function(site, env) {
 
   // Make a request
   return this.__request(
-    ['terminus'],
     ['site', 'connection-info'],
     [
       '--format=json',

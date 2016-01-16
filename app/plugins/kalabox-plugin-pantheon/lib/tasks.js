@@ -66,6 +66,7 @@ module.exports = function(kbox) {
      * Helper to get pull questions
      */
     var getPullQuestions = function(options) {
+
       return [
         {
           type: 'list',
@@ -222,7 +223,7 @@ module.exports = function(kbox) {
 
         // Grab the CLI options that are available
         var options = this.options;
-        var questions = getPullQuestions();
+        var questions = getPullQuestions(this.options);
 
         // Filter out interactive questions based on passed in options
         questions = kbox.util.cli.filterQuestions(questions, options);
@@ -313,7 +314,7 @@ module.exports = function(kbox) {
 
         // Grab the CLI options that are available
         var options = this.options;
-        var questions = getPushQuestions(options);
+        var questions = getPushQuestions();
 
         // Filter out interactive questions based on passed in options
         questions = kbox.util.cli.filterQuestions(questions, options);
