@@ -186,22 +186,7 @@ module.exports = function(kbox, app) {
       // Hack together an rsync command
       var envSite = [env, uuid].join('.');
       var fileBox = envSite + '@appserver.' + envSite + '.drush.in:files/';
-      var fileMount = '/media';
-      var cmd = [
-        '-rlvz',
-        '--size-only',
-        '--ipv4',
-        '--progress',
-        '-e',
-        'ssh\ -p\ 2222\ -i\ /user/.ssh/pantheon.kalabox.id_rsa\ -o\ ' +
-          'StrictHostKeyChecking=no'
-      ];
-      cmd = cmd.concat(terminus.getExcludes());
-      cmd.push(fileBox);
-      cmd.push(fileMount);
-
-      // Rysnc our files
-      return rsync(cmd);
+      return rsync(fileBox, '/media');
 
     });
   };

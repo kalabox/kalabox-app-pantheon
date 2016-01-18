@@ -60,7 +60,7 @@ Terminus.prototype.__request = function(cmd, options) {
 
         // Build run definition
         var loginDef = terminusContainer();
-        loginDef.opts.entrypoint = 'bash --login -c';
+        loginDef.opts.entrypoint = ['bash', '--login', '-c'];
         loginCmd.unshift('terminus');
         loginCmd = loginCmd.concat(loginOptions);
         loginDef.opts.cmd = _.uniq(loginCmd);
@@ -82,7 +82,7 @@ Terminus.prototype.__request = function(cmd, options) {
 
       // Build run definition
       var runDef = terminusContainer();
-      runDef.opts.entrypoint = 'bash --login -c';
+      runDef.opts.entrypoint = ['bash', '--login', '-c'];
       cmd.unshift('terminus');
       cmd = cmd.concat(options);
       runDef.opts.cmd = _.uniq(cmd);
@@ -339,42 +339,6 @@ Terminus.prototype.connectionInfo = function(site, env) {
     self.bindings = data[0];
     return self.kbox.Promise.resolve(self.bindings);
   });
-
-};
-
-/*
- * This one is a little weird since its not really a terminus call
- * but its something we should keep outside of push/pull for reusability
- * @todo: maybe this goes into a util mod at some point?
- * @todo: eventually we might want to do this by framework?
- *
- * https://dashboard.getpantheon.com/api/sites/UUID/bindings
- */
-Terminus.prototype.getExcludes = function() {
-
-  /*
-   * Basic map function to translate a directory into
-   * a rsync exclusion string
-   */
-  var exclude = function(dir) {
-    return ['--exclude', dir];
-  };
-
-  // Generic list of dirs to exclude
-  var dirs = [
-    'js',
-    'css',
-    'ctools',
-    'imagecache',
-    'xmlsitemap',
-    'backup_migrate',
-    'php/twig/*',
-    'styles/*',
-    'less'
-  ];
-
-  // Return exclude array
-  return _.flatten(_.map(dirs, exclude));
 
 };
 

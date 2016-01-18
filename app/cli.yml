@@ -14,7 +14,10 @@ terminal:
   description: Exec into your appserver
 terminus:
   service: terminus
-  entrypoint: bash --login -c
+  entrypoint:
+    - bash
+    - --login
+    - -c
 wp:
   service: terminus
   entrypoint: wp

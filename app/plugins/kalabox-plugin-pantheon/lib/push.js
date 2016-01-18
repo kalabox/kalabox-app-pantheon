@@ -127,7 +127,7 @@ module.exports = function(kbox, app) {
       exportRun.opts.entrypoint = 'export-mysql';
       // jshint camelcase:false
       // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-      exportRun.opts.cmd = ['"' + bindings.mysql_command + '"', dumpFile];
+      exportRun.opts.cmd = [bindings.mysql_command, dumpFile];
       // jshint camelcase:true
       // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
 
@@ -151,34 +151,11 @@ module.exports = function(kbox, app) {
 
     // Push up our files
     .then(function(uuid) {
-      // @todo: lots of cleanup here
+
+      // Hack together an rsync command
       var envSite = [env, uuid].join('.');
       var fileBox = envSite + '@appserver.' + envSite + '.drush.in:files/';
-      // jshint ignore:start
-      // jscs:disable
-      var fileMount = "/media/";
-      // jshint ignore:end
-      // jscs:enable
-      var cmd = [
-        '-rlvz',
-        '--size-only',
-        '--ipv4',
-        '--progress',
-        '-e',
-        'ssh -p 2222 -i /user/.ssh/pantheon.kalabox.id_rsa -o ' +
-          'StrictHostKeyChecking=no'
-      ];
-      cmd = cmd.concat(terminus.getExcludes());
-      // jshint ignore:start
-      // jscs:disable
-      cmd.push(fileMount);
-      // jshint ignore:end
-      // jscs:enable
-      cmd.push('--temp-dir=/tmp/');
-      cmd.push(fileBox);
-
-      // Rsync our files
-      return rsync(cmd);
+      return rsync('/media/', fileBox);
 
     });
   };

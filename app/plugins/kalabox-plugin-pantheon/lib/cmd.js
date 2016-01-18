@@ -2,6 +2,9 @@
 
 module.exports = function(kbox, app) {
 
+  // npm modules
+  var _ = require('lodash');
+
   /*
    * Cli container def
    */
@@ -45,7 +48,56 @@ module.exports = function(kbox, app) {
   /*
    * Run rsync commands
    */
-  var rsync = function(cmd) {
+  var rsync = function(source, dest) {
+
+    /*
+     * Basic map function to translate a directory into
+     * a rsync exclusion string
+     */
+    var exclude = function(dir) {
+      return ['--exclude', dir];
+    };
+
+    // Generic list of dirs to exclude
+    var dirs = [
+      'js',
+      'css',
+      'ctools',
+      'imagecache',
+      'xmlsitemap',
+      'backup_migrate',
+      'php/twig/*',
+      'styles/*',
+      'less'
+    ];
+
+    // Our ssh options
+    var sshOptions = kbox.util.shell.escSpaces([
+      'ssh',
+      '-p',
+      '2222',
+      '-i',
+      '/user/.ssh/pantheon.kalabox.id_rsa',
+      '-o',
+      'StrictHostKeyChecking=no'
+    ]);
+
+    // Base command
+    var cmd = [
+      '-rlvz',
+      '--size-only',
+      '--ipv4',
+      '--progress',
+      '-e',
+      sshOptions
+    ];
+    cmd = cmd.concat(_.flatten(_.map(dirs, exclude)));
+
+    // Add source and destination
+    cmd.push(source);
+    cmd.push(dest);
+
+    // Run the command
     return run('rsync', cmd);
   };
 
