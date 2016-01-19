@@ -160,7 +160,7 @@ module.exports = function(kbox, app) {
       // Construct our import definition
       var importRun = getDbRun();
       importRun.opts.entrypoint = 'import-mysql';
-      importRun.opts.cmd = sqlDump;
+      importRun.opts.cmd = [sqlDump];
 
       // Perform the run.
       return engine.run(importRun);

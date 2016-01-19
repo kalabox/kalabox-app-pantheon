@@ -107,7 +107,7 @@ module.exports = function(kbox, app) {
       // Construct our import definition
       var dumpRun = getDbRun();
       dumpRun.opts.entrypoint = 'dump-mysql';
-      dumpRun.opts.cmd = dumpFile;
+      dumpRun.opts.cmd = [dumpFile];
 
       // Perform the run.
       return engine.run(dumpRun);
