@@ -80,7 +80,7 @@ module.exports = function(kbox, app) {
       '/user/.ssh/pantheon.kalabox.id_rsa',
       '-o',
       'StrictHostKeyChecking=no'
-    ]);
+    ], 'linux');
 
     // Base command
     var cmd = [

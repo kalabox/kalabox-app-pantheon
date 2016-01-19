@@ -100,6 +100,9 @@ module.exports = function(kbox) {
             var anDb = answers.database;
             var pullDb = optDb !== 'none' && anDb !== 'none';
             return !options.latestbackup && pullDb;
+          },
+          default: function() {
+            return false;
           }
         },
         {

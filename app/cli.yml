@@ -29,4 +29,3 @@ drush:
   postcmdopts: --strict=0
 bash:
   service: cli
-  entrypoint: bash
