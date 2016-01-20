@@ -27,15 +27,15 @@ phpbrew -d switch ${PHP_BREW_VERSION}
 # Set up our solr certs
 if [ ! -f "/certs/binding.pem" ]; then
   openssl genrsa -out /certs/binding.key 2048 && \
-  openssl req -new -x509 -key /certs/binding.key -out /certs/binding.crt -days 365 -subj "/C=US/ST=California/L=Oakland/O=Kalabox/OU=KB/CN=solr.${DOMAIN}" && \
+  openssl req -new -x509 -key /certs/binding.key -out /certs/binding.crt -days 365 -subj "/C=US/ST=California/L=Oakland/O=Kalabox/OU=KB/CN=solr" && \
   cat /certs/binding.crt /certs/binding.key > /certs/binding.pem
 fi
 
 # Make sure our solr certs are whitelisted correctly
-if [ ! -d "/usr/share/ca-certificates/solr.${DOMAIN}" ]; then
-  mkdir /usr/share/ca-certificates/solr.${APPDOMAIN} && \
-  cp /certs/binding.crt /usr/share/ca-certificates/solr.${APPDOMAIN}/binding.crt && \
-  echo "solr.${DOMAIN}/binding.crt" >> /etc/ca-certificates.conf && \
+if [ ! -d "/usr/share/ca-certificates/solr" ]; then
+  mkdir /usr/share/ca-certificates/solr && \
+  cp /certs/binding.crt /usr/share/ca-certificates/solr/binding.crt && \
+  echo "solr/binding.crt" >> /etc/ca-certificates.conf && \
   update-ca-certificates --fresh
 fi
 
