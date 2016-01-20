@@ -104,8 +104,15 @@ Terminus.prototype.__request = function(cmd, options) {
         return !_.isEmpty(response);
       })
 
-      // Return objects
+      // Return valid JSON objects
       .map(function(response) {
+        try {
+          JSON.parse(response);
+        }
+        catch (e) {
+          // Pass in valid json that we know will be filtered out
+          return {data: 'now'};
+        }
         return JSON.parse(response);
       })
 
