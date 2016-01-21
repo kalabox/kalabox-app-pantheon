@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Load our phpbrew things
+[[ -e ~/.phpbrew/bashrc ]] && source ~/.phpbrew/bashrc
+
+# Translate pantheon php version to brew version
+if [ $PHP_VERSION == "53" ]; then
+  export PHP_BREW_VERSION="5.3.29"
+elif [ $PHP_VERSION == "55" ]; then
+  export PHP_BREW_VERSION="5.5.24"
+fi
+
+# Use our custom terminus php.ini We want to use a custom ini here so we can
+# set error reporting so that notices are not reported to stderr
+if [ -f "/src/config/terminus/php.ini" ]; then
+  rm ${HOME}/.phpbrew/php/php-${PHP_BREW_VERSION}/etc/php.ini
+  cp /src/config/terminus/php.ini ${HOME}/.phpbrew/php/php-${PHP_BREW_VERSION}/etc/php.ini
+fi
+
+# Switch to relevant php version
+phpbrew -d switch ${PHP_BREW_VERSION}

@@ -1,19 +1,9 @@
 {
-  "name": "solr",
-  "scripts": {
-    "postinstall": "node ./scripts/downloadLibs.js"
-  },
-  "version": "0.10.8",
-  "postInstallPkgs": [
-    "kalabox-plugin-drush@^0.10.0",
-    "kalabox-plugin-git@^0.10.0",
-    "kalabox-plugin-rsync@^0.10.0"
-  ],
+  "name": "pantheon",
+  "version": "0.11.0",
   "dependencies": {
     "fs-extra": "^0.18.2",
     "inquirer": "^0.9.0",
-    "ssh-fingerprint": "0.0.1",
-    "ssh-keygen": "^0.2.1",
     "lodash": "^3.9.3",
     "restler": "^3.3.0"
   }

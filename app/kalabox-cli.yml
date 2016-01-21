@@ -1,0 +1,94 @@
+#
+# This contains additional services needed by the cli plugin.
+#
+
+#
+# Basic cli tooling.
+#
+# This is a small alpine linux container that contains some basic and common
+# cli tools like git, rsync and bash.
+#
+# It shares your entire user directory in at /usr. It also uses your Pantheon
+# keys and username for its git config.
+#
+cli:
+  image: kalabox/cli:dev
+  volumes:
+    - $KALABOX_ENGINE_HOME:/user
+  volumes_from:
+    - data
+  environment:
+    WEBROOT: /code
+    TERM: xterm-color
+    GIT_SSH_COMMAND: ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o IdentityFile=/user/.ssh/pantheon.kalabox.id_rsa
+    GIT_AUTHOR_NAME: $KALABOX_APP_PANTHEON_CONFIG_NAME
+    GIT_AUTHOR_EMAIL: $KALABOX_APP_PANTHEON_CONFIG_EMAIL
+    GIT_COMMITTER_NAME: $KALABOX_APP_PANTHEON_CONFIG_NAME
+    GIT_COMMITTER_EMAIL: $KALABOX_APP_PANTHEON_CONFIG_EMAIL
+  links:
+    - db:database
+  working_dir: /code
+  stdin_open: true
+  tty: true
+
+#
+# Pantheon tooling.
+#
+# This contains additional Pantheon specific tooling options such as
+# drush, wp-cli and terminus.
+#
+terminus:
+
+  # Comment this and uncomment 'build' below if you want to edit your
+  # local dockerfile and build from there. This is useful for development
+  image: kalabox/terminus:$KALABOX_IMG_VERSION
+
+  # Uncomment this and comment 'image' above if you want to edit your
+  # local dockerfile and build from there. This is useful for development
+  #
+  # build: ./dockerfiles/terminus
+
+  volumes:
+    - $KALABOX_ENGINE_HOME:/user
+    - $KALABOX_APP_ROOT:/src
+    - $KALABOX_ENGINE_HOME/.kalabox/pantheon/session/$KALABOX_APP_PANTHEON_CONFIG_EMAIL:/root/.terminus/cache/session
+    - $KALABOX_APP_ROOT/config/drush:/root/.drush
+  volumes_from:
+    - data
+  environment:
+    FRAMEWORK: $KALABOX_APP_PANTHEON_FRAMEWORK
+    PHP_VERSION: 55
+    DOMAIN: $KALABOX_DOMAIN
+    TERM: xterm-color
+    DOCROOT: $KALABOX_APP_PANTHEON_DOCROOT
+    FILEMOUNT: $KALABOX_APP_PANTHEON_FILEMOUNT
+    DRUPAL_HASH_SALT: $KALABOX_APP_PANTHEON_DRUPAL_HASH_SALT
+    DB_HOST: $KALABOX_APP_PANTHEON_DB_HOST
+    DB_PORT: $KALABOX_APP_PANTHEON_DB_PORT
+    DB_USER: $KALABOX_APP_PANTHEON_DB_USER
+    DB_PASSWORD: $KALABOX_APP_PANTHEON_DB_PASSWORD
+    DB_NAME: $KALABOX_APP_PANTHEON_DB_NAME
+    PANTHEON_ACCOUNT: $KALABOX_APP_PANTHEON_PANTHEON_ACCOUNT
+    PANTHEON_SITE: $KALABOX_APP_PANTHEON_PANTHEON_SITE
+    PANTHEON_SITE_NAME: $KALABOX_APP_PANTHEON_PANTHEON_SITE_NAME
+    PANTHEON_ENVIRONMENT: $KALABOX_APP_PANTHEON_PANTHEON_ENVIRONMENT
+    PANTHEON_INFRASTRUCTURE_ENVIRONMENT: $KALABOX_APP_PANTHEON_PANTHEON_INFRASTRUCTURE_ENVIRONMENT
+    PRESSFLOW_SETTINGS: $KALABOX_APP_PANTHEON_PRESSFLOW_SETTINGS
+    BACKDROP_SETTINGS: $KALABOX_APP_PANTHEON_PRESSFLOW_SETTINGS
+    CACHE_HOST: $KALABOX_APP_PANTHEON_CACHE_HOST
+    CACHE_PORT: $KALABOX_APP_PANTHEON_CACHE_PORT
+    CACHE_PASSWORD: $KALABOX_APP_PANTHEON_CACHE_PASSWORD
+    PANTHEON_INDEX_HOST: $KALABOX_APP_PANTHEON_PANTHEON_INDEX_HOST
+    PANTHEON_INDEX_PORT: $KALABOX_APP_PANTHEON_PANTHEON_INDEX_PORT
+    AUTH_KEY: $KALABOX_APP_PANTHEON_AUTH_KEY
+    SECURE_AUTH_KEY: $KALABOX_APP_PANTHEON_SECURE_AUTH_KEY
+    LOGGED_IN_KEY: $KALABOX_APP_PANTHEON_LOGGED_IN_KEY
+    AUTH_SALT: $KALABOX_APP_PANTHEON_AUTH_SALT
+    SECURE_AUTH_SALT: $KALABOX_APP_PANTHEON_SECURE_AUTH_SALT
+    LOGGED_IN_SALT: $KALABOX_APP_PANTHEON_LOGGED_IN_SALT
+    NONCE_SALT: $KALABOX_APP_PANTHEON_NONCE_SALT
+  links:
+    - db:database
+  working_dir: /code
+  stdin_open: true
+  tty: true

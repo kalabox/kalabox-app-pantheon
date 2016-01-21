@@ -15,7 +15,7 @@ $aliases['kbox'] = array(
               'username' => 'pantheon',
               'password' => '',
               'port' => 3306,
-              'host' => 'drupal.kbox',
+              'host' => 'database',
               'database' => 'pantheon',
             ),
         ),

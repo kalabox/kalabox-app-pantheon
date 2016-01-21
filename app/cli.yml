@@ -1,0 +1,117 @@
+#
+# Cli plugin task definition
+#
+# If the cli plugin is enabled in kalabox.yml then this file will be
+# used used to specify the tooling commands that this app can run.
+#
+# Each object defines a specific task. When a task is implemnented correctly
+# it should show up when you run `kbox` inside of your app. T
+#
+# Tasks can use any of the services in kalabox-compose.yml, kalabox-cli.yml or
+# other compose files you load with your app.
+#
+# Here is a general description of a task object
+#
+# commandname:
+#
+#   service: [service] - The service on which to run the command.
+#
+#   stripfirst: [true|false] - If your commandname key is different from the
+#     entrypoint you might want to strip the commandname aka running `kgit git`
+#     vs `kgit`.
+#
+#   entrypoint: [string|array] - The binary to use. This will default to the
+#     entrypoint of the service.
+#
+#   description: [string] - A human readable description that will show up
+#     on the CLI.
+#
+#   precmdopts: [string] - A string of options to insert between the entrypoint
+#     and the command the user types.
+#
+#   postcmdopts: [string] - A string to append to the user entered command.
+#
+#
+# NOTE: You will want to make sure your services correctly set relevant options
+# such as sharing config files or the working directory.
+#
+
+#
+# Adds a git command to your Pantheon app.
+#
+# You can still use your local git if you want. We also use a git wrapper called
+# `kgit` to handle sharing files correctly.
+#
+# By default your git commands will use your Pantheon ssh key and git user/email
+# will be based on your Pantheon info.
+#
+# This will run relative to your webroot.
+#
+git:
+  service: cli
+  stripfirst: true
+  entrypoint: kgit
+  description: Run a git command on your codebase
+
+#
+# Adds a rsync command to your Pantheon app.
+#
+# This will run relative to your webroot.
+#
+rysnc:
+  service: cli
+  entrypoint: rsync
+  description: Run a rsync command on your codebase
+
+#
+# This will drop you into a bash shell on your appserver
+#
+terminal:
+  service: appserver
+  stripfirst: true
+  entrypoint: bash
+  description: "'ssh' into your appserver"
+
+#
+# Adds a terminus command to your pantheon app.
+#
+# This will share the session that lives on your host at
+# ~/.kalabox/pantheon/session/EMAIL. It will also share the exact same
+# configuration as your appserver. It will also use your pantheon ssh key.
+#
+# Commands will be run relative to your webroot.
+#
+terminus:
+  service: terminus
+  entrypoint:
+    - bash
+    - --login
+    - -c
+  description: Run a terminus command on your codebase
+
+#
+# Adds a wp-cli command to your pantheon app.
+#
+# Commands will be run relative to your webroot.
+#
+wp:
+  service: terminus
+  entrypoint: wp
+  precmdopts: --allow-root
+  description: Run a wp-cli command on your codebase
+
+#
+# Adds a drush 8 command to your pantheon app.
+#
+# This will share the drush config that lives in config/drush relative to your
+# app root. So you can drop custom aliases and command files in there. Drush
+# will also use your pantheon SSH key by default.
+#
+# Commands will be run relative to your webroot.
+#
+drush:
+  service: terminus
+  stripfirst: true
+  entrypoint: drush8
+  postcmdopts: --strict=0
+  description: Run a drush 8 command on your codebase

@@ -1,0 +1,127 @@
+#
+# Kalabox Pantheon app configuration file
+#
+# This file contains the top level configuration for your Pantheon app
+# and for the plugins it contains. See inline below for more detail
+# on each.
+#
+
+#
+# This is the name you choose during `kbox create pantheon`. Changing this
+# is generally dark and full of peril.
+#
+name: pantheon
+
+#
+# This tells Kalabox that this is a Pantheon app. Generally you are not
+# going to want to edit or change this either
+#
+type: pantheon
+
+#
+# This is an array of the plugins that a Kalabox app implements. By default
+# Kalabox will look for plugins in the current directories:
+#
+#   Inside of Kalabox source/binary
+#
+#     1. ./node_modules/*
+#     2. ./plugins
+#
+#   Relative to the root of your app directory
+#
+#     1. ./node_modules/*
+#     2. ./plugins/*
+#
+#   In the global plugin directory
+#
+#     1. ~/.kalabox/plugins
+#
+# Drop a plugin in one of these locations and then add it to the plugins array
+# below. Example:
+#
+#   plugins:
+#     - kalabox-plugin-pantheon
+#     - my-wicked-awesome-plugin
+#
+plugins:
+  - kalabox-plugin-pantheon
+
+#
+# This contains configuration for each plugin that Kalabox uses for a Pantheon
+# app. "cli", "syncthing" and "services" are all core Kalabox plugins.
+#
+# Read more inline below for options on each.
+#
+# It is also worth noting that changing these options may cause your Pantheon
+# app to misbehave.
+#
+pluginconfig:
+
+  #
+  # cli plugin config.
+  #
+  # The cli plugin allows users to specify which tooling
+  # options they want available for their app. This is a great way to get
+  # your team using the exact same tools that make the most sense for this
+  # app.
+  #
+  # Options:
+  #   cli: [on|off] - Turns the Kalabox cli plugin on or off for this app.
+  #
+  # The cli plugin will also install the services in the kalabox-cli.yml file
+  # and also load tasks that live in the cli.yml file. Check out both
+  # those files for more options.
+  #
+  cli: on
+
+  #
+  # sharing plugin config.
+  #
+  # The sharing plugin shares your apps code between the Kalabox VM and
+  # your host. Generally you are going to want this on.
+  #
+  # Options:
+  #
+  #   share: [service:directory] - Tells Kalabox what service and directory
+  #     to share. Generally you will want this to be your webroot
+  #
+  #   codeDir: [path relative to appRoot] - If you want your code to live on
+  #     your host in a different directory than 'code' you can specify that here
+  #
+  #   ignore: [array of paths] - These are paths that sharing will ignore.
+  #     Generally you will not want to share massive amounts of static assets.
+  #
+  syncthing:
+    share: data:/code
+    ignore:
+      - "sites/default/files"
+      - "files"
+      - "wp-content/uploads"
+      - "!*modules*"
+
+  #
+  # services plugin config.
+  #
+  # The services plugin provides domain resolution and proxying for specific
+  # services. This will use the global config "domain" key as the DNS suffix.
+  # By default this is 'kbox'.
+  #
+  # Options:
+  #   Objects keyed by service name containing a list of proxy objects.
+  #
+  #   Proxy Object:
+  #     - port: [port/protocal] - The exposed service port and protocol
+  #     - hostname: [string] - the hostname in HOSTNAME.appname.domain
+  #     - default: [true|false] - will use appname.domain as the hostname
+  #     - secure: [true|false] - http vs https.
+  #
+  services:
+    appserver:
+      - port: 8888/tcp
+        hostname: appserver
+    edge:
+      - port: 80/tcp
+        default: true
+      - port: 443/tcp
+        default: true
+        secure: true

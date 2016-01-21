@@ -2,14 +2,6 @@
 
 module.exports = function(kbox, app) {
 
-  // Grab some kalabox modules
-  var engine = kbox.engine;
-  var Promise = kbox.Promise;
-  Promise.longStackTraces();
-
-  // Intrinsic modules.
-  var path = require('path');
-
   // NPM modules
   var _ = require('lodash');
 
@@ -17,34 +9,24 @@ module.exports = function(kbox, app) {
   var Terminus = require('./terminus.js');
   var terminus = new Terminus(kbox, app);
 
-  // Grab delegated helpers
-  var pathToRoot = path.resolve(__dirname, '..', '..', '..');
-  var pathToNode = path.join(pathToRoot, 'node_modules');
-  var Git = require(pathToNode + '/kalabox-plugin-git/lib/git.js');
-  var git = new Git(kbox, app);
-  var Rsync = require(pathToNode + '/kalabox-plugin-rsync/lib/rsync.js');
-  var rsync = new Rsync(kbox, app);
+  // Grab some kalabox modules
+  var engine = kbox.engine;
+  var Promise = kbox.Promise;
 
   /*
    * Push up our sites code
    */
   var pushCode = function(site, env, message) {
 
-    // the pantheon site UUID
-    var connectionModeStart;
-
     // Check to see what our connection mode is
     return terminus.getConnectionMode(site, env)
 
     // Set the connection mode to git if needed
     // and then try again
-    .then(function(connectionMode) {
+    .tap(function(connectionMode) {
 
-      // Set so we can use later
-      connectionModeStart = connectionMode;
-
-      // If we are in SFTP mode set back to git
-      if (connectionModeStart !== 'git') {
+      // If we are in SFTP mode check for changes
+      if (!_.includes(connectionMode, 'git')) {
 
         return terminus.hasChanges(site, env)
         .then(function(hasChanges) {
@@ -64,32 +46,35 @@ module.exports = function(kbox, app) {
     })
 
     // Wake the site
-    .then(function() {
+    .tap(function() {
       return terminus.wakeSite(site, env);
     })
 
     // Push up our code
-    .then(function() {
+    .tap(function() {
+
+      // Grab the git client
+      var git = require('./cmd.js')(kbox, app).git;
 
       // Add in all our changes
-      return git.cmd(['add', '--all'], [])
+      return git(['add', '--all'], [])
 
       // Commit our changes
       .then(function() {
-        return git.cmd(['commit', '--allow-empty', '-m', message], []);
+        return git(['commit', '--allow-empty', '-m', message], []);
       })
 
       // Push our changes
       .then(function() {
         var branch = (env === 'dev') ? 'master' : env;
-        return git.cmd(['push', 'origin', branch], []);
+        return git(['push', 'origin', branch], []);
       });
 
     })
 
     // Set our connection mode back to what we started with
-    .then(function() {
-      return terminus.setConnectionMode(site, env, connectionModeStart);
+    .then(function(connectionMode) {
+      return terminus.setConnectionMode(site, env, connectionMode);
     });
 
   };
@@ -98,79 +83,57 @@ module.exports = function(kbox, app) {
    * Push your local DB up to pantheon
    */
   var pushDB = function(site, env) {
-    // Get the cid of this apps database
-    // @todo: this looks gross
-    var dbID = _.result(_.find(app.components, function(cmp) {
-      return cmp.name === 'db';
-    }), 'containerId');
-    var wasRunning = null;
-    var defaults = {
-      PublishAllPorts: true,
-      Binds: [app.rootBind + ':/src:rw']
+
+    /*
+     * Helper to get a DB run def template
+     */
+    var getDbRun = function() {
+      return {
+        compose: app.composeCore,
+        project: app.name,
+        opts: {
+          services: ['db'],
+        }
+      };
     };
 
-    // Check if DB container is running
-    return engine.isRunning(dbID)
-
-    // If DB is not running start it up
-    .then(function(status) {
-      wasRunning = status;
-      if (!wasRunning) {
-        return engine.start(dbID, defaults)
-        // Wait a bit to get the DB going before we do the next thing
-        // @todo: Have a way to check that the DB container is
-        // actually ready?
-        .delay(5000);
-      }
-    })
+    // Create a unique name for this file
+    var fileId = _.uniqueId([site, env].join('-'));
+    var dumpFile = '/backups/' + fileId + '.sql';
 
     // Dump our database
-    .then(function() {
-      return engine.queryData(dbID, ['dump-mysql']);
-    })
+    return Promise.try(function() {
 
-    // Get the site ID
-    .then(function() {
-      return terminus.getUUID(site);
+      // Construct our import definition
+      var dumpRun = getDbRun();
+      dumpRun.opts.entrypoint = 'dump-mysql';
+      dumpRun.opts.cmd = [dumpFile];
+
+      // Perform the run.
+      return engine.run(dumpRun);
+
     })
 
     // Grab binding info
-    .then(function(uuid) {
-      return terminus.getBindings(uuid);
-    })
-
-    // Extra DB connection info from bindings
-    .then(function(binds) {
-      var box = _.find(binds, function(bind) {
-        return (bind.database === 'pantheon' && bind.environment === env);
-      });
-      var connectionInfo = {
-        password: box.password,
-        host: ['dbserver', env, box.site, 'drush', 'in'].join('.'),
-        port: box.port.toString()
-      };
-      return Promise.resolve(connectionInfo);
+    .then(function() {
+      return terminus.connectionInfo(site, env);
     })
 
     // Push our DB up to pantheon
-    .then(function(connectionInfo) {
-      // Perform a container run.
-      var dbFile = '/src/config/terminus/pantheon.sql';
-      var payload = [
-        'import-mysql',
-        connectionInfo.host,
-        connectionInfo.password,
-        connectionInfo.port,
-        dbFile
-      ];
-      return engine.queryData(dbID, payload);
-    })
+    .then(function(bindings) {
 
-    // Ensure DB is returned to state we found it in
-    .then(function() {
-      if (!wasRunning) {
-        return engine.stop(dbID);
-      }
+      // Construct our import definition
+      var exportRun = getDbRun();
+      exportRun.opts.entrypoint = 'export-mysql';
+      // jshint camelcase:false
+      // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
+      exportRun.opts.cmd = [bindings.mysql_command, dumpFile];
+      // jshint camelcase:true
+      // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
+
+      // Perform the run.
+      return engine.run(exportRun);
+
     });
 
   };
@@ -180,20 +143,20 @@ module.exports = function(kbox, app) {
    */
   var pushFiles = function(site, env) {
 
+    // Grab the rsync client
+    var rsync = require('./cmd.js')(kbox, app).rsync;
+
     // Get panthoen site UUID
     return terminus.getUUID(site)
 
     // Push up our files
     .then(function(uuid) {
-      var siteid = uuid;
-      // @todo: lots of cleanup here
-      var envSite = [env, siteid].join('.');
-      var fileBox = envSite + '@appserver.' + envSite + '.drush.in:files/';
-      var fileMount = '/media/* --temp-dir=/tmp/';
-      var connect = '-rlvz --size-only --ipv4 --progress -e \'ssh -p 2222\'';
-      var opts = [connect, terminus.getExcludes()].join(' ');
 
-      return rsync.cmd([opts, fileMount, fileBox], true);
+      // Hack together an rsync command
+      var envSite = [env, uuid].join('.');
+      var fileBox = envSite + '@appserver.' + envSite + '.drush.in:files/';
+      return rsync('/media/', fileBox);
+
     });
   };
 

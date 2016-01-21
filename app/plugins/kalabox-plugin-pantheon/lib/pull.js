@@ -2,40 +2,28 @@
 
 module.exports = function(kbox, app) {
 
-  // Grab some kalabox modules
-  var engine = kbox.engine;
-  var Promise = kbox.Promise;
-  Promise.longStackTraces();
-
-  // Intrinsic modules.
-  var url = require('url');
+  // Node modules.
   var fs = require('fs');
   var path = require('path');
 
-  // NPM modules
+  // Npm modules
   var _ = require('lodash');
+
+  // Grab some kalabox modules
+  var engine = kbox.engine;
 
   // Grab the terminus client
   var Terminus = require('./terminus.js');
   var terminus = new Terminus(kbox, app);
 
-  // Grab delegated helpers
-  var pathToRoot = path.resolve(__dirname, '..', '..', '..');
-  var pathToNode = path.join(pathToRoot, 'node_modules');
-  var Git = require(pathToNode + '/kalabox-plugin-git/lib/git.js');
-  var git = new Git(kbox, app);
-  var Rsync = require(pathToNode + '/kalabox-plugin-rsync/lib/rsync.js');
-  var rsync = new Rsync(kbox, app);
-
   /*
    * Check to see if this is the first time we are going to do a pull or not
    * @todo: this is pretty weak for now
    */
-  var firstTime = function() {
-    // @todo: this only works if you have started your app first
-    var gitFile = path.join(app.config.codeRoot, '.git');
+  var firstTime = _.once(function() {
+    var gitFile = path.join(app.config.syncthing.codeRoot, '.git');
     return !fs.existsSync(gitFile);
-  };
+  });
 
   /*
    * Pull down our sites code
@@ -45,101 +33,114 @@ module.exports = function(kbox, app) {
     // Determine correct operation
     var type = (firstTime()) ? 'clone' : 'pull';
 
-    // the pantheon site UUID
-    var siteid;
-    var repo;
+    // Grab the git client
+    var git = require('./cmd.js')(kbox, app).git;
 
-    // Grab the sites UUID from teh machinename
-    return terminus.getUUID(site)
+    // Do this if we are gitting for the first time
+    if (type === 'clone') {
 
-    // Wake the site up
-    .then(function(uuid) {
-      siteid = uuid;
-      return terminus.wakeSite(site, env);
-    })
+      // Grab pantheon aliases
+      return terminus.getSiteAliases()
 
-    // Generate our code repo URL
-    // NOTE: even multidev requies we use 'dev' instead of env
-    .then(function() {
-      var build = {
-        protocol: 'ssh',
-        slashes: true,
-        auth: ['codeserver', 'dev', siteid].join('.'),
-        hostname: ['codeserver', 'dev', siteid, 'drush', 'in'].join('.'),
-        port: 2222,
-        pathname: ['~', 'repository.git'].join('/')
-      };
+      // Wake the site up
+      // @todo: is this needed?
+      .then(function() {
+        return terminus.wakeSite(site, env);
+      })
 
-      // Format our metadata into a url
-      repo = url.format(build);
+      // Get connection info
+      .then(function() {
+        return terminus.connectionInfo(site, env);
+      })
 
-      // Do this if we are gitting for the first time
-      if (type === 'clone') {
+      // Generate our code repo URL
+      // NOTE: even multidev requires we use 'dev' instead of env
+      .then(function(bindings) {
+
+        // jshint camelcase:false
+        // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
+        // Get the repo from bindings
+        var repo = bindings.git_url;
+        // jshint camelcase:true
+        // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
 
         // Clone the repo
-        return git.cmd(['clone', repo, './'], [])
+        return git(['clone', repo, './'])
 
         // Grab branches if we need more than master
         .then(function() {
           if (env !== 'dev') {
-            return git.cmd(['fetch', 'origin'], []);
+            return git(['fetch', 'origin']);
           }
         })
 
         // Checkout correct branch if needed
         .then(function() {
           if (env !== 'dev') {
-            return git.cmd(['checkout', env], []);
+            return git(['checkout', env]);
           }
+        })
+
+        // Symlink our files directory to media
+        .then(function() {
+
+          /*
+           * Helper to get a appserver run def template
+           */
+          var getAppRunner = function() {
+            return {
+              compose: app.composeCore,
+              project: app.name,
+              opts: {
+                services: ['appserver']
+              }
+            };
+          };
+
+          // Construct our extract definition
+          var linkRun = getAppRunner();
+          linkRun.opts.entrypoint = 'ln';
+          linkRun.opts.cmd = [
+            '-nsf',
+            '/media',
+            '/code/' + process.env.KALABOX_APP_PANTHEON_FILEMOUNT
+          ];
+
+          // Do the linking
+          return engine.run(linkRun);
+
         });
-      }
+      });
+    }
 
-      // If we already have da git then just pull down the correct branch
-      else {
-        var branch = (env === 'dev') ? 'master' : env;
-        return git.cmd(['pull', 'origin', branch], []);
-      }
+    // If we already have da git then just pull down the correct branch
+    else {
+      var branch = (env === 'dev') ? 'master' : env;
+      return git(['pull', 'origin', branch]);
+    }
 
-    });
   };
 
   /*
    * Pull down our sites database
    */
   var pullDB = function(site, env, newBackup) {
-    // Get the cid of this apps database
-    // @todo: this looks gross
-    var dbID = _.result(_.find(app.components, function(cmp) {
-      return cmp.name === 'db';
-    }), 'containerId');
 
-    // Set some default things
-    var wasRunning = null;
-    var defaults = {
-      PublishAllPorts: true,
-      Binds: [app.rootBind + ':/src:rw']
+    /*
+     * Helper to get a DB run def template
+     */
+    var getDbRun = function() {
+      return {
+        compose: app.composeCore,
+        project: app.name,
+        opts: {
+          services: ['db'],
+        }
+      };
     };
 
-    // Check if the DB container is already running
-    return engine.isRunning(dbID)
-
-    // If not running START IT UP
-    .then(function(status) {
-      wasRunning = status;
-      if (!wasRunning) {
-        return engine.start(dbID, defaults);
-      }
-    })
-
-    // GEt the UUID for this site
-    .then(function() {
-      return terminus.getUUID(site);
-    })
-
     // Check if site has a backup
-    .then(function(uuid) {
-      return terminus.hasBackup(uuid, env, 'database');
-    })
+    return terminus.hasBackup(site, env, 'db')
 
     // If no backup or for backup then MAKE THAT SHIT
     .then(function(hasBackup) {
@@ -154,17 +155,16 @@ module.exports = function(kbox, app) {
     })
 
     // Import the backup
-    .then(function(importFile) {
-      // Perform a container run.
-      var payload = ['import-mysql', 'localhost', null, '3306', importFile];
-      return engine.queryData(dbID, payload);
-    })
+    .tap(function(sqlDump) {
 
-    // Stop the DB container if that is how we found it initially
-    .then(function() {
-      if (!wasRunning) {
-        return engine.stop(dbID);
-      }
+      // Construct our import definition
+      var importRun = getDbRun();
+      importRun.opts.entrypoint = 'import-mysql';
+      importRun.opts.cmd = [sqlDump];
+
+      // Perform the run.
+      return engine.run(importRun);
+
     });
 
   };
@@ -173,25 +173,20 @@ module.exports = function(kbox, app) {
    * Pull files via RSYNC
    */
   var pullFilesRsync = function(site, env) {
+
+    // Grab the rsync client
+    var rsync = require('./cmd.js')(kbox, app).rsync;
+
     // Get our UUID
     return terminus.getUUID(site)
 
-    // Generate our code repo URL and CUT THAT MEAT!
-    // errr PULL THAT CODE!
+    // Generate our rsync command
     .then(function(uuid) {
-      // This can have a newline in it that F's everything
-      var siteid = uuid;
 
-      // @todo: lots of cleanup here
       // Hack together an rsync command
-      var envSite = [env, siteid].join('.');
+      var envSite = [env, uuid].join('.');
       var fileBox = envSite + '@appserver.' + envSite + '.drush.in:files/';
-      var fileMount = '/media';
-      var connect = '-rlvz --size-only --ipv4 --progress -e \'ssh -p 2222\'';
-      var opts = [connect, terminus.getExcludes()].join(' ');
-
-      // Rysnc our files
-      return rsync.cmd([opts, fileBox, fileMount], true);
+      return rsync(fileBox, '/media');
 
     });
   };
@@ -201,19 +196,12 @@ module.exports = function(kbox, app) {
    */
   var pullFilesArchive = function(site, env, newBackup) {
 
-    // Get our UUID
-    return terminus.getUUID(site)
-
     // Check if site has a backup
-    .then(function(uuid) {
-      return terminus.hasBackup(uuid, env, 'files');
-    })
+    return terminus.hasBackup(site, env, 'files')
 
     // If no backup or for backup then MAKE THAT SHIT
     .then(function(hasBackup) {
       if (!hasBackup || newBackup) {
-        // @todo: it might make more sense to default to
-        // rsync here?
         return terminus.createBackup(site, env, 'files');
       }
     })
@@ -224,39 +212,45 @@ module.exports = function(kbox, app) {
     })
 
     // Extract the backup and remove
-    .then(function(importFile) {
+    .then(function(filesDump) {
 
-      // Image name
-      var image = 'kalabox/debian:stable';
+      /*
+       * Helper to get a cli run def template
+       */
+      var getFilesRunner = function() {
+        return {
+          compose: app.composeCore,
+          project: app.name,
+          opts: {
+            services: ['appserver'],
+            mode: 'attach'
+          }
+        };
+      };
 
-      // Build create options
-      var createOpts = {};
-
-      // Build start options
-      var startOpts = kbox.util.docker.StartOpts()
-        .bind(app.rootBind, '/src')
-        .volumeFrom(app.dataContainerName)
-        .json();
-
-      // CMD to extract our archive file to /media
-      var extractCmd = [
-        'tar',
+      // Construct our extract definition
+      var extractRun = getFilesRunner();
+      extractRun.opts.entrypoint = 'tar';
+      extractRun.opts.cmd = [
         '-zxvf',
-        importFile,
+        filesDump,
         '--strip-components=1',
         '--overwrite',
         '--directory=/media'
       ];
 
-      // Cmd to remove the archive
-      var rmCmd = ['rm', '-f', importFile];
+      // Construct our remove definition
+      var removeRun = getFilesRunner();
+      removeRun.opts.entrypoint = 'rm';
+      removeRun.opts.cmd = [
+        '-f',
+        filesDump
+      ];
 
-      // Extract the archive
-      return kbox.engine.run(image, extractCmd, createOpts, startOpts)
-
-      // Remove the archive
+      // Extract and then remove the archive
+      return kbox.engine.run(extractRun)
       .then(function() {
-        return kbox.engine.run(image, rmCmd, createOpts, startOpts);
+        return kbox.engine.run(removeRun);
       });
 
     });
