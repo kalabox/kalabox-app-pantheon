@@ -1,11 +1,11 @@
 # Kalabox Pantheon App
-## Overview 
+## Overview
 
 By default Kalabox can pull apps from and push apps to Pantheon... but this is much more than basic push/pull integration. Kalabox will build out a local Pantheon environment for each app. This means `solr`, `redis`, `ssl` and `terminus` all work just like they do on Pantheon. You can also use `drush`, `wp-cli`, `ssl` and toggle `php` version. YAY!
 
 ## Creating and starting a Pantheon app
 
-This will spin up a Pantheon-on-Kalabox environment, set up relevant tools like `terminus`, `drush` and `wp-cli` and pull down the site and environment that you choose. 
+This will spin up a Pantheon-on-Kalabox environment, set up relevant tools like `terminus`, `drush` and `wp-cli` and pull down the site and environment that you choose.
 
 ```bash
 cd ~/dir/i/want/my/app/to/live (usually ~/Desktop/apps)
@@ -22,18 +22,20 @@ kbox start
 ```
 
 **NOTE:** You **must** issue your `kbox create pantheon` from somewhere inside your `HOME` directory.
+**NOTE:** This 'create' functionality actually comes from the core kalabox-pantheon plugin.
 
 ## Tools and working with your code
 
 You can run various Pantheon-helpful tools like terminus. To see a list of all the things run `kbox` from inside of your app directory.
 
 ```bash
-kbox
+Usage: kbox <command> [-- <options>]
 
 Global commands that can be run from anywhere
   apps             Display list of apps.
-  create       
+  create
       pantheon     Creates a Pantheon app.
+  env              Print Kalabox environmental vars.
   update           Run this after you update your Kalabox code.
   version          Display the kbox version.
 
@@ -49,31 +51,36 @@ Actions that can be performed on this app
   stop             Stop a running kbox application.
 
 Commands and tools this app can use
-  drush            Run drush commands.
-  git              Run git commands.
-  rsync            Run rsync commands.
-  terminus         Run terminus commands.
-  wp               Run wp-cli commands.
+  drush            Run a drush command on your codebase
+  git              Run a git command on your codebase
+  rysnc            Run a rsync command on your codebase
+  terminal         Exec into your appserver
+  terminus         Run a terminus command against your codebase
+  wp               Run a wp-cli command against your codebase
+
+Options:
+  -h, --help     Display help message.                                 [boolean]
+  -v, --verbose  Use verbose output.                                   [boolean]
 
 ```
 
 ## Pulling from Pantheon
 
-You can refresh your local code and even your database and files by running `kbox pull` from inside of your Pantheon app. 
+You can refresh your local code and even your database and files by running `kbox pull` from inside of your Pantheon app.
 
 ```
 kbox pull -- -h
 Options:
-  -h, --help     Display help message.                                 
-  -v, --verbose  Use verbose output.                                
+  -h, --help     Display help message.
+  -v, --verbose  Use verbose output.
   --database     Pull DB from an env. Options are dev, test, live and none
   --files        Pull files from an env. Options are dev, test, live and none
-  --newbackup    True to generate a new DB backup                      
+  --newbackup    True to generate a new DB backup
 ```
 
 ## Pushing to Pantheon
 
-You can easily push up code and even your database and files by running `kbox push`. 
+You can easily push up code and even your database and files by running `kbox push`.
 
 ```bash
 Options:
@@ -84,22 +91,29 @@ Options:
   --files        Push files to a spefic env. Options are dev and none   [string]
 ```
 
+## Edge
+
+To bypass varnish and directly hit the appserver you can go to appserver.appname.kbox.
+
 ## SSL
 
 You can use `https` by just typing in `https://myapp.kbox` in your browser. We self-sign the certs so you will need to allow this in your browser.
 
 ## SOLR
 
-Apache Solr comes in each local Pantheon environment. You can use it the exact same way as you do on Pantheon. Reference the [Pantheon docs](https://pantheon.io/docs/articles/sites/apache-solr/) for more information.
+Apache Solr comes in each local Pantheon environment. You can use it the exact same way as you do on Pantheon.
+
+https://pantheon.io/docs/articles/sites/apache-solr/
 
 ## Redis
 
 Just follow the same instructions from Pantheon to get redis to work locally.
+
 https://pantheon.io/docs/articles/sites/redis-as-a-caching-backend/
 
 The TL;DR for Drupal 7 (on php 5.3) here is
 
-1. Install the [redis module](http://drupal.org/project/redis).
+1. Install the [redis module](http://drupal.org/project/redis) (only 2.x supported)
 2. Use this code snippet in settings.php
 
 ```php
@@ -158,4 +172,4 @@ xdebug is set up on your php appserver. Here is an example SublimeText 2 config 
 * [Docker](https://github.com/docker/docker)
 
 -------------------------------------------------------------------------------------
-(C) 2015 Kalamuna and friends
+(C) 2016 Kalabox Inc and friends

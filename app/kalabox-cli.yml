@@ -1,3 +1,16 @@
+#
+# This contains additional services needed by the cli plugin.
+#
+
+#
+# Basic cli tooling.
+#
+# This is a small alpine linux container that contains some basic and common
+# cli tools like git, rsync and bash.
+#
+# It shares your entire user directory in at /usr. It also uses your Pantheon
+# keys and username for its git config.
+#
 cli:
   image: kalabox/cli:dev
   volumes:
@@ -17,9 +30,24 @@ cli:
   working_dir: /code
   stdin_open: true
   tty: true
+
+#
+# Pantheon tooling.
+#
+# This contains additional Pantheon specific tooling options such as
+# drush, wp-cli and terminus.
+#
 terminus:
-  #image: kalabox/terminus:$KALABOX_IMG_VERSION
-  build: ./dockerfiles/terminus
+
+  # Comment this and uncomment 'build' below if you want to edit your
+  # local dockerfile and build from there. This is useful for development
+  image: kalabox/terminus:$KALABOX_IMG_VERSION
+
+  # Uncomment this and comment 'image' above if you want to edit your
+  # local dockerfile and build from there. This is useful for development
+  #
+  # build: ./dockerfiles/terminus
+
   volumes:
     - $KALABOX_ENGINE_HOME:/user
     - $KALABOX_APP_ROOT:/src
