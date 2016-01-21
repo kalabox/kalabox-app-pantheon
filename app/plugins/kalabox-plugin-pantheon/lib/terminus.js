@@ -121,6 +121,14 @@ Terminus.prototype.__request = function(cmd, options) {
         return !response.date && !response.level && !response.message;
       })
 
+      // Catch errors
+      .catch(function(err) {
+        // Some errors are OK
+        if (!_.includes(err.message, 'No backups available.')) {
+          throw new VError(err);
+        }
+      })
+
       // We can assume we only need the first response here
       .then(function(result) {
         log.info('Run returned: ', result);
