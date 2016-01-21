@@ -145,17 +145,19 @@ after-success() {
 
         # PUSH BACK TO OUR GIT REPO
         # Bump our things and reset tags
-        grunt bump-patch
+        # Dont bump or push if this is a new minor version
+        if [ "${DISCO_ARRAY[2]}" -gt "0" ]; then
+          grunt bump-patch
+          # Reset upstream tags so we can push our changes to it
+          # We need to re-add this in because our clone was originally read-only
+          git tag -d $DISCO_TAG
+          git push origin :$DISCO_TAG
 
-        # Reset upstream tags so we can push our changes to it
-        # We need to re-add this in because our clone was originally read-only
-        git tag -d $DISCO_TAG
-        git push origin :$DISCO_TAG
-
-        # Add all our new code and push reset tag with ci skipping on
-        git add --all
-        git commit -m "${COMMIT_MSG} VERSION ${DISCO_TAG} [ci skip]" --author="Kala C. Bot <kalacommitbot@kalamuna.com>" --no-verify
-        git tag $DISCO_TAG
+          # Add all our new code and push reset tag with ci skipping on
+          git add --all
+          git commit -m "${COMMIT_MSG} VERSION ${DISCO_TAG} [ci skip]" --author="Kala C. Bot <kalacommitbot@kalamuna.com>" --no-verify
+          git tag $DISCO_TAG
+        fi
 
         # NODE PACKAGES
         # Deploy to NPM
