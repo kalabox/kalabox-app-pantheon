@@ -125,7 +125,7 @@ Terminus.prototype.__request = function(cmd, options) {
       .catch(function(err) {
         // Some errors are OK
         if (!_.includes(err.message, 'No backups available.')) {
-          throw new VError(err);
+          throw new Error(err);
         }
       })
 
