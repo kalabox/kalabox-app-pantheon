@@ -1,3 +1,43 @@
+#
+# Kalabox Pantheon compose file
+#
+# This contains the core service definitions for Pantheon-on-Kalabox. This
+# is a docker-compose file so please check out the compose file documentation
+# over at https://docs.docker.com/compose/compose-file/.
+#
+# There are, however, a few caveats to take into account kalabox-compose.ymls
+#
+#   1. It is probably a bad idea to use the `container_name` key.
+#
+#   2. You can run `kbox env` inside of your app for a list of environmental
+#      variables that you can use inside of this compose file.
+#
+#   3. Ports need to be exposed to the host on the outside using
+#
+#      ports:
+#       - "PORTNUMBER"
+#
+#      Otherwise they are not usable in the services plugin.
+#
+#    4. The config directory in your app root contains a lot of
+#       service config that is shared into each service. This is all
+#       editable directly and should take on a `kbox restart`.
+#
+
+#
+# This defines a data container to share common Pantheon app assets such as:
+#
+#   1. /media - Static assets like images and compiled css, Your files/wp-uploads
+#               directory is symlinked here
+#
+#   2. /certs - Shared service certs
+#
+#   3. /sql - MariaDB databases to preserve data on rebuilds
+#
+#   4. /code - Your applications codebase, also where you shared code lives
+#
+#   5. /backups - Backups that are downloaded from Pantheon
+#
 data:
   image: busybox
   volumes:
@@ -6,9 +46,35 @@ data:
     - /sql
     - /code
     - /backups
+
+#
+# This defines a Pantheon appserver.
+#
+# We are currently running the same services as the Pantheon appserver with
+# the current exception of apache tika.
+#
+# We also populate this service with similar environmental variables to what
+# you would find on the pantheon appserver so you can make use of things
+# like:
+#
+#   PRESSFLOW_SETTINGS
+#   PANTHEON_ENVIRONMENT
+#   CACHE_HOST
+#
+# Check your services config in kalabox.yml on how to access this directly
+# instead of going through the edge service.
+#
 appserver:
-  #image: kalabox/pantheon-appserver:$KALABOX_IMG_VERSION
-  build: ./dockerfiles/pantheon-appserver
+
+  # Comment this and uncomment 'build' below if you want to edit your
+  # local dockerfile and build from there. This is useful for development
+  image: kalabox/pantheon-appserver:$KALABOX_IMG_VERSION
+
+  # Uncomment this and comment 'image' above if you want to edit your
+  # local dockerfile and build from there. This is useful for development
+  #
+  # build: ./dockerfiles/pantheon-appserver
+
   hostname: $KALABOX_APP_HOSTNAME
   ports:
     - "8888"
@@ -52,16 +118,43 @@ appserver:
     SECURE_AUTH_SALT: $KALABOX_APP_PANTHEON_SECURE_AUTH_SALT
     LOGGED_IN_SALT: $KALABOX_APP_PANTHEON_LOGGED_IN_SALT
     NONCE_SALT: $KALABOX_APP_PANTHEON_NONCE_SALT
+#
+# This defines a Pantheon database server.
+#
 db:
-  #image: kalabox/pantheon-mariadb:$KALABOX_IMG_VERSION
-  build: ./dockerfiles/pantheon-mariadb
+
+  # Comment this and uncomment 'build' below if you want to edit your
+  # local dockerfile and build from there. This is useful for development
+  image: kalabox/pantheon-mariadb:$KALABOX_IMG_VERSION
+
+  # Uncomment this and comment 'image' above if you want to edit your
+  # local dockerfile and build from there. This is useful for development
+  #
+  # build: ./dockerfiles/pantheon-mariadb
+
   volumes:
     - $KALABOX_APP_ROOT_BIND:/src:rw
   volumes_from:
     - data
+
+#
+# This defines a Pantheon edgeserver.
+#
+# This defines SSL termination and varnish configuration to mimic Pantheon.
+# This is what serves your page when you go to appname.kbox. Check
+# your services config on how to change or bypass this.
+#
 edge:
-  #image: kalabox/pantheon-edge:$KALABOX_IMG_VERSION
-  build: dockerfiles/pantheon-edge
+
+  # Comment this and uncomment 'build' below if you want to edit your
+  # local dockerfile and build from there. This is useful for development
+  image: kalabox/pantheon-edge:$KALABOX_IMG_VERSION
+
+  # Uncomment this and comment 'image' above if you want to edit your
+  # local dockerfile and build from there. This is useful for development
+  #
+  # build: dockerfiles/pantheon-edge
+
   links:
     - appserver:web
   volumes:
@@ -73,12 +166,43 @@ edge:
   ports:
     - "80"
     - "443"
+
+#
+# This defines a Pantheon redis server.
+#
+# You should be able to use redis the same way you do on pantheon by
+# following:
+#   https://pantheon.io/docs/articles/sites/redis-as-a-caching-backend/
+#
 redis:
-  #image: kalabox/pantheon-redis:$KALABOX_IMG_VERSION
-  build: dockerfiles/pantheon-redis
+
+  # Comment this and uncomment 'build' below if you want to edit your
+  # local dockerfile and build from there. This is useful for development
+  image: kalabox/pantheon-redis:$KALABOX_IMG_VERSION
+
+  # Uncomment this and comment 'image' above if you want to edit your
+  # local dockerfile and build from there. This is useful for development
+  #
+  # build: dockerfiles/pantheon-redis
+
+#
+# This defines a Pantheon solr server.
+#
+# You should be able to use solr the same way you do on pantheon by
+# following:
+#   https://pantheon.io/docs/articles/sites/apache-solr/
+#
 solr:
+
+  # Comment this and uncomment 'build' below if you want to edit your
+  # local dockerfile and build from there. This is useful for development
   image: kalabox/pantheon-solr:$KALABOX_IMG_VERSION
-  #build: dockerfiles/pantheon-solr
+
+  # Uncomment this and comment 'image' above if you want to edit your
+  # local dockerfile and build from there. This is useful for development
+  #
+  # build: dockerfiles/pantheon-solr
+
   volumes:
    - $KALABOX_APP_ROOT_BIND:/src:rw
   volumes_from:

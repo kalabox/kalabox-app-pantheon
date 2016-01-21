@@ -115,5 +115,3 @@ drush:
   entrypoint: drush8
   postcmdopts: --strict=0
   description: Run a drush 8 command on your codebase
-
-
