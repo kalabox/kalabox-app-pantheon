@@ -335,7 +335,7 @@ Terminus.prototype.connectionInfo = function(site, env) {
 
   // We run this a lot so lets cache per run and do a lookup before we
   // make a request
-  if (self.bindings !== undefined) {
+  if (!_.isEmpty(self.bindings)) {
     return self.kbox.Promise.resolve(self.bindings);
   }
 
