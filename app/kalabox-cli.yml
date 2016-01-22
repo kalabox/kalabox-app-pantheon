@@ -12,7 +12,7 @@
 # keys and username for its git config.
 #
 cli:
-  image: kalabox/cli:dev
+  image: kalabox/cli:$KALABOX_IMG_VERSION
   volumes:
     - $KALABOX_ENGINE_HOME:/user
   volumes_from:
