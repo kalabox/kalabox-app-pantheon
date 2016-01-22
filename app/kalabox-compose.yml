@@ -68,7 +68,7 @@ appserver:
 
   # Comment this and uncomment 'build' below if you want to edit your
   # local dockerfile and build from there. This is useful for development
-  image: kalabox/pantheon-appserver:$KALABOX_IMG_VERSION
+  image: kalabox/pantheon-appserver:$KALABOX_PANTHEON_IMAGE_VERSION
 
   # Uncomment this and comment 'image' above if you want to edit your
   # local dockerfile and build from there. This is useful for development
@@ -125,7 +125,7 @@ db:
 
   # Comment this and uncomment 'build' below if you want to edit your
   # local dockerfile and build from there. This is useful for development
-  image: kalabox/pantheon-mariadb:$KALABOX_IMG_VERSION
+  image: kalabox/pantheon-mariadb:$KALABOX_PANTHEON_IMAGE_VERSION
 
   # Uncomment this and comment 'image' above if you want to edit your
   # local dockerfile and build from there. This is useful for development
@@ -148,7 +148,7 @@ edge:
 
   # Comment this and uncomment 'build' below if you want to edit your
   # local dockerfile and build from there. This is useful for development
-  image: kalabox/pantheon-edge:$KALABOX_IMG_VERSION
+  image: kalabox/pantheon-edge:$KALABOX_PANTHEON_IMAGE_VERSION
 
   # Uncomment this and comment 'image' above if you want to edit your
   # local dockerfile and build from there. This is useful for development
@@ -178,7 +178,7 @@ redis:
 
   # Comment this and uncomment 'build' below if you want to edit your
   # local dockerfile and build from there. This is useful for development
-  image: kalabox/pantheon-redis:$KALABOX_IMG_VERSION
+  image: kalabox/pantheon-redis:$KALABOX_PANTHEON_IMAGE_VERSION
 
   # Uncomment this and comment 'image' above if you want to edit your
   # local dockerfile and build from there. This is useful for development
@@ -196,7 +196,7 @@ solr:
 
   # Comment this and uncomment 'build' below if you want to edit your
   # local dockerfile and build from there. This is useful for development
-  image: kalabox/pantheon-solr:$KALABOX_IMG_VERSION
+  image: kalabox/pantheon-solr:$KALABOX_PANTHEON_IMAGE_VERSION
 
   # Uncomment this and comment 'image' above if you want to edit your
   # local dockerfile and build from there. This is useful for development
