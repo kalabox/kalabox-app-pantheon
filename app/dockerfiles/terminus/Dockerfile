@@ -2,7 +2,7 @@
 # docker build -t kalabox/terminus .
 # docker run -d -e PHP_VERSION=55 -e FRAMEWORK=backdrop kalabox/pantheon-appserver
 
-FROM kalabox/pantheon-appserver:v0.11.0
+FROM kalabox/pantheon-appserver:dev
 
 # Set Customization options
 ENV PHP_VERSION 55
