@@ -112,6 +112,10 @@ wp:
 drush:
   service: terminus
   stripfirst: true
-  entrypoint: drush8
+  entrypoint:
+    - bash
+    - --login
+    - -c
+  precmdopts: drush8
   postcmdopts: --strict=0
   description: Run a drush 8 command on your codebase
