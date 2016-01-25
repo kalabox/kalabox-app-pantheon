@@ -22,6 +22,7 @@ RUN \
   chmod +x /usr/local/bin/terminus && \
   mkdir -p /usr/share/drush/commands && mkdir -p /root/.terminus/cache && \
   cd /usr/share/drush/commands && \
+  curl -L "http://ftp.drupal.org/files/projects/registry_rebuild-7.x-2.3.tar.gz" | tar -zvx && \
   curl -O "https://raw.githubusercontent.com/drush-ops/config-extra/1.0.1/config_extra.drush.inc" && \
   apt-get -y clean && \
   apt-get -y autoclean && \
