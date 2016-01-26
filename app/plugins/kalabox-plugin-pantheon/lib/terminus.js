@@ -179,10 +179,32 @@ Terminus.prototype.wakeSite = function(site, env) {
 Terminus.prototype.getConnectionMode = function(site, env) {
 
   // Grab the data
+  // Until https://github.com/pantheon-systems/cli/issues/844 is resolved
+  // lets not try to grab --field=connection_mode for now and just
+  // return connection_mode if it exists or some default (git?) if it
+  // doesnt
   return this.__request(
-    ['site', 'environment-info', '--field=connection_mode'],
+    ['site', 'environment-info'],
     ['--format=json', '--site=' + site, '--env=' + env]
-  );
+  )
+
+  // Return the connection mode if we have it
+  .then(function(environment) {
+    if (_.has(environment[0], 'connection_mode')) {
+      // jshint camelcase:false
+      // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
+      return environment[0].connection_mode;
+      // jshint camelcase:true
+      // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
+    }
+    // It's probably safest to assume this is sftp even if it isnt
+    // this way we don't overwrite any changes and it forces us to
+    // actually set the connection mode so it doesnt return null
+    // next time
+    else {
+      return 'sftp';
+    }
+  });
 
 };
 
