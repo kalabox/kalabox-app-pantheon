@@ -93,11 +93,17 @@ Options:
 
 ## Edge
 
-To bypass varnish and directly hit the appserver you can go to appserver.appname.kbox.
+To see what your site is like/how it behaves hitting the pantheon varnish
+edge you can go to `http(s)://edge.myapp.kbox`. **Note that this
+will likely interfere with your code sharing since varnish will be serving
+you back a cached page and not what is actually on your appserver.**
 
 ## SSL
 
-You can use `https` by just typing in `https://myapp.kbox` in your browser. We self-sign the certs so you will need to allow this in your browser.
+You can use `https` by just typing in `https://edge.myapp.kbox` in your browser. We self-sign the certs so you will need to allow this in your browser.
+
+Pantheon's ssl layer is at the edge so you need to route your traffic
+through there for now.
 
 ## SOLR
 
