@@ -26,7 +26,7 @@ module.exports = function(kbox, app) {
     .tap(function(connectionMode) {
 
       // If we are in SFTP mode check for changes
-      if (!_.includes(connectionMode, 'git')) {
+      if (connectionMode !== 'git') {
 
         return terminus.hasChanges(site, env)
         .then(function(hasChanges) {
