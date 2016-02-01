@@ -41,7 +41,7 @@
 data:
   image: busybox
   volumes:
-    - /media
+    - $KALABOX_APP_ROOT_BIND/files:/media:rw
     - /certs
     - /sql
     - /code
