@@ -89,6 +89,8 @@ terminus:
     NONCE_SALT: $KALABOX_APP_PANTHEON_NONCE_SALT
   links:
     - db:database
+    - redis:redis
+    - solr:solr
   working_dir: /code
   stdin_open: true
   tty: true
