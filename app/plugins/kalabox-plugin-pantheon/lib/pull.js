@@ -5,6 +5,7 @@ module.exports = function(kbox, app) {
   // Node modules.
   var fs = require('fs');
   var path = require('path');
+  var util = require('util');
 
   // Npm modules
   var _ = require('lodash');
@@ -24,6 +25,50 @@ module.exports = function(kbox, app) {
     var gitFile = path.join(app.config.syncthing.codeRoot, '.git');
     return !fs.existsSync(gitFile);
   });
+
+  /*
+   * Pull down the site's screenshot for use in the gui.
+   */
+  var pullScreenshot = function(site, env) {
+
+    // Get site aliases.
+    return terminus.getSiteAliases()
+    // Get UUID of site.
+    .then(function() {
+      return terminus.getUUID(site);
+    })
+    // Download screenshot.
+    .then(function(uuid) {
+      // Name of the image.
+      var imageFilename = util.format(
+        '%s_%s.png',
+        uuid,
+        env
+       );
+      // Url of the image to download.
+      var imageUrl = util.format(
+        'http://s3.amazonaws.com/pantheon-screenshots/%s',
+        imageFilename
+      );
+      // Folder to download image to.
+      var downloadFolder = app.config.appRoot;
+      // Download file.
+      return kbox.util.download.downloadFiles([imageUrl], downloadFolder)
+      // Rename file to scrrenshot.png.
+      .then(function() {
+        var src = path.join(downloadFolder, imageFilename);
+        var dest = path.join(downloadFolder, 'screenshot.png');
+        return kbox.Promise.fromNode(function(cb) {
+          fs.rename(src, dest, cb);
+        });
+      });
+    })
+    // Ignore errors.
+    .catch(function() {
+
+    });
+
+  };
 
   /*
    * Pull down our sites code
@@ -274,7 +319,8 @@ module.exports = function(kbox, app) {
   return {
     pullCode: pullCode,
     pullDB: pullDB,
-    pullFiles: pullFiles
+    pullFiles: pullFiles,
+    pullScreenshot: pullScreenshot
   };
 
 };
