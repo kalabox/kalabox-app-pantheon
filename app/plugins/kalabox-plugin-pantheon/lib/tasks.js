@@ -246,6 +246,11 @@ module.exports = function(kbox) {
           // Report to metrics.
           return kbox.metrics.reportAction('pull')
 
+          // Pull screenshot
+          .then(function() {
+            return puller.pullScreenshot(pantheonConf.site, pantheonConf.env);
+          })
+
           // Pull our code
           .then(function() {
             return puller.pullCode(pantheonConf.site, pantheonConf.env);

@@ -25,6 +25,10 @@ module.exports = function(kbox) {
         var config = app.config.pluginconfig.pantheon;
         // Grab pantheon aliases
         return terminus.getSiteAliases()
+        // Pull screensho
+        .then(function() {
+          return puller.pullScreenshot(config.site, config.env);
+        })
         // Pull our code
         .then(function() {
           self.update('Pulling code.');
