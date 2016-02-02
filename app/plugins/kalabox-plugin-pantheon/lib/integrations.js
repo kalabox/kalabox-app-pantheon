@@ -13,38 +13,35 @@ module.exports = function(kbox) {
     var terminus = new Terminus(kbox, app);
 
     // Set the integrations pull method.
-    kbox.integrations.get('pantheon').setMethod('pull', function() {
+    kbox.integrations.get('pantheon').setMethod('pull', function(opts) {
       var self = this;
-      return self.ask([
-        {
-          id: 'shouldPullFiles'
-        },
-        {
-          id: 'shouldPullDatabase'
-        }
-      ])
-      .then(function(answers) {
+      // Default option handling.
+      opts = opts || {};
+      opts.files = opts.files || true;
+      opts.database = opts.database || true;
+			// Pull.
+      return kbox.Promise.try(function() {
         // Grab pantheon config so we can mix in interactives
-        var pantheonConf = app.config.pluginConf['kalabox-plugin-pantheon'];
+        var config = app.config.pluginconfig.pantheon;
         // Grab pantheon aliases
         return terminus.getSiteAliases()
         // Pull our code
         .then(function() {
           self.update('Pulling code.');
-          return puller.pullCode(pantheonConf.site, pantheonConf.env);
+          return puller.pullCode(config.site, config.env);
         })
         // Pull our DB if selected
         .then(function() {
-          if (answers.shouldPullDatabase) {
+          if (opts.database) {
             self.update('Pulling database.');
-            return puller.pullDB(pantheonConf.site, pantheonConf.env);
+            return puller.pullDB(config.site, config.env);
           }
         })
         // Pull our files if selected
         .then(function() {
-          if (answers.shouldPullFiles) {
+          if (opts.files) {
             self.update('Pulling files.');
-            return puller.pullFiles(pantheonConf.site, pantheonConf.env);
+            return puller.pullFiles(config.site, config.env);
           }
         })
         .then(function() {
@@ -54,50 +51,41 @@ module.exports = function(kbox) {
     });
 
     // Set the integrations push method.
-    kbox.integrations.get('pantheon').setMethod('push', function() {
+    kbox.integrations.get('pantheon').setMethod('push', function(opts) {
       // Save reference for later.
       var self = this;
+			// Default options.
+      opts = opts || {};
+      opts.message = opts.message || 'No commit message given.';
+      opts.database = opts.database || false;
+      opts.files = opts.files || false;
       // Get plugin.
-      var pantheonConf = app.config.pluginConf['kalabox-plugin-pantheon'];
+      var config = app.config.pluginconfig.pantheon;
       // Get site aliases.
       return kbox.Promise.try(function() {
         return terminus.getSiteAliases();
       })
-      // Ask questions.
-      .then(function() {
-        return self.ask([
-          {
-            id: 'message'
-          },
-          {
-            id: 'database'
-          },
-          {
-            id: 'files'
-          }
-        ]);
-      })
       // Push code.
-      .tap(function(answers) {
+      .tap(function() {
         self.update('Pushing code.');
         return pusher.pushCode(
-          pantheonConf.site,
-          pantheonConf.env,
-          answers.message
+          config.site,
+          config.env,
+          opts.message
         );
       })
       // Push database.
-      .tap(function(answers) {
-        if (answers.database && answers.database !== 'none') {
+      .tap(function() {
+        if (opts.database) {
           self.update('Pushing database.');
-          return pusher.pushDB(pantheonConf.site, answers.database);
+          return pusher.pushDB(config.site, config.env);
         }
       })
       // Push files.
-      .tap(function(answers) {
-        if (answers.files && answers.files !== 'none') {
+      .tap(function() {
+        if (opts.files) {
           self.update('Pushing files.');
-          return pusher.pushFiles(pantheonConf.site, answers.files);
+          return pusher.pushFiles(config.site, config.env);
         }
       })
       // Signal completion.
