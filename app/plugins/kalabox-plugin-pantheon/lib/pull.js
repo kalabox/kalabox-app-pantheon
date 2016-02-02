@@ -35,7 +35,7 @@ module.exports = function(kbox, app) {
     return terminus.getSiteAliases()
     // Get UUID of site.
     .then(function() {
-      return terminus.getUUID(site)
+      return terminus.getUUID(site);
     })
     // Download screenshot.
     .then(function(uuid) {
