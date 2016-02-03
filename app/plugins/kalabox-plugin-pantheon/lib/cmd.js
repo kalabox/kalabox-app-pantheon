@@ -13,7 +13,7 @@ module.exports = function(kbox, app) {
       compose: app.composeCore,
       project: app.name,
       opts: {
-        mode: 'attach',
+        mode: 'collect',
         services: ['cli']
       }
     };
