@@ -44,7 +44,7 @@ RUN \
   curl -sS https://getcomposer.org/installer | php && \
   mv composer.phar /usr/local/bin/composer && \
   ln -s /usr/local/bin/composer /usr/bin/composer && \
-  curl https://github.com/drush-ops/drush/releases/download/8.0.2/drush.phar -L -o /usr/local/bin/drush8 && \
+  curl https://github.com/drush-ops/drush/releases/download/8.0.3/drush.phar -L -o /usr/local/bin/drush8 && \
   chmod +x /usr/local/bin/drush8 && \
   cd /tmp && curl -O 'http://download.gna.org/wkhtmltopdf/0.12/0.12.2.1/wkhtmltox-0.12.2.1_linux-wheezy-amd64.deb' && \
   dpkg -i /tmp/wkhtmltox-0.12.2.1_linux-wheezy-amd64.deb && \
