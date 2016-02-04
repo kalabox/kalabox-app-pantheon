@@ -53,7 +53,7 @@ Actions that can be performed on this app
 Commands and tools this app can use
   drush            Run a drush command on your codebase
   git              Run a git command on your codebase
-  rysnc            Run a rsync command on your codebase
+  rsync            Run a rsync command on your codebase
   terminal         Exec into your appserver
   terminus         Run a terminus command against your codebase
   wp               Run a wp-cli command against your codebase
