@@ -13,7 +13,7 @@ module.exports = function(kbox, app) {
       compose: app.composeCore,
       project: app.name,
       opts: {
-        mode: 'collect',
+        mode: kbox.core.deps.get('mode') === 'gui' ? 'collect' : 'attach',
         services: ['cli']
       }
     };

@@ -268,7 +268,7 @@ module.exports = function(kbox, app) {
           project: app.name,
           opts: {
             services: ['appserver'],
-            mode: 'attach'
+            mode: kbox.core.deps.get('mode') === 'gui' ? 'collect' : 'attach'
           }
         };
       };
