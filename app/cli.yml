@@ -58,7 +58,7 @@ git:
 #
 # This will run relative to your webroot.
 #
-rysnc:
+rsync:
   service: cli
   entrypoint: rsync
   description: Run a rsync command on your codebase
