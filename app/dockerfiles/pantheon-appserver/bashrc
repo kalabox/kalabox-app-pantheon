@@ -1,9 +1,10 @@
 #!/bin/bash
 
 # Drupal8 needs /media/styles to exist for Drops8
-# @todo: is this still true?
+# It also needs $HOME/tmp to exist
 if [ $FRAMEWORK == "drupal8" ]; then
   mkdir -p /media/styles
+  mkdir -p ${HOME}/tmp
 fi
 
 # /srv/binding emulation
