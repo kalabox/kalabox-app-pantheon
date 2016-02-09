@@ -111,7 +111,7 @@ Terminus.prototype.__request = function(cmd, options) {
         }
         catch (e) {
           // Pass in valid json that we know will be filtered out
-          return {data: 'now'};
+          return {date: 'now'};
         }
         return JSON.parse(response);
       })
