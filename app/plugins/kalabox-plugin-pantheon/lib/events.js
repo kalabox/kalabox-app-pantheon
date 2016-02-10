@@ -29,8 +29,13 @@ module.exports = function(kbox) {
       // Our pantheon config for later on
       var pantheonConf = app.config.pluginconfig.pantheon;
 
+      // Pull the pantheon site screenshot
+      return puller.pullScreenshot(pantheonConf.site, pantheonConf.env)
+
       // Pull our code for the first time
-      return puller.pullCode(pantheonConf.site, pantheonConf.env)
+      .then(function() {
+        return puller.pullCode(pantheonConf.site, pantheonConf.env);
+      })
 
       // Pull our DB
       .then(function() {
