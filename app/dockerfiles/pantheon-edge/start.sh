@@ -4,7 +4,7 @@
 # @todo: lots of clean up to do here
 if [ ! -f "/certs/edge-ssl-termination.pem" ]; then
   openssl genrsa -out /certs/edge-ssl-termination.key 2048 && \
-  openssl req -new -x509 -key /certs/edge-ssl-termination.key -out /certs/edge-ssl-termination.crt -days 365 -subj "/C=US/ST=California/L=San Francisco/O=Kalabox/OU=KB/CN=edge.${DOMAIN}" && \
+  openssl req -new -x509 -key /certs/edge-ssl-termination.key -out /certs/edge-ssl-termination.crt -days 365 -subj "/C=US/ST=California/L=San Francisco/O=Kalabox/OU=KB/CN=edge" && \
   cat /certs/edge-ssl-termination.crt /certs/edge-ssl-termination.key > /certs/edge-ssl-termination.pem
 fi
 

@@ -119,6 +119,9 @@ pluginconfig:
     appserver:
       - port: 8888/tcp
         default: true
+      - port: 444/tcp
+        default: true
+        secure: true
     edge:
       - port: 80/tcp
         hostname: edge

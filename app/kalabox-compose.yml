@@ -78,6 +78,7 @@ appserver:
   hostname: $KALABOX_APP_HOSTNAME
   ports:
     - "8888"
+    - "444"
   volumes:
     - $KALABOX_APP_ROOT_BIND:/src:rw
   volumes_from:
