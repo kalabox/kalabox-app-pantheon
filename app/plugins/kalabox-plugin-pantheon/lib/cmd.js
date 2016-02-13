@@ -5,6 +5,9 @@ module.exports = function(kbox, app) {
   // npm modules
   var _ = require('lodash');
 
+  // Kalabox mods
+  var env = kbox.core.env;
+
   /*
    * Cli container def
    */
@@ -34,6 +37,7 @@ module.exports = function(kbox, app) {
     log.info(runDef);
 
     return kbox.Promise.retry(function() {
+      env.setEnv('KALABOX_CLI_WORKING_DIR', '/code');
       return kbox.engine.run(runDef);
     });
   };
