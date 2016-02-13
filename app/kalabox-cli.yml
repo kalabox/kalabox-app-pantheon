@@ -27,7 +27,7 @@ cli:
     GIT_COMMITTER_EMAIL: $KALABOX_APP_PANTHEON_CONFIG_EMAIL
   links:
     - db:database
-  working_dir: /code
+  working_dir: $KALABOX_CLI_WORKING_DIR
   stdin_open: true
   tty: true
 
@@ -91,6 +91,6 @@ terminus:
     - db:database
     - redis:redis
     - solr:solr
-  working_dir: /code
+  working_dir: $KALABOX_CLI_WORKING_DIR
   stdin_open: true
   tty: true
