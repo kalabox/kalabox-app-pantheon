@@ -31,6 +31,10 @@
 #
 #   postcmdopts: [string] - A string to append to the user entered command.
 #
+#   mapping: [string] - A string that maps an approot path to a path inside the container
+#     so we can set a accurate working directory for our task. You can use <> notation to
+#     map to other properties on the app object
+#
 #
 # NOTE: You will want to make sure your services correctly set relevant options
 # such as sharing config files or the working directory.
@@ -52,6 +56,7 @@ git:
   stripfirst: true
   entrypoint: kgit
   description: Run a git command on your codebase
+  mapping: <config.syncthing.codeDir>:/code
 
 #
 # Adds a rsync command to your Pantheon app.
@@ -62,6 +67,7 @@ rsync:
   service: cli
   entrypoint: rsync
   description: Run a rsync command on your codebase
+  mapping: files:/media
 
 #
 # This will drop you into a bash shell on your appserver
@@ -88,6 +94,7 @@ terminus:
     - --login
     - -c
   description: Run a terminus command on your codebase
+  mapping: <config.syncthing.codeDir>:/code
 
 #
 # Adds a wp-cli command to your pantheon app.
@@ -99,6 +106,7 @@ wp:
   entrypoint: wp
   precmdopts: --allow-root
   description: Run a wp-cli command on your codebase
+  mapping: <config.syncthing.codeDir>:/code
 
 #
 # Adds a drush 8 command to your pantheon app.
@@ -119,3 +127,4 @@ drush:
   precmdopts: drush8
   postcmdopts: --strict=0
   description: Run a drush 8 command on your codebase
+  mapping: <config.syncthing.codeDir>:/code
