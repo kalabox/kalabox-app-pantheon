@@ -31,6 +31,8 @@ module.exports = function(kbox, app) {
    */
   var pullScreenshot = function(site, env) {
 
+    kbox.status.update('Pulling screenshot.');
+
     // Get site aliases.
     return terminus.getSiteAliases()
     // Get UUID of site.
@@ -74,6 +76,8 @@ module.exports = function(kbox, app) {
    * Pull down our sites code
    */
   var pullCode = function(site, env) {
+
+    kbox.status.update('Pulling code.');
 
     // Determine correct operation
     var type = (firstTime()) ? 'clone' : 'pull';
@@ -170,6 +174,8 @@ module.exports = function(kbox, app) {
    * Pull down our sites database
    */
   var pullDB = function(site, env, newBackup) {
+
+    kbox.status.update('Pulling database.');
 
     /*
      * Helper to get a DB run def template
@@ -305,6 +311,9 @@ module.exports = function(kbox, app) {
    * Pull down our sites database
    */
   var pullFiles = function(site, env, newBackup) {
+
+    kbox.status.update('Pulling files.');
+
     // If this is the first time we want to grab the files from an archive
     // since this will be way faster. subsequent pulls we will use rsync since
     // this will be way faster
