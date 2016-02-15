@@ -61,12 +61,12 @@ git:
 #
 # Adds a rsync command to your Pantheon app.
 #
-# This will run relative to your webroot.
+# This will run relative to your files directory.
 #
 rsync:
   service: cli
   entrypoint: rsync
-  description: Run a rsync command on your codebase
+  description: Run a rsync command on your files directory
   mapping: files:/media
 
 #
@@ -93,7 +93,7 @@ terminus:
     - bash
     - --login
     - -c
-  description: Run a terminus command on your codebase
+  description: Run a terminus command
   mapping: <config.syncthing.codeDir>:/code
 
 #
@@ -127,4 +127,99 @@ drush:
   precmdopts: drush8
   postcmdopts: --strict=0
   description: Run a drush 8 command on your codebase
+  mapping: <config.syncthing.codeDir>:/code
+
+#
+# Adds a php cli command to your pantheon app.
+#
+# Commands will be run relative to your webroot.
+#
+php:
+  service: terminus
+  entrypoint:
+    - bash
+    - --login
+    - -c
+  description: Run a php cli command
+  mapping: <config.syncthing.codeDir>:/code
+
+#
+# Adds a composer command to your pantheon app.
+#
+# Commands will be run relative to your webroot.
+#
+composer:
+  service: terminus
+  entrypoint:
+    - bash
+    - --login
+    - -c
+  description: Run a php cli command
+  mapping: <config.syncthing.codeDir>:/code
+
+#
+# Adds a mysql command to your pantheon app.
+#
+# Commands will be run relative to your webroot.
+#
+mysql:
+  service: appserver
+  precmdopts: -upantheon
+  entrypoint: mysql
+  description: Drop into a mysql shell
+  mapping: <config.syncthing.codeDir>:/code
+
+#
+# Adds a node command to your pantheon app.
+#
+# Commands will be run relative to your webroot.
+#
+node:
+  service: cli
+  entrypoint: node
+  description: Run a node command
+  mapping: <config.syncthing.codeDir>:/code
+
+#
+# Adds a npm command to your pantheon app.
+#
+# Commands will be run relative to your webroot.
+#
+npm:
+  service: cli
+  entrypoint: npm
+  description: Run a npm command
+  mapping: <config.syncthing.codeDir>:/code
+
+#
+# Adds a grunt command to your pantheon app.
+#
+# Commands will be run relative to your webroot.
+#
+grunt:
+  service: cli
+  entrypoint: grunt
+  description: Run a grunt command
+  mapping: <config.syncthing.codeDir>:/code
+
+#
+# Adds a gulp command to your pantheon app.
+#
+# Commands will be run relative to your webroot.
+#
+gulp:
+  service: cli
+  entrypoint: gulp
+  description: Run a gulp command
+  mapping: <config.syncthing.codeDir>:/code
+
+#
+# Adds a bower command to your pantheon app.
+#
+# Commands will be run relative to your webroot.
+#
+bower:
+  service: cli
+  entrypoint: bower
+  description: Run a bower command
   mapping: <config.syncthing.codeDir>:/code
