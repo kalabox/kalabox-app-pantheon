@@ -168,3 +168,58 @@ mysql:
   entrypoint: mysql
   description: Drop into a mysql shell
   mapping: <config.syncthing.codeDir>:/code
+
+#
+# Adds a node command to your pantheon app.
+#
+# Commands will be run relative to your webroot.
+#
+node:
+  service: cli
+  entrypoint: node
+  description: Run a node command
+  mapping: <config.syncthing.codeDir>:/code
+
+#
+# Adds a npm command to your pantheon app.
+#
+# Commands will be run relative to your webroot.
+#
+npm:
+  service: cli
+  entrypoint: npm
+  description: Run a npm command
+  mapping: <config.syncthing.codeDir>:/code
+
+#
+# Adds a grunt command to your pantheon app.
+#
+# Commands will be run relative to your webroot.
+#
+grunt:
+  service: cli
+  entrypoint: grunt
+  description: Run a grunt command
+  mapping: <config.syncthing.codeDir>:/code
+
+#
+# Adds a gulp command to your pantheon app.
+#
+# Commands will be run relative to your webroot.
+#
+gulp:
+  service: cli
+  entrypoint: gulp
+  description: Run a gulp command
+  mapping: <config.syncthing.codeDir>:/code
+
+#
+# Adds a bower command to your pantheon app.
+#
+# Commands will be run relative to your webroot.
+#
+bower:
+  service: cli
+  entrypoint: bower
+  description: Run a bower command
+  mapping: <config.syncthing.codeDir>:/code
