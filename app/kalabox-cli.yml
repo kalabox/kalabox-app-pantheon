@@ -51,6 +51,7 @@ terminus:
   volumes:
     - $KALABOX_ENGINE_HOME:/user
     - $KALABOX_APP_ROOT:/src
+    - $KALABOX_APP_ROOT/config/terminus/:/root/.terminus/cache
     - $KALABOX_ENGINE_HOME/.kalabox/pantheon/session/$KALABOX_APP_PANTHEON_CONFIG_EMAIL:/root/.terminus/cache/session
     - $KALABOX_APP_ROOT/config/drush:/root/.drush
   volumes_from:
