@@ -10,7 +10,6 @@ This will spin up a Pantheon-on-Kalabox environment, set up relevant tools like 
 ```bash
 cd ~/dir/i/want/my/app/to/live (usually ~/Desktop/apps)
 kbox create pantheon # and follow the prompts
-kbox start
 ```
 
 Or you can run non-interactively
@@ -18,7 +17,6 @@ Or you can run non-interactively
 ```bash
 cd ~/dir/i/want/my/app/to/live (usually ~/Desktop/apps)
 kbox create pantheon -- --email=me@me.com --password=**** --site=pantheon-site --env=pantheon-env --name=myApp
-kbox start
 ```
 
 **NOTE:** You **must** issue your `kbox create pantheon` from somewhere inside your `HOME` directory.
@@ -32,31 +30,44 @@ You can run various Pantheon-helpful tools like terminus. To see a list of all t
 Usage: kbox <command> [-- <options>]
 
 Global commands that can be run from anywhere
-  apps             Display list of apps.
   create
       pantheon     Creates a Pantheon app.
   env              Print Kalabox environmental vars.
+  list             Display list of apps.
   update           Run this after you update your Kalabox code.
   version          Display the kbox version.
 
 Actions that can be performed on this app
   config           Display the kbox application's configuration.
-  containers       Display list of application's installed containers.
   destroy          Completely destroys and removes an app.
   pull             Pull down new code and optionally data and files.
   push             Push up new code and optionally data and files.
   rebuild          Rebuilds your app while maintaining your app data.
   restart          Stop and then start a running kbox application.
+  services         Display connection info for services.
   start            Start an installed kbox application.
   stop             Stop a running kbox application.
 
 Commands and tools this app can use
-  drush            Run a drush command on your codebase
+  bower            Run a bower command
+  composer         Run a php cli command
+  drush            Run a drush 8 command on your codebase
   git              Run a git command on your codebase
-  rsync            Run a rsync command on your codebase
-  terminal         Exec into your appserver
-  terminus         Run a terminus command against your codebase
-  wp               Run a wp-cli command against your codebase
+  grunt            Run a grunt command
+  gulp             Run a gulp command
+  mysql            Drop into a mysql shell
+  node             Run a node command
+  npm              Run a npm command
+  php              Run a php cli command
+  rsync            Run a rsync command on your files directory
+  terminal         'ssh' into your appserver
+  terminus         Run a terminus command
+  wp               Run a wp-cli command on your codebase
+
+Some things that are useful for development
+  down             Bring kbox container engine down.
+  status           Display status of kbox container engine.
+  up               Bring kbox container engine up.
 
 Options:
   -h, --help     Display help message.                                 [boolean]
@@ -91,6 +102,81 @@ Options:
   --files        Push files to a spefic env. Options are dev and none   [string]
 ```
 
+## Connecting to your database
+
+You can connect to your database using a third-party tool such as SequelPro
+or SqlWorkbench. To get the connection info run `kbox services` from inside a running pantheon app.
+
+```
+kbox services
+[
+  {
+    "name": "edge",
+    "project": "playbox",
+    "url": [
+      "http://edge.playbox.kbox",
+      "https://edge.playbox.kbox"
+    ]
+  },
+  {
+    "name": "appserver",
+    "project": "playbox",
+    "url": [
+      "http://playbox.kbox",
+      "https://playbox.kbox"
+    ]
+  },
+  {
+    "name": "db",
+    "project": "playbox",
+    "credentials": {
+      "database": "pantheon",
+      "user": "pantheon",
+      "password": "",
+      "host": "10.13.37.100",
+      "port": "32783"
+    }
+  },
+  {
+    "name": "solr",
+    "project": "playbox"
+  },
+  {
+    "name": "redis",
+    "project": "playbox"
+  }
+]
+```
+
+Your connection info will be listed in the DB object. This information
+may change between restarts.
+
+```json
+  {
+    "name": "db",
+    "project": "playbox",
+    "credentials": {
+      "database": "pantheon",
+      "user": "pantheon",
+      "password": "",
+      "host": "10.13.37.100",
+      "port": "32783"
+    }
+  }
+```
+
+## Using CLI tools
+
+We package a lot of common CLI tools into your app. You can use most of these
+more or less like you would if you had them natively installed. Here is a
+brief example of doing an `npm install` on a theme.
+
+```bash
+cd /path/to/my/pantheon/app
+cd code/sites/all/themes/kalatheme
+kbox npm install
+```
+
 ## Edge
 
 To see what your site is like/how it behaves hitting the pantheon varnish
@@ -100,10 +186,10 @@ you back a cached page and not what is actually on your appserver.**
 
 ## SSL
 
-You can use `https` by just typing in `https://edge.myapp.kbox` in your browser. We self-sign the certs so you will need to allow this in your browser.
+You can use `https` by just typing in `https://myapp.kbox` in your browser. We self-sign the certs so you will need to allow this in your browser.
 
-Pantheon's ssl layer is at the edge so you need to route your traffic
-through there for now.
+Pantheon's ssl layer is at the edge so if you want to test SSL in a more
+realistica way you should route your traffic through our edgeserver at https://edge.myapp.kbox.
 
 ## SOLR
 
