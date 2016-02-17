@@ -89,6 +89,8 @@ Options:
   --newbackup    True to generate a new DB backup
 ```
 
+**Important:** To avoid slow pulls on larger sites, Kalabox pulls from Pantheon's database backups, instead of the active database. If you would like to retrieve the most recent version of your database, you will need to indicate y when asked Retrieve latest DB instead of most recent backup? (y/N) or use the --newbackup flag.
+
 ## Pushing to Pantheon
 
 You can easily push up code and even your database and files by running `kbox push`.
