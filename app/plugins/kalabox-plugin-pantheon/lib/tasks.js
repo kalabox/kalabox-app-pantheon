@@ -71,7 +71,7 @@ module.exports = function(kbox) {
         {
           type: 'list',
           name: 'database',
-          message: 'Which database do you want to use?',
+          message: 'Which database backup do you want to use?',
           choices: function() {
 
             // Get approved choices
@@ -94,7 +94,7 @@ module.exports = function(kbox) {
         {
           type: 'confirm',
           name: 'newbackup',
-          message: 'Create a new DB backup?',
+          message: 'Retrieve latest DB instead of most recent backup? (y/N)',
           when: function(answers) {
             var optDb = options.database;
             var anDb = answers.database;

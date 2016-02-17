@@ -35,8 +35,9 @@ module.exports = function(kbox, app) {
           // If we have uncommmited changes throw error
           if (hasChanges) {
             var msg = [
-              'Kalabox has detected you have uncommitted changes.',
-              'Please commit those changes and try kbox push again'
+              'Kalabox has detected you have uncommitted changes on Pantheon.',
+              'Please login to your Pantheon dashboard commit those changes',
+              'and then try kbox push again.'
             ];
             throw new Error(msg.join(' '));
           }
