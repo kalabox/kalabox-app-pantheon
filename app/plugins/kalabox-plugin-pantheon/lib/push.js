@@ -18,7 +18,7 @@ module.exports = function(kbox, app) {
    */
   var pushCode = function(site, env, message) {
 
-    kbox.status.update('Pushing code.');
+    kbox.core.log.status('Pushing code.');
 
     // Check to see what our connection mode is
     return terminus.getConnectionMode(site, env)
@@ -87,7 +87,7 @@ module.exports = function(kbox, app) {
    */
   var pushDB = function(site, env) {
 
-    kbox.status.update('Pushing database.');
+    kbox.core.log.status('Pushing database.');
 
     /*
      * Helper to get a DB run def template
@@ -148,7 +148,7 @@ module.exports = function(kbox, app) {
    */
   var pushFiles = function(site, env) {
 
-    kbox.status.update('Pushing files.');
+    kbox.core.log.status('Pushing files.');
 
     // Grab the rsync client
     var rsync = require('./cmd.js')(kbox, app).rsync;
