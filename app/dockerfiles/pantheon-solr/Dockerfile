@@ -1,6 +1,6 @@
 # docker build -t kalabox/solr:mytag .
 
-FROM kalabox/debian:stable
+FROM debian:jesse
 
 RUN \
   apt-get -y update && \
