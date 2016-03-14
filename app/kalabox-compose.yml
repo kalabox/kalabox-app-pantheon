@@ -144,7 +144,7 @@ db:
     - $KALABOX_APP_ROOT_BIND/config/mysql/import.sh:/usr/local/bin/import-mysql:rw
     - $KALABOX_APP_ROOT_BIND/config/mysql/dump.sh:/usr/local/bin/dump-mysql:rw
     - $KALABOX_APP_ROOT_BIND/config/mysql/export.sh:/usr/local/bin/export-mysql:rw
-    - $KALABOX_APP_ROOT_BING/config/mysql:/etc/mysql/conf.d
+    - $KALABOX_APP_ROOT_BIND/config/mysql:/etc/mysql/conf.d
   volumes_from:
     - data
 
