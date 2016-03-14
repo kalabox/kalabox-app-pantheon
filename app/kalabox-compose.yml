@@ -127,17 +127,20 @@ db:
 
   # Comment this and uncomment 'build' below if you want to edit your
   # local dockerfile and build from there. This is useful for development
-  image: kalabox/pantheon-mariadb:$KALABOX_APP_PANTHEON_CONFIG_IMAGES
-
-  # Uncomment this and comment 'image' above if you want to edit your
-  # local dockerfile and build from there. This is useful for development
-  #
-  # build: ./dockerfiles/pantheon-mariadb
-
+  image: mariadb:5.5
+  environment:
+    MYSQL_USER: pantheon
+    MYSQL_PASSWORD: pantheon
+    MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    MYSQL_DATABASE: pantheon
   ports:
     - "3306"
   volumes:
-    - $KALABOX_APP_ROOT_BIND:/src:rw
+    - $KALABOX_APP_ROOT_BIND:/src
+    - $KALABOX_APP_ROOT_BIND/config/mysql/import.sh:/usr/local/bin/import-mysql:rw
+    - $KALABOX_APP_ROOT_BIND/config/mysql/dump.sh:/usr/local/bin/dump-mysql:rw
+    - $KALABOX_APP_ROOT_BIND/config/mysql/export.sh:/usr/local/bin/export-mysql:rw
+    - $KALABOX_APP_ROOT_BING/config/mysql:/etc/mysql/conf.d
   volumes_from:
     - data
 
