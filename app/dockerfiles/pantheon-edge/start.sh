@@ -8,11 +8,5 @@ if [ ! -f "/certs/edge-ssl-termination.pem" ]; then
   cat /certs/edge-ssl-termination.crt /certs/edge-ssl-termination.key > /certs/edge-ssl-termination.pem
 fi
 
-# Copy the configuration for ssl termination with nginx to the correct place
-if [ -f "/src/config/nginx/ssl-termination.conf" ]; then
-  rm /etc/nginx/sites-enabled/default
-  cp /src/config/nginx/ssl-termination.conf /etc/nginx/sites-enabled/default
-fi
-
 varnishd -a :80 -f /etc/varnish/default.vcl -s malloc,128m
 nginx

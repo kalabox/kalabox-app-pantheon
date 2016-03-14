@@ -1,6 +1,6 @@
 # docker build -t kalabox/pantheon-edge:mytag .
 
-FROM kalabox/nginx:v0.10.0
+FROM nginx:1.8.1
 
 RUN \
   apt-get -y update && \
