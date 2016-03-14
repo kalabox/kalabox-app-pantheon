@@ -50,7 +50,7 @@ module.exports = function(kbox) {
             prefix: '',
             database: 'pantheon',
             username: 'pantheon',
-            password: '',
+            password: 'pantheon',
             host: 'database',
             port: 3306
           }

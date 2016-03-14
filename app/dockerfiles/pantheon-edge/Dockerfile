@@ -9,15 +9,12 @@ RUN \
   echo "deb https://repo.varnish-cache.org/debian/ jessie varnish-4.0" >> /etc/apt/sources.list.d/varnish-cache.list &&\
   apt-get -y update && \
   apt-get -y install varnish && \
-  rm /etc/varnish/default.vcl && \
-  ln -s /src/config/varnish/default.vcl /etc/varnish/default.vcl && \
   apt-get -y clean && \
   apt-get -y autoclean && \
   apt-get -y autoremove && \
   rm -rf /var/lib/apt/* && rm -rf && rm -rf /var/lib/cache/* && rm -rf /var/lib/log/* && rm -rf /tmp/*
 
 COPY start.sh /root/start.sh
-RUN chmod +x /root/start.sh
 
 CMD ["/root/start.sh"]
 

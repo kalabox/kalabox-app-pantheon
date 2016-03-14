@@ -15,7 +15,7 @@ RUN apt-get -y update && apt-get -y install \
   libgmp10 libpng12-0 libltdl7 libmcrypt4 libpq5 libicu52 libxslt1.1 \
   imagemagick libmagickwand-6.q16-2 libmagickcore-6.q16-2 \
   mysql-client postgresql-client-common sqlite \
-  php5-cli php5-curl php5-mysql php5-json \
+  php5-cli php5-intl php5-curl php5-mysql php5-json \
   xfonts-base xfonts-75dpi && \
   apt-get -y clean && \
   apt-get -y autoclean && \
@@ -29,7 +29,7 @@ RUN \
   chmod +x /usr/local/bin/phpbrew && \
   phpbrew init && \
   cd /root/.phpbrew && \
-  curl -L "http://github.com/kalabox/phpbrewer/releases/download/pantheon-2/php.tar.gz" | tar -zvx
+  curl -L "http://github.com/kalabox/phpbrewer/releases/download/pantheon-beta1/php.tar.gz" | tar -zvx
 
 # get some extra tools we need for pantheon
 RUN \

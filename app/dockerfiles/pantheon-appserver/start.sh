@@ -36,6 +36,5 @@ if [ ! -d "/usr/share/ca-certificates/solr" ]; then
 fi
 
 # Run all the services
-cron
-/root/.phpbrew/php/${PHPBREW_PHP}/sbin/php-fpm -R
+/root/.phpbrew/php/${PHPBREW_PHP}/sbin/php-fpm
 nginx

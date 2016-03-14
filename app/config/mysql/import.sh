@@ -15,7 +15,7 @@ elif [[ $ARCHIVE == *sql ]]; then
 fi
 
 echo "Importing ${SQL} to db"
-mysql -u pantheon -h db -P 3306 pantheon < "${SQL}"
+mysql -u pantheon -ppantheon -h db -P 3306 pantheon < "${SQL}"
 
 rm -f "${SQL}"
 rm -f "${ARCHIVE}"

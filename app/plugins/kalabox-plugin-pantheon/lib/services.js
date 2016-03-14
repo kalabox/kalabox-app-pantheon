@@ -78,7 +78,7 @@ module.exports = function(kbox, app) {
         serviceSummary.credentials = {
           database: 'pantheon',
           user: 'pantheon',
-          password: '',
+          password: 'pantheon',
           host: '10.13.37.100',
           port: portInfo[0].HostPort
         };

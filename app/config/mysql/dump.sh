@@ -3,4 +3,4 @@
 # Grab arguments
 DUMPFILE="$1"
 
-mysqldump -h db -u pantheon pantheon > ${DUMPFILE}
+mysqldump -h db -u pantheon -ppantheon pantheon > ${DUMPFILE}

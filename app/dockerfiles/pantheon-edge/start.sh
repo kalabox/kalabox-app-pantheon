@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # Set up our certs for ssl termination with nginx
 # @todo: lots of clean up to do here

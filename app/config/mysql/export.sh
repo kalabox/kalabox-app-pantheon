@@ -2,10 +2,20 @@
 
 # Grab arguments
 # mysql -u pantheon -pPASS -h dbserver.ENV.UUID.drush.in -P 13459 pantheon
-MYSQL_CMD="$1"
-SQL_FILE="$2"
+ARCHIVE="$1"
 
-echo "Exporting ${SQL_FILE} to Pantheon"
-${MYSQL_CMD} < "${SQL_FILE}"
+if [[ $ARCHIVE == *gz ]]; then
+  echo "Extracting ${ARCHIVE}"
+  gunzip -df "${ARCHIVE}"
+  SUFFIX=".gz"
+  SQL=${ARCHIVE%$SUFFIX}
+elif [[ $ARCHIVE == *sql ]]; then
+  echo "USING EXISTING ${ARCHIVE}"
+  SQL=${ARCHIVE}
+fi
 
-rm -f "${SQL_FILE}"
+echo "Importing ${SQL} to db"
+mysql -u pantheon -p pantheon -h db -P 3306 pantheon < "${SQL}"
+
+rm -f "${SQL}"
+rm -f "${ARCHIVE}"
