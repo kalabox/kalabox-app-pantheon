@@ -25,13 +25,6 @@ fi
 echo "Using php ${PHP_BREW_VERSION}"
 phpbrew -d switch ${PHP_BREW_VERSION}
 
-# Use the correct site.conf for the framework
-# /src/config/nginx/site.conf /etc/nginx/sites-enabled/default
-if [ -f "/src/config/nginx/${FRAMEWORK}.conf" ]; then
-  rm /etc/nginx/sites-enabled/default
-  cp /src/config/nginx/${FRAMEWORK}.conf /etc/nginx/sites-enabled/default
-fi
-
 # Move in our custom config files if they exist
 # Use our custom www.conf pool for fpm
 if [ -f "/src/config/php/www.conf" ]; then
@@ -65,16 +58,4 @@ fi
 if [ -f "${HOME}/.phpbrew/php/php-${PHP_BREW_VERSION}/var/db/opcache.ini" ]; then
   sed -i '$a opcache.max_accelerated_files = 16229' ${HOME}/.phpbrew/php/php-${PHP_BREW_VERSION}/var/db/opcache.ini
   sed -i '$a opcache.memory_consumption = 256' ${HOME}/.phpbrew/php/php-${PHP_BREW_VERSION}/var/db/opcache.ini
-fi
-
-# Inject dynamic ENV things for our crontab
-if [ ! -f "/etc/cron.hourly/drush-cron" ] && [ $FRAMEWORK != "wordpress" ]; then
-  cp /src/config/cron/drush-cron /etc/cron.hourly/drush-cron
-  sed -i -e "s|REPLACE_HOME|$HOME|g" /etc/cron.hourly/drush-cron
-  sed -i -e "s|REPLACE_PATH|$PATH|g" /etc/cron.hourly/drush-cron
-  sed -i -e "s|REPLACE_PRESSFLOW_SETTINGS|$PRESSFLOW_SETTINGS|g" /etc/cron.hourly/drush-cron
-  sed -i -e "s|REPLACE_DRUSH_VERSION|$DRUSH_VERSION|g" /etc/cron.hourly/drush-cron
-  sed -i -e "s|REPLACE_PHP_VERSION|PHP_BREW_VERSION|g" /etc/cron.hourly/drush-cron
-  sed -i -e "s|REPLACE_PHPBREW_PATH|$PHPBREW_PATH|g" /etc/cron.hourly/drush-cron
-  chmod +x /etc/cron.hourly/drush-cron
 fi

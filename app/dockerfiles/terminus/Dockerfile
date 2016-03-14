@@ -1,6 +1,7 @@
 # Pantheon terminus mock for Kalabox
 # docker build -t kalabox/terminus .
 # docker run -d -e PHP_VERSION=55 -e FRAMEWORK=backdrop kalabox/pantheon-appserver
+# kdiff3-qt cron
 
 FROM kalabox/pantheon-appserver:v0.11.3
 

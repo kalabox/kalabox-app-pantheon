@@ -68,12 +68,12 @@ appserver:
 
   # Comment this and uncomment 'build' below if you want to edit your
   # local dockerfile and build from there. This is useful for development
-  image: kalabox/pantheon-appserver:$KALABOX_APP_PANTHEON_CONFIG_IMAGES
+  # image: kalabox/pantheon-appserver:$KALABOX_APP_PANTHEON_CONFIG_IMAGES
 
   # Uncomment this and comment 'image' above if you want to edit your
   # local dockerfile and build from there. This is useful for development
   #
-  # build: ./dockerfiles/pantheon-appserver
+  build: ./dockerfiles/pantheon-appserver
 
   hostname: $KALABOX_APP_HOSTNAME
   ports:
@@ -81,6 +81,8 @@ appserver:
     - "444"
   volumes:
     - $KALABOX_APP_ROOT_BIND:/src:rw
+    - $KALABOX_APP_ROOT_BIND/config/nginx/$KALABOX_APP_PANTHEON_FRAMEWORK.conf:/etc/nginx/sites-enabled/default:rw
+    - $KALABOX_APP_ROOT_BIND/config/nginx/nginx.conf:/etc/nginx/nginx.conf
   volumes_from:
     - data
   links:
@@ -155,12 +157,12 @@ edge:
 
   # Comment this and uncomment 'build' below if you want to edit your
   # local dockerfile and build from there. This is useful for development
-  image: kalabox/pantheon-edge:$KALABOX_APP_PANTHEON_CONFIG_IMAGES
+  # image: kalabox/pantheon-edge:$KALABOX_APP_PANTHEON_CONFIG_IMAGES
 
   # Uncomment this and comment 'image' above if you want to edit your
   # local dockerfile and build from there. This is useful for development
   #
-  # build: dockerfiles/pantheon-edge
+  build: dockerfiles/pantheon-edge
 
   links:
     - appserver:web
@@ -200,12 +202,12 @@ solr:
 
   # Comment this and uncomment 'build' below if you want to edit your
   # local dockerfile and build from there. This is useful for development
-  image: kalabox/pantheon-solr:$KALABOX_APP_PANTHEON_CONFIG_IMAGES
+  # image: kalabox/pantheon-solr:$KALABOX_APP_PANTHEON_CONFIG_IMAGES
 
   # Uncomment this and comment 'image' above if you want to edit your
   # local dockerfile and build from there. This is useful for development
   #
-  # build: dockerfiles/pantheon-solr
+  build: dockerfiles/pantheon-solr
 
   volumes:
    - $KALABOX_APP_ROOT_BIND:/src:rw
