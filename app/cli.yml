@@ -56,7 +56,7 @@ git:
   stripfirst: true
   entrypoint: kgit
   description: Run a git command on your codebase
-  mapping: <config.syncthing.codeDir>:/code
+  mapping: <config.sharing.codeDir>:/code
 
 #
 # Adds a rsync command to your Pantheon app.
@@ -94,7 +94,7 @@ terminus:
     - --login
     - -c
   description: Run a terminus command
-  mapping: <config.syncthing.codeDir>:/code
+  mapping: <config.sharing.codeDir>:/code
 
 #
 # Adds a wp-cli command to your pantheon app.
@@ -106,7 +106,7 @@ wp:
   entrypoint: wp
   precmdopts: --allow-root
   description: Run a wp-cli command on your codebase
-  mapping: <config.syncthing.codeDir>:/code
+  mapping: <config.sharing.codeDir>:/code
 
 #
 # Adds a drush 8 command to your pantheon app.
@@ -127,7 +127,7 @@ drush:
   precmdopts: drush8
   postcmdopts: --strict=0
   description: Run a drush 8 command on your codebase
-  mapping: <config.syncthing.codeDir>:/code
+  mapping: <config.sharing.codeDir>:/code
 
 #
 # Adds a php cli command to your pantheon app.
@@ -141,7 +141,7 @@ php:
     - --login
     - -c
   description: Run a php cli command
-  mapping: <config.syncthing.codeDir>:/code
+  mapping: <config.sharing.codeDir>:/code
 
 #
 # Adds a composer command to your pantheon app.
@@ -155,7 +155,7 @@ composer:
     - --login
     - -c
   description: Run a php cli command
-  mapping: <config.syncthing.codeDir>:/code
+  mapping: <config.sharing.codeDir>:/code
 
 #
 # Adds a mysql command to your pantheon app.
@@ -167,7 +167,7 @@ mysql:
   precmdopts: -upantheon
   entrypoint: mysql
   description: Drop into a mysql shell
-  mapping: <config.syncthing.codeDir>:/code
+  mapping: <config.sharing.codeDir>:/code
 
 #
 # Adds a node command to your pantheon app.
@@ -178,7 +178,7 @@ node:
   service: cli
   entrypoint: node
   description: Run a node command
-  mapping: <config.syncthing.codeDir>:/code
+  mapping: <config.sharing.codeDir>:/code
 
 #
 # Adds a npm command to your pantheon app.
@@ -189,7 +189,7 @@ npm:
   service: cli
   entrypoint: npm
   description: Run a npm command
-  mapping: <config.syncthing.codeDir>:/code
+  mapping: <config.sharing.codeDir>:/code
 
 #
 # Adds a grunt command to your pantheon app.
@@ -200,7 +200,7 @@ grunt:
   service: cli
   entrypoint: grunt
   description: Run a grunt command
-  mapping: <config.syncthing.codeDir>:/code
+  mapping: <config.sharing.codeDir>:/code
 
 #
 # Adds a gulp command to your pantheon app.
@@ -211,7 +211,7 @@ gulp:
   service: cli
   entrypoint: gulp
   description: Run a gulp command
-  mapping: <config.syncthing.codeDir>:/code
+  mapping: <config.sharing.codeDir>:/code
 
 #
 # Adds a bower command to your pantheon app.
@@ -222,4 +222,4 @@ bower:
   service: cli
   entrypoint: bower
   description: Run a bower command
-  mapping: <config.syncthing.codeDir>:/code
+  mapping: <config.sharing.codeDir>:/code

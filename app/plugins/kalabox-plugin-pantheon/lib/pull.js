@@ -22,7 +22,7 @@ module.exports = function(kbox, app) {
    * @todo: this is pretty weak for now
    */
   var firstTime = _.once(function() {
-    var gitFile = path.join(app.config.syncthing.codeRoot, '.git');
+    var gitFile = path.join(app.config.sharing.codeRoot, '.git');
     return !fs.existsSync(gitFile);
   });
 
