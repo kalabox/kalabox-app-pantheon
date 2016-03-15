@@ -1,7 +1,6 @@
 # Pantheon terminus mock for Kalabox
 # docker build -t kalabox/terminus .
 # docker run -d -e PHP_VERSION=55 -e FRAMEWORK=backdrop kalabox/pantheon-appserver
-# kdiff3-qt cron
 
 FROM drush/drush:8
 
@@ -19,10 +18,10 @@ RUN \
   apt-get -y clean && \
   apt-get -y autoclean && \
   apt-get -y autoremove && \
-  rm -rf /var/lib/apt/* && rm -rf && rm -rf /var/lib/cache/* && rm -rf /var/lib/log/* && rm -rf /tmp/*
+  rm -rf && rm -rf /var/lib/cache/* && \
+  rm -rf /var/lib/log/* && rm -rf /tmp/*
 
 # Set up our kalabox specific stuff
-COPY bashrc /root/.bashrc
 COPY ssh-config /root/.ssh/config
 
 ENTRYPOINT ["/bin/bash"]
