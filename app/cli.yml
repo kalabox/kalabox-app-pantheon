@@ -53,8 +53,6 @@
 #
 git:
   service: cli
-  stripfirst: true
-  entrypoint: kgit
   description: Run a git command on your codebase
   mapping: <config.sharing.codeDir>:/code
 
@@ -65,7 +63,6 @@ git:
 #
 rsync:
   service: cli
-  entrypoint: rsync
   description: Run a rsync command on your files directory
   mapping: files:/media
 
@@ -89,7 +86,6 @@ terminal:
 #
 terminus:
   service: terminus
-  entrypoint: terminus
   description: Run a terminus command
   mapping: <config.sharing.codeDir>:/code
 
@@ -100,8 +96,6 @@ terminus:
 #
 wp:
   service: terminus
-  entrypoint: wp
-  precmdopts: --allow-root
   description: Run a wp-cli command on your codebase
   mapping: <config.sharing.codeDir>:/code
 
@@ -116,8 +110,6 @@ wp:
 #
 drush:
   service: terminus
-  entrypoint: drush
-  postcmdopts: --strict=0
   description: Run a drush 8 command on your codebase
   mapping: <config.sharing.codeDir>:/code
 
@@ -128,7 +120,6 @@ drush:
 #
 php:
   service: terminus
-  entrypoint: php
   description: Run a php cli command
   mapping: <config.sharing.codeDir>:/code
 
@@ -139,7 +130,6 @@ php:
 #
 composer:
   service: terminus
-  entrypoint: composer
   description: Run a php cli command
   mapping: <config.sharing.codeDir>:/code
 
@@ -162,7 +152,6 @@ mysql:
 #
 node:
   service: cli
-  entrypoint: node
   description: Run a node command
   mapping: <config.sharing.codeDir>:/code
 
@@ -173,7 +162,6 @@ node:
 #
 npm:
   service: cli
-  entrypoint: npm
   description: Run a npm command
   mapping: <config.sharing.codeDir>:/code
 
@@ -184,7 +172,6 @@ npm:
 #
 grunt:
   service: cli
-  entrypoint: grunt
   description: Run a grunt command
   mapping: <config.sharing.codeDir>:/code
 
@@ -195,7 +182,6 @@ grunt:
 #
 gulp:
   service: cli
-  entrypoint: gulp
   description: Run a gulp command
   mapping: <config.sharing.codeDir>:/code
 
@@ -206,6 +192,5 @@ gulp:
 #
 bower:
   service: cli
-  entrypoint: bower
   description: Run a bower command
   mapping: <config.sharing.codeDir>:/code

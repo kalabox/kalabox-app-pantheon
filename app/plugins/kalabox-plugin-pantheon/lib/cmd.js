@@ -46,7 +46,9 @@ module.exports = function(kbox, app) {
    * Run git commands
    */
   var git = function(cmd) {
-    return run('kgit', cmd);
+    var gitCmd = (process.platform === 'linux') ? 'git' : 'kgit';
+    cmd.unshift(gitCmd);
+    return run('usermap', cmd);
   };
 
   /*
@@ -93,7 +95,7 @@ module.exports = function(kbox, app) {
       '--ipv4',
       '--progress',
       '-e',
-      sshOptions
+      '"' + sshOptions + '"'
     ];
     cmd = cmd.concat(_.flatten(_.map(dirs, exclude)));
 
@@ -102,7 +104,8 @@ module.exports = function(kbox, app) {
     cmd.push(dest);
 
     // Run the command
-    return run('rsync', cmd);
+    cmd.unshift('rsync');
+    return run('usermap', cmd);
   };
 
   // Return our things
