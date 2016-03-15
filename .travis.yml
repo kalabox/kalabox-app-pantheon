@@ -16,7 +16,6 @@ after_success:
 - $HOME/travis-ci.sh after-success
 before_deploy:
 - $HOME/travis-ci.sh before-deploy
-- cd built
 after_deploy:
 - $HOME/travis-ci.sh after-deploy
 cache:
