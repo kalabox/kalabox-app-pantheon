@@ -22,7 +22,7 @@ module.exports = function(kbox, app) {
    * @todo: this is pretty weak for now
    */
   var firstTime = _.once(function() {
-    var gitFile = path.join(app.config.syncthing.codeRoot, '.git');
+    var gitFile = path.join(app.config.sharing.codeRoot, '.git');
     return !fs.existsSync(gitFile);
   });
 
@@ -273,7 +273,7 @@ module.exports = function(kbox, app) {
           compose: app.composeCore,
           project: app.name,
           opts: {
-            services: ['appserver'],
+            services: ['cli'],
             mode: kbox.core.deps.get('mode') === 'gui' ? 'collect' : 'attach'
           }
         };
@@ -281,13 +281,17 @@ module.exports = function(kbox, app) {
 
       // Construct our extract definition
       var extractRun = getFilesRunner();
-      extractRun.opts.entrypoint = 'tar';
+      extractRun.opts.entrypoint = 'usermap';
       extractRun.opts.cmd = [
+        'tar',
         '-zxvf',
         filesDump,
-        '--strip-components=1',
-        '--overwrite',
-        '--directory=/media'
+        '-C',
+        '/tmp',
+        '&&',
+        'mv',
+        '/tmp/files_' + env + '/*',
+        '/media'
       ];
 
       // Construct our remove definition

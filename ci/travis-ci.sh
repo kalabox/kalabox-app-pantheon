@@ -13,13 +13,16 @@ PLUGIN_REPO="kalabox/kalabox-app-pantheon"
 # Do some stuff before npm install
 #
 before-install() {
+
   # Gather intel
-  echo $TRAVIS_TAG
-  echo $TRAVIS_BRANCH
-  echo $TRAVIS_PULL_REQUEST
-  echo $TRAVIS_REPO_SLUG
-  echo $TRAVIS_NODE_VERSION
-  echo $TRAVIS_BUILD_DIR
+  echo "TRAVIS_TAG: ${TRAVIS_TAG}"
+  echo "TRAVIS_BRANCH: ${TRAVIS_BRANCH}"
+  echo "TRAVIS_PULL_REQUEST: ${TRAVIS_PULL_REQUEST}"
+  echo "TRAVIS_REPO_SLUG: ${TRAVIS_REPO_SLUG}"
+  echo "TRAVIS_BUILD_DIR: ${TRAVIS_BUILD_DIR}"
+  echo "TRAVIS_OS_NAME: ${TRAVIS_OS_NAME}"
+  echo "PATH: ${PATH}"
+
   # Add our key
   if [ $TRAVIS_PULL_REQUEST == "false" ] &&
     [ -z "$TRAVIS_TAG" ] &&
@@ -31,7 +34,6 @@ before-install() {
 
 # before-script
 #
-# Setup Drupal to run the tests.
 #
 before-script() {
   # Global install some npm
@@ -108,63 +110,6 @@ after-success() {
     # Commit our new app deps
     git add --all
     git commit -m "BUILT OUT APP DEPS [ci skip]" --author="Kala C. Bot <kalacommitbot@kalamuna.com>" --no-verify
-
-    # Only do stuff if
-    #   1. DISCO_TAG is non-empty
-    #   2. Our commit is a tagged commit
-    #   3. Our branch name is contained within the tag
-    # If this is all true then we want to roll a new package and push up other relevant
-    # versioned thing. This gaurantees that we can still tag things without setting off a build/deploy
-    if [ ! -z "$DISCO_TAG" ] && [[ ! "$DISCO_TAG" =~ "~" ]] && [[ "$DISCO_TAG" =~ "$TRAVIS_BRANCH" ]]; then
-
-      # Split our package version and tag into arrays so we can make sure our tag is larger
-      # than the package version
-      IFS='.' read -a BUILD_ARRAY <<< "$BUILD_VERSION"
-      IFS='.' read -a DISCO_ARRAY <<< "$DISCO_TAG"
-
-      # Build and deploy packages only in the two scenarios
-      #   1. If our minor versions are the same and the tag patch version is larger
-      #   2. If this is a new minor version and that minor version is larger than previous minor versions
-      if [ "${DISCO_ARRAY[1]}" -gt "${BUILD_ARRAY[1]}" ] ||
-        ([ "${DISCO_ARRAY[1]}" -eq "${BUILD_ARRAY[1]}" ] && [ "${DISCO_ARRAY[2]}" -gt "${BUILD_ARRAY[2]}" ]); then
-
-        # DEFINE SOME FUN COMMIT MESSAGE VERBS
-        COMMIT_MSG[0]='TWERKING'
-        COMMIT_MSG[1]='BUILDING'
-        COMMIT_MSG[2]='HYPERSPLICING'
-        COMMIT_MSG[3]='RICK ROLLIN'
-        COMMIT_MSG[4]='CONSTRUCTING'
-        COMMIT_MSG[5]='DECREEING'
-        COMMIT_MSG[6]='MOLECULARLY REASSEMBLING'
-        COMMIT_MSG[7]='SCRIBING'
-        COMMIT_MSG[8]='ROUGH RIDING'
-        COMMIT_MSG[9]='LIBERATING'
-        MODULUS=${#COMMIT_MSG[@]}
-        COMMIT_RANDOM=$((${DISCO_ARRAY[2]}%${MODULUS}))
-        COMMIT_MSG=${COMMIT_MSG[COMMIT_RANDOM]}
-
-        # PUSH BACK TO OUR GIT REPO
-        # Bump our things and reset tags
-        # Dont bump or push if this is a new minor version
-        if [ "${DISCO_ARRAY[2]}" -gt "0" ]; then
-          grunt bump-patch
-          # Reset upstream tags so we can push our changes to it
-          # We need to re-add this in because our clone was originally read-only
-          git tag -d $DISCO_TAG
-          git push origin :$DISCO_TAG
-
-          # Add all our new code and push reset tag with ci skipping on
-          git add --all
-          git commit -m "${COMMIT_MSG} VERSION ${DISCO_TAG} [ci skip]" --author="Kala C. Bot <kalacommitbot@kalamuna.com>" --no-verify
-          git tag $DISCO_TAG
-        fi
-
-        # NODE PACKAGES
-        # Deploy to NPM
-        $HOME/npm-config.sh > /dev/null
-        npm publish ./
-      fi
-    fi
 
     # Push up our generated app deps plus a tag if we also have a new version
     git push origin $TRAVIS_BRANCH --tags

@@ -12,7 +12,7 @@
 # keys and username for its git config.
 #
 cli:
-  image: kalabox/cli:$KALABOX_IMG_VERSION
+  image: kalabox/cli:stable
   volumes:
     - $KALABOX_ENGINE_HOME:/user
   volumes_from:
@@ -20,6 +20,8 @@ cli:
   environment:
     WEBROOT: /code
     TERM: xterm-color
+    KALABOX_UID: $KALABOX_ENGINE_ID
+    KALABOX_GID: $KALABOX_ENGINE_GID
     GIT_SSH_COMMAND: ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o IdentityFile=/user/.ssh/pantheon.kalabox.id_rsa
     GIT_AUTHOR_NAME: $KALABOX_APP_PANTHEON_CONFIG_NAME
     GIT_AUTHOR_EMAIL: $KALABOX_APP_PANTHEON_CONFIG_EMAIL
@@ -41,22 +43,26 @@ terminus:
 
   # Comment this and uncomment 'build' below if you want to edit your
   # local dockerfile and build from there. This is useful for development
-  image: kalabox/terminus:$KALABOX_APP_PANTHEON_CONFIG_IMAGES
+  # image: kalabox/terminus:$KALABOX_APP_PANTHEON_CONFIG_IMAGES
 
   # Uncomment this and comment 'image' above if you want to edit your
   # local dockerfile and build from there. This is useful for development
   #
-  # build: ./dockerfiles/terminus
+  build: ./dockerfiles/terminus
 
+  entrypoint: usermap
   volumes:
     - $KALABOX_ENGINE_HOME:/user
     - $KALABOX_APP_ROOT:/src
     - $KALABOX_APP_ROOT/config/terminus/:/root/.terminus/cache
     - $KALABOX_ENGINE_HOME/.kalabox/pantheon/session/$KALABOX_APP_PANTHEON_CONFIG_EMAIL:/root/.terminus/cache/session
     - $KALABOX_APP_ROOT/config/drush:/root/.drush
+    - $KALABOX_APP_ROOT/config/scripts/usermap.sh:/usr/local/bin/usermap
   volumes_from:
     - data
   environment:
+    KALABOX_UID: $KALABOX_ENGINE_ID
+    KALABOX_GID: $KALABOX_ENGINE_GID
     FRAMEWORK: $KALABOX_APP_PANTHEON_FRAMEWORK
     PHP_VERSION: 55
     DOMAIN: $KALABOX_DOMAIN

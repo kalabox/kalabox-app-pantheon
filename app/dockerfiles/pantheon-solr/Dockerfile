@@ -1,11 +1,11 @@
 # docker build -t kalabox/solr:mytag .
 
-FROM kalabox/debian:stable
+FROM debian:jessie
 
 RUN \
-  apt-get -y update && \
-  apt-get -y install incron tomcat7 libtcnative-1 tomcat7-admin && \
-  cd /tmp && curl -L "https://archive.apache.org/dist/lucene/solr/3.6.2/apache-solr-3.6.2.tgz" | tar -zvx && \
+  apt-get -y update && apt-get -y install \
+  unzip curl incron tomcat7 libtcnative-1 tomcat7-admin && \
+  cd /tmp && curl -Lk "https://archive.apache.org/dist/lucene/solr/3.6.2/apache-solr-3.6.2.tgz" | tar -zvx && \
   mv /tmp/apache-solr-3.6.2/example/solr /usr/share/solr && \
   unzip /tmp/apache-solr-3.6.2/example/webapps/solr.war -d /usr/share/solr/web && \
   mkdir -p /usr/share/solr/lib && \

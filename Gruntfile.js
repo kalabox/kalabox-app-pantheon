@@ -23,7 +23,7 @@ module.exports = function(grunt) {
       }
     },
 
-    // This handles automatic version bumping in travis
+    // This handles automatic version bumping
     bump: {
       options: {
         files: [
@@ -37,7 +37,12 @@ module.exports = function(grunt) {
         createTag: true,
         tagName: 'v%VERSION%',
         tagMessage: 'Version %VERSION%',
-        push: false
+        pushTo: 'origin',
+        gitDescribeOptions: '--tags --always --abbrev=1 --dirty=-d',
+        globalReplace: false,
+        prereleaseName: 'alpha',
+        metadata: '',
+        regExp: false
       }
     },
 
@@ -75,8 +80,19 @@ module.exports = function(grunt) {
   // SETUP WORKFLOWS
   //--------------------------------------------------------------------------
 
-  grunt.registerTask('bump-patch', [
-    'bump-only:patch'
+  // Bump our minor version
+  grunt.registerTask('bigrelease', [
+    'bump:minor'
+  ]);
+
+  // Bump our patch version
+  grunt.registerTask('release', [
+    'bump:patch'
+  ]);
+
+  // Do a prerelease version
+  grunt.registerTask('prerelease', [
+    'bump:prerelease'
   ]);
 
   grunt.registerTask('test', [

@@ -48,7 +48,7 @@ plugins:
 
 #
 # This contains configuration for each plugin that Kalabox uses for a Pantheon
-# app. "cli", "syncthing" and "services" are all core Kalabox plugins.
+# app. "cli", "sharing" and "services" are all core Kalabox plugins.
 #
 # Read more inline below for options on each.
 #
@@ -91,7 +91,7 @@ pluginconfig:
   #   ignore: [array of paths] - These are paths that sharing will ignore.
   #     Generally you will not want to share massive amounts of static assets.
   #
-  syncthing:
+  sharing:
     share: data:/code
     ignore:
       - "sites/default/files"

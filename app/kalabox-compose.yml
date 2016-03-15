@@ -41,9 +41,9 @@
 data:
   image: busybox
   volumes:
-    - $KALABOX_APP_ROOT_BIND/files:/media:rw
+    - $KALABOX_APP_ROOT_BIND/files:/media
     - /certs
-    - /sql
+    - /var/lib/mysql
     - /code
     - /backups
 
@@ -68,19 +68,21 @@ appserver:
 
   # Comment this and uncomment 'build' below if you want to edit your
   # local dockerfile and build from there. This is useful for development
-  image: kalabox/pantheon-appserver:$KALABOX_APP_PANTHEON_CONFIG_IMAGES
+  # image: kalabox/pantheon-appserver:$KALABOX_APP_PANTHEON_CONFIG_IMAGES
 
   # Uncomment this and comment 'image' above if you want to edit your
   # local dockerfile and build from there. This is useful for development
   #
-  # build: ./dockerfiles/pantheon-appserver
+  build: ./dockerfiles/pantheon-appserver
 
   hostname: $KALABOX_APP_HOSTNAME
   ports:
     - "8888"
     - "444"
   volumes:
-    - $KALABOX_APP_ROOT_BIND:/src:rw
+    - $KALABOX_APP_ROOT_BIND:/src
+    - $KALABOX_APP_ROOT_BIND/config/nginx/$KALABOX_APP_PANTHEON_FRAMEWORK.conf:/etc/nginx/conf.d/default.conf
+    - $KALABOX_APP_ROOT_BIND/config/nginx/nginx.conf:/etc/nginx/nginx.conf
   volumes_from:
     - data
   links:
@@ -89,6 +91,8 @@ appserver:
     - solr:solr
   environment:
     TERM: xterm
+    KALABOX_UID: $KALABOX_ENGINE_ID
+    KALABOX_GID: $KALABOX_ENGINE_GID
     DOMAIN: $KALABOX_DOMAIN
     FRAMEWORK: $KALABOX_APP_PANTHEON_FRAMEWORK
     PHP_VERSION: $KALABOX_APP_PANTHEON_CONFIG_PHP
@@ -127,17 +131,21 @@ db:
 
   # Comment this and uncomment 'build' below if you want to edit your
   # local dockerfile and build from there. This is useful for development
-  image: kalabox/pantheon-mariadb:$KALABOX_APP_PANTHEON_CONFIG_IMAGES
-
-  # Uncomment this and comment 'image' above if you want to edit your
-  # local dockerfile and build from there. This is useful for development
-  #
-  # build: ./dockerfiles/pantheon-mariadb
-
+  image: mariadb:5.5
+  hostname: db
+  environment:
+    MYSQL_USER: pantheon
+    MYSQL_PASSWORD: pantheon
+    MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    MYSQL_DATABASE: pantheon
   ports:
     - "3306"
   volumes:
-    - $KALABOX_APP_ROOT_BIND:/src:rw
+    - $KALABOX_APP_ROOT_BIND:/src
+    - $KALABOX_APP_ROOT_BIND/config/mysql/import.sh:/usr/local/bin/import-mysql
+    - $KALABOX_APP_ROOT_BIND/config/mysql/dump.sh:/usr/local/bin/dump-mysql
+    - $KALABOX_APP_ROOT_BIND/config/mysql/export.sh:/usr/local/bin/export-mysql
+    - $KALABOX_APP_ROOT_BIND/config/mysql:/etc/mysql/conf.d
   volumes_from:
     - data
 
@@ -152,17 +160,20 @@ edge:
 
   # Comment this and uncomment 'build' below if you want to edit your
   # local dockerfile and build from there. This is useful for development
-  image: kalabox/pantheon-edge:$KALABOX_APP_PANTHEON_CONFIG_IMAGES
+  # image: kalabox/pantheon-edge:$KALABOX_APP_PANTHEON_CONFIG_IMAGES
 
   # Uncomment this and comment 'image' above if you want to edit your
   # local dockerfile and build from there. This is useful for development
   #
-  # build: dockerfiles/pantheon-edge
+  build: dockerfiles/pantheon-edge
 
   links:
     - appserver:web
   volumes:
-    - $KALABOX_APP_ROOT_BIND:/src:rw
+    - $KALABOX_APP_ROOT_BIND:/src
+    - $KALABOX_APP_ROOT_BIND/config/varnish/default.vcl:/etc/varnish/default.vcl
+    - $KALABOX_APP_ROOT_BIND/config/nginx/nginx.conf:/etc/nginx/nginx.conf
+    - $KALABOX_APP_ROOT_BIND/config/nginx/ssl-termination.conf:/etc/nginx/conf.d/default.conf
   volumes_from:
     - data
   environment:
@@ -180,14 +191,12 @@ edge:
 #
 redis:
 
-  # Comment this and uncomment 'build' below if you want to edit your
-  # local dockerfile and build from there. This is useful for development
-  image: kalabox/pantheon-redis:$KALABOX_APP_PANTHEON_CONFIG_IMAGES
-
-  # Uncomment this and comment 'image' above if you want to edit your
-  # local dockerfile and build from there. This is useful for development
-  #
-  # build: dockerfiles/pantheon-redis
+  image: redis:2.8
+  volumes:
+    - $KALABOX_APP_ROOT_BIND/config/redis/redis.conf:/usr/local/etc/redis/redis.conf
+  command: redis-server /usr/local/etc/redis/redis.conf
+  expose:
+    - "8160"
 
 #
 # This defines a Pantheon solr server.
@@ -200,14 +209,14 @@ solr:
 
   # Comment this and uncomment 'build' below if you want to edit your
   # local dockerfile and build from there. This is useful for development
-  image: kalabox/pantheon-solr:$KALABOX_APP_PANTHEON_CONFIG_IMAGES
+  # image: kalabox/pantheon-solr:$KALABOX_APP_PANTHEON_CONFIG_IMAGES
 
   # Uncomment this and comment 'image' above if you want to edit your
   # local dockerfile and build from there. This is useful for development
   #
-  # build: dockerfiles/pantheon-solr
+  build: dockerfiles/pantheon-solr
 
   volumes:
-   - $KALABOX_APP_ROOT_BIND:/src:rw
+   - $KALABOX_APP_ROOT_BIND:/src
   volumes_from:
     - data

@@ -1,4 +1,17 @@
 #!/bin/bash
+set -e
+
+# Set defaults
+: ${KALABOX_UID:='1000'}
+: ${KALABOX_GID:='50'}
+
+# Do this so our mounted VB volumes work
+# @todo: silent fail perm setting?
+echo "Remapping apache permissions for VB sharing compat..."
+usermod -u "$KALABOX_UID" www-data
+groupmod -g "$KALABOX_GID" www-data || usermod -G staff www-data
+chown -Rf www-data:www-data /code
+chown -Rf www-data:www-data /media
 
 # Set up our certs for ssl termination with nginx
 if [ ! -f "/certs/appserver.pem" ]; then
@@ -23,6 +36,5 @@ if [ ! -d "/usr/share/ca-certificates/solr" ]; then
 fi
 
 # Run all the services
-cron
-/root/.phpbrew/php/${PHPBREW_PHP}/sbin/php-fpm -R
+/root/.phpbrew/php/${PHPBREW_PHP}/sbin/php-fpm
 nginx
