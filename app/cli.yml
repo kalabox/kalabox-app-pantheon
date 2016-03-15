@@ -130,7 +130,7 @@ php:
 #
 composer:
   service: terminus
-  description: Run a php cli command
+  description: Run a composer cli command
   mapping: <config.sharing.codeDir>:/code
 
 #
