@@ -46,8 +46,7 @@ module.exports = function(kbox, app) {
    * Run git commands
    */
   var git = function(cmd) {
-    var gitCmd = (process.platform === 'linux') ? 'git' : 'kgit';
-    cmd.unshift(gitCmd);
+    cmd.unshift('git');
     return run('usermap', cmd);
   };
 
