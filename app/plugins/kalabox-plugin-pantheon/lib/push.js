@@ -64,7 +64,7 @@ module.exports = function(kbox, app) {
 
       // Commit our changes
       .then(function() {
-        return git(['commit', '--allow-empty', '-m', message], []);
+        return git(['commit', '--allow-empty', '-m', '"' + message + '"'], []);
       })
 
       // Push our changes
