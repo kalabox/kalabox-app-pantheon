@@ -59,6 +59,7 @@ terminus:
     - $KALABOX_ENGINE_HOME/.kalabox/pantheon/session/$KALABOX_APP_PANTHEON_CONFIG_EMAIL:/root/.terminus/cache/session
     - $KALABOX_APP_ROOT/config/drush:/root/.drush
     - $KALABOX_APP_ROOT/config/scripts/usermap.sh:/usr/local/bin/usermap
+    - $KALABOX_APP_ROOT/config/terminus/php.ini:/usr/local/etc/php/conf.d/php.ini
   volumes_from:
     - data
   environment:
