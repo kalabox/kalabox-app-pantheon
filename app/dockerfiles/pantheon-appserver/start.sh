@@ -13,27 +13,24 @@ groupmod -g "$KALABOX_GID" www-data || usermod -G staff www-data
 chown -Rf www-data:www-data /code
 chown -Rf www-data:www-data /media
 
-# Set up our certs for ssl termination with nginx
+# Set up our certs for the appserver with nginx
 if [ ! -f "/certs/appserver.pem" ]; then
   openssl genrsa -out /certs/appserver.key 2048 && \
   openssl req -new -x509 -key /certs/appserver.key -out /certs/appserver.crt -days 365 -subj "/C=US/ST=California/L=San Francisco/O=Kalabox/OU=KB/CN=appserver" && \
   cat /certs/appserver.crt /certs/appserver.key > /certs/appserver.pem
 fi
 
-# Set up our solr certs
-if [ ! -f "/certs/binding.pem" ]; then
-  openssl genrsa -out /certs/binding.key 2048 && \
-  openssl req -new -x509 -key /certs/binding.key -out /certs/binding.crt -days 365 -subj "/C=US/ST=California/L=San Francisco/O=Kalabox/OU=KB/CN=solr" && \
-  cat /certs/binding.crt /certs/binding.key > /certs/binding.pem
-fi
+# Wait until our solr crt is ready and then whitelist it
+NEXT_WAIT_TIME=0
+until [ -f /certs/binding.crt ] || [ $NEXT_WAIT_TIME -eq 5 ]; do
+  echo "Waiting for solr certs to be set up..."
+  sleep $(( NEXT_WAIT_TIME++ ))
+done
+mkdir -p /usr/share/ca-certificates/solr
+cp /certs/binding.crt /usr/share/ca-certificates/solr/binding.crt
+echo "solr/binding.crt" >> /etc/ca-certificates.conf
+update-ca-certificates --fresh
 
-# Make sure our solr certs are whitelisted correctly
-if [ ! -d "/usr/share/ca-certificates/solr" ]; then
-  mkdir /usr/share/ca-certificates/solr && \
-  cp /certs/binding.crt /usr/share/ca-certificates/solr/binding.crt && \
-  echo "solr/binding.crt" >> /etc/ca-certificates.conf && \
-  update-ca-certificates --fresh
-fi
 
 # Run all the services
 /root/.phpbrew/php/${PHPBREW_PHP}/sbin/php-fpm
