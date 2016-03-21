@@ -106,7 +106,6 @@ module.exports = function(kbox) {
         pantheonSite: 'UUID',
         pantheonSiteName: app.name,
         pantheonEnvironment: 'kalabox',
-        pantheonInfrastructureEnvironment: 'kalabox',
         pressflowSettings: JSON.stringify(settings),
         cacheHost: settings.conf.redis_client_host,
         cachePort: settings.conf.redis_client_port,
