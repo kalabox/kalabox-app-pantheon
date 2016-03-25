@@ -66,6 +66,75 @@ module.exports = function(kbox) {
       };
 
       /*
+       * Helper to get pull questions
+       */
+      var getPullQuestions = function(options) {
+
+        return [
+          {
+            type: 'list',
+            name: 'database',
+            message: 'Which database backup do you want to use?',
+            choices: function() {
+
+              // Get approved choices
+              var choices = getEnvPullChoices();
+
+              // Add none choice
+              choices.push({
+                name: 'Do not pull a database',
+                value: 'none'
+              });
+
+              // Return our choices
+              return choices;
+
+            },
+            default: function() {
+              return pantheonConf.env;
+            }
+          },
+          {
+            type: 'confirm',
+            name: 'newbackup',
+            message: 'Retrieve latest DB instead of most recent backup? (y/N)',
+            when: function(answers) {
+              var optDb = options.database;
+              var anDb = answers.database;
+              var pullDb = optDb !== 'none' && anDb !== 'none';
+              return !options.latestbackup && pullDb;
+            },
+            default: function() {
+              return false;
+            }
+          },
+          {
+            type: 'list',
+            name: 'files',
+            message: 'Which files do you want to use?',
+            choices: function() {
+
+              // Get approved choices
+              var choices = getEnvPullChoices();
+
+              // Add none choice
+              choices.push({
+                name: 'Do not pull files',
+                value: 'none'
+              });
+
+              // Return our choices
+              return choices;
+
+            },
+            default: function(answers) {
+              return answers.database || pantheonConf.env;
+            }
+          }
+        ];
+      };
+
+      /*
        * Helper to get push questions
        */
       var getPushQuestions = function() {
