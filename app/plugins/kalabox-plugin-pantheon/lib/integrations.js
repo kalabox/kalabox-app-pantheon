@@ -17,9 +17,10 @@ module.exports = function(kbox) {
       var self = this;
       // Default option handling.
       opts = opts || {};
-      opts.files = opts.files || true;
-      opts.database = opts.database || true;
-			// Pull.
+      opts.files = opts.files || 'none';
+      opts.database = opts.database || 'none';
+
+      // Pull.
       return kbox.Promise.try(function() {
         // Grab pantheon config so we can mix in interactives
         var config = app.config.pluginconfig.pantheon;
@@ -36,16 +37,16 @@ module.exports = function(kbox) {
         })
         // Pull our DB if selected
         .then(function() {
-          if (opts.database) {
+          if (opts.database && opts.database !== 'none') {
             self.update('Pulling database.');
-            return puller.pullDB(config.site, config.env);
+            return puller.pullDB(config.site, opts.database);
           }
         })
         // Pull our files if selected
         .then(function() {
-          if (opts.files) {
+          if (opts.files && opts.files !== 'none') {
             self.update('Pulling files.');
-            return puller.pullFiles(config.site, config.env);
+            return puller.pullFiles(config.site, opts.files);
           }
         })
         .then(function() {
@@ -58,11 +59,11 @@ module.exports = function(kbox) {
     kbox.integrations.get('pantheon').setMethod('push', function(opts) {
       // Save reference for later.
       var self = this;
-			// Default options.
+      // Default options.
       opts = opts || {};
       opts.message = opts.message || 'No commit message given.';
-      opts.database = opts.database || false;
-      opts.files = opts.files || false;
+      opts.database = opts.database || 'none';
+      opts.files = opts.files || 'none';
       // Get plugin.
       var config = app.config.pluginconfig.pantheon;
       // Get site aliases.
@@ -80,16 +81,16 @@ module.exports = function(kbox) {
       })
       // Push database.
       .tap(function() {
-        if (opts.database) {
+        if (opts.database && opts.database !== 'none') {
           self.update('Pushing database.');
-          return pusher.pushDB(config.site, config.env);
+          return pusher.pushDB(config.site, opts.database);
         }
       })
       // Push files.
       .tap(function() {
-        if (opts.files) {
+        if (opts.files && opts.files !== 'none') {
           self.update('Pushing files.');
-          return pusher.pushFiles(config.site, config.env);
+          return pusher.pushFiles(config.site, opts.files);
         }
       })
       // Signal completion.
