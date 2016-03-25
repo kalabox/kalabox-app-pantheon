@@ -73,13 +73,14 @@ module.exports = function(kbox, app) {
 
         // Get port from inspect data
         var portInfo = _.get(data, 'NetworkSettings.Ports.3306/tcp');
+        var host = [app.name, app.domain].join('.');
 
         // Build a creds array
-        serviceSummary.credentials = {
+        serviceSummary.external_connection_info = {
           database: 'pantheon',
           user: 'pantheon',
           password: 'pantheon',
-          host: '10.13.37.100',
+          host: host,
           port: portInfo[0].HostPort
         };
       }
