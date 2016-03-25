@@ -12,7 +12,7 @@ module.exports = function(kbox) {
   kbox.ifApp(function(app) {
 
     // Only run if app type is pantheon.
-    if (app.type === 'pantheon') {
+    if (app.config.type === 'pantheon') {
 
       /*
        * Load our app config
