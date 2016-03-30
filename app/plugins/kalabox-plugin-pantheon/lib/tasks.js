@@ -74,7 +74,7 @@ module.exports = function(kbox) {
           {
             type: 'list',
             name: 'database',
-            message: 'Which database backup do you want to use?',
+            message: 'Pull database from which environment?',
             choices: function() {
 
               // Get approved choices
@@ -97,7 +97,7 @@ module.exports = function(kbox) {
           {
             type: 'list',
             name: 'files',
-            message: 'Which files do you want to use?',
+            message: 'Pull files from which environment?',
             choices: function() {
 
               // Get approved choices
@@ -133,7 +133,7 @@ module.exports = function(kbox) {
           {
             type: 'list',
             name: 'database',
-            message: 'Which env do you want to push the DB to?',
+            message: 'Push database to which environment?',
             choices: function() {
 
               // Get approved choices
@@ -156,7 +156,7 @@ module.exports = function(kbox) {
           {
             type: 'list',
             name: 'files',
-            message: 'Which env do you want to push the files to?',
+            message: 'Push files to which environment?',
             choices: function() {
 
               // Get approved choices
