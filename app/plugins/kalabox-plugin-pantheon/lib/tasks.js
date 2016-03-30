@@ -68,13 +68,13 @@ module.exports = function(kbox) {
       /*
        * Helper to get pull questions
        */
-      var getPullQuestions = function(options) {
+      var getPullQuestions = function() {
 
         return [
           {
             type: 'list',
             name: 'database',
-            message: 'Which database backup do you want to use?',
+            message: 'Pull database from which environment?',
             choices: function() {
 
               // Get approved choices
@@ -95,23 +95,9 @@ module.exports = function(kbox) {
             }
           },
           {
-            type: 'confirm',
-            name: 'newbackup',
-            message: 'Retrieve latest DB instead of most recent backup? (y/N)',
-            when: function(answers) {
-              var optDb = options.database;
-              var anDb = answers.database;
-              var pullDb = optDb !== 'none' && anDb !== 'none';
-              return !options.latestbackup && pullDb;
-            },
-            default: function() {
-              return false;
-            }
-          },
-          {
             type: 'list',
             name: 'files',
-            message: 'Which files do you want to use?',
+            message: 'Pull files from which environment?',
             choices: function() {
 
               // Get approved choices
@@ -147,7 +133,7 @@ module.exports = function(kbox) {
           {
             type: 'list',
             name: 'database',
-            message: 'Which env do you want to push the DB to?',
+            message: 'Push database to which environment?',
             choices: function() {
 
               // Get approved choices
@@ -170,7 +156,7 @@ module.exports = function(kbox) {
           {
             type: 'list',
             name: 'files',
-            message: 'Which env do you want to push the files to?',
+            message: 'Push files to which environment?',
             choices: function() {
 
               // Get approved choices
@@ -213,23 +199,13 @@ module.exports = function(kbox) {
           kind: 'string',
           description: 'Pull files from an env. ' + getOptions + ' and none'
         });
-        task.options.push({
-          name: 'newbackup',
-          kind: 'boolean',
-          description: 'True to generate a new DB backup'
-        });
-        task.options.push({
-          name: 'latestbackup',
-          kind: 'boolean',
-          description: 'Use latest DB backup'
-        });
 
         // This is what we run yo!
         task.func = function(done) {
 
           // Grab the CLI options that are available
           var options = this.options;
-          var questions = getPullQuestions(this.options);
+          var questions = getPullQuestions();
 
           // Filter out interactive questions based on passed in options
           questions = kbox.util.cli.filterQuestions(questions, options);

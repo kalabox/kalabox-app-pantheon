@@ -2,16 +2,12 @@
 
 module.exports = function(kbox, app) {
 
-  // NPM modules
-  var _ = require('lodash');
-
   // Grab the terminus client
   var Terminus = require('./terminus.js');
   var terminus = new Terminus(kbox, app);
 
   // Grab some kalabox modules
   var engine = kbox.engine;
-  var Promise = kbox.Promise;
 
   /*
    * Push up our sites code
@@ -92,32 +88,19 @@ module.exports = function(kbox, app) {
     /*
      * Helper to get a DB run def template
      */
-    var getDbRun = function() {
+    var getDrushRun = function() {
       return {
         compose: app.composeCore,
         project: app.name,
         opts: {
-          services: ['db'],
+          mode: kbox.core.deps.get('mode') === 'gui' ? 'collect' : 'attach',
+          services: ['terminus'],
         }
       };
     };
 
-    // Create a unique name for this file
-    var fileId = _.uniqueId([site, env].join('-'));
-    var dumpFile = '/backups/' + fileId + '.sql';
-
-    // Dump our database
-    return Promise.try(function() {
-
-      // Construct our import definition
-      var dumpRun = getDbRun();
-      dumpRun.opts.entrypoint = 'dump-mysql';
-      dumpRun.opts.cmd = [dumpFile];
-
-      // Perform the run.
-      return engine.run(dumpRun);
-
-    })
+    // Make sure remote db is up
+    return terminus.wakeSite(site, env)
 
     // Grab binding info
     .then(function() {
@@ -128,11 +111,19 @@ module.exports = function(kbox, app) {
     .then(function(bindings) {
 
       // Construct our import definition
-      var exportRun = getDbRun();
-      exportRun.opts.entrypoint = 'export-mysql';
+      var exportRun = getDrushRun();
+      var alias = '@kbox';
+      exportRun.opts.entrypoint = ['bash', '-c'];
       // jshint camelcase:false
       // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-      exportRun.opts.cmd = [bindings.mysql_command, dumpFile];
+      //
+      exportRun.opts.cmd = [
+        'drush',
+        alias,
+        'sql-dump',
+        '|',
+        bindings.mysql_command
+      ];
       // jshint camelcase:true
       // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
 

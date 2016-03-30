@@ -13,7 +13,7 @@ $aliases['kbox'] = array(
             array (
               'driver' => 'mysql',
               'username' => 'pantheon',
-              'password' => '',
+              'password' => 'pantheon',
               'port' => 3306,
               'host' => 'database',
               'database' => 'pantheon',
