@@ -206,10 +206,11 @@ module.exports = function(kbox, app) {
         '|',
         'mysql',
         '-u',
-        'root',
+        '$DB_USER',
+        '-p$DB_PASSWORD',
         '-h',
-        'database',
-        'pantheon'
+        '$DB_HOST',
+        '$DB_NAME'
       ];
 
       // Perform the run.

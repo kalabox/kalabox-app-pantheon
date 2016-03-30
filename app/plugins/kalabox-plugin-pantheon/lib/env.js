@@ -103,7 +103,7 @@ module.exports = function(kbox) {
           dbHost: 'database',
           dbPort: 3306,
           dbUser: 'pantheon',
-          dbPassword: '',
+          dbPassword: 'pantheon',
           dbName: 'pantheon',
           pantheonAccount: getConfig().email,
           pantheonSite: 'UUID',

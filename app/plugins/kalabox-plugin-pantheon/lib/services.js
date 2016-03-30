@@ -77,9 +77,9 @@ module.exports = function(kbox, app) {
 
         // Build a creds array
         serviceSummary.external_connection_info = {
-          database: 'pantheon',
-          user: 'pantheon',
-          password: 'pantheon',
+          database: process.env.KALABOX_APP_PANTHEON_DB_NAME,
+          user: process.env.KALABOX_APP_PANTHEON_DB_USER,
+          password: process.env.KALABOX_APP_PANTHEON_DB_PASSWORD,
           host: host,
           port: portInfo[0].HostPort
         };
