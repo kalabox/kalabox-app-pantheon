@@ -140,6 +140,15 @@ module.exports = function(kbox, app) {
             };
           };
 
+          // Construct our rm definition
+          // We need this for backdrop
+          var rmRun = getAppRunner();
+          rmRun.opts.entrypoint = 'rm';
+          rmRun.opts.cmd = [
+            '-rf',
+            '/code/' + process.env.KALABOX_APP_PANTHEON_FILEMOUNT
+          ];
+
           // Construct our extract definition
           var linkRun = getAppRunner();
           linkRun.opts.entrypoint = 'ln';
@@ -149,8 +158,12 @@ module.exports = function(kbox, app) {
             '/code/' + process.env.KALABOX_APP_PANTHEON_FILEMOUNT
           ];
 
-          // Do the linking
-          return engine.run(linkRun);
+          // Do the Remove
+          return engine.run(rmRun)
+          // Do the link
+          .then(function() {
+            return engine.run(linkRun);
+          });
 
         });
       });
