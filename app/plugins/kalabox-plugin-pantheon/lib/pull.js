@@ -91,12 +91,6 @@ module.exports = function(kbox, app) {
       // Grab pantheon aliases
       return terminus.getSiteAliases()
 
-      // Wake the site up
-      // @todo: is this needed?
-      .then(function() {
-        return terminus.wakeSite(site, env);
-      })
-
       // Get connection info
       .then(function() {
         return terminus.connectionInfo(site, env);
@@ -173,45 +167,50 @@ module.exports = function(kbox, app) {
   /*
    * Pull down our sites database
    */
-  var pullDB = function(site, env, newBackup) {
+  var pullDB = function(site, env) {
 
     kbox.core.log.status('Pulling database.');
 
     /*
      * Helper to get a DB run def template
      */
-    var getDbRun = function() {
+    var getDrushRun = function() {
       return {
         compose: app.composeCore,
         project: app.name,
         opts: {
-          services: ['db'],
+          mode: kbox.core.deps.get('mode') === 'gui' ? 'collect' : 'attach',
+          services: ['terminus'],
         }
       };
     };
 
-    // Check if site has a backup
-    return terminus.hasBackup(site, env, 'db')
-
-    // If no backup or for backup then MAKE THAT SHIT
-    .then(function(hasBackup) {
-      if (!hasBackup || newBackup) {
-        return terminus.createBackup(site, env, 'db');
-      }
-    })
-
-    // Download our backup
-    .then(function() {
-      return terminus.downloadBackup(site, env, 'db');
-    })
+    // Make sure remote db is up
+    return terminus.wakeSite(site, env)
 
     // Import the backup
-    .tap(function(sqlDump) {
+    .then(function() {
 
       // Construct our import definition
-      var importRun = getDbRun();
-      importRun.opts.entrypoint = 'import-mysql';
-      importRun.opts.cmd = sqlDump;
+      var alias = ['@pantheon', site, env].join('.');
+      var importRun = getDrushRun();
+      importRun.opts.entrypoint = ['bash', '-c'];
+      importRun.opts.cmd = [
+        'drush',
+        alias,
+        'sql-connect',
+        '&&',
+        'drush',
+        alias,
+        'sql-dump',
+        '|',
+        'mysql',
+        '-u',
+        'root',
+        '-h',
+        'database',
+        'pantheon'
+      ];
 
       // Perform the run.
       return engine.run(importRun);

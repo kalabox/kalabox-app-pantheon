@@ -68,7 +68,7 @@ module.exports = function(kbox) {
       /*
        * Helper to get pull questions
        */
-      var getPullQuestions = function(options) {
+      var getPullQuestions = function() {
 
         return [
           {
@@ -92,20 +92,6 @@ module.exports = function(kbox) {
             },
             default: function() {
               return pantheonConf.env;
-            }
-          },
-          {
-            type: 'confirm',
-            name: 'newbackup',
-            message: 'Retrieve latest DB instead of most recent backup? (y/N)',
-            when: function(answers) {
-              var optDb = options.database;
-              var anDb = answers.database;
-              var pullDb = optDb !== 'none' && anDb !== 'none';
-              return !options.latestbackup && pullDb;
-            },
-            default: function() {
-              return false;
             }
           },
           {
@@ -213,23 +199,13 @@ module.exports = function(kbox) {
           kind: 'string',
           description: 'Pull files from an env. ' + getOptions + ' and none'
         });
-        task.options.push({
-          name: 'newbackup',
-          kind: 'boolean',
-          description: 'True to generate a new DB backup'
-        });
-        task.options.push({
-          name: 'latestbackup',
-          kind: 'boolean',
-          description: 'Use latest DB backup'
-        });
 
         // This is what we run yo!
         task.func = function(done) {
 
           // Grab the CLI options that are available
           var options = this.options;
-          var questions = getPullQuestions(this.options);
+          var questions = getPullQuestions();
 
           // Filter out interactive questions based on passed in options
           questions = kbox.util.cli.filterQuestions(questions, options);
