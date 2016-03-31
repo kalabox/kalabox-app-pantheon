@@ -59,6 +59,11 @@ module.exports = function(grunt) {
       options: {
         config: '.jscsrc'
       }
+    },
+
+    // Basic BATS test
+    bats: {
+      files: ['test/basic/install.bats'],
     }
 
   };
@@ -97,7 +102,8 @@ module.exports = function(grunt) {
 
   grunt.registerTask('test', [
     'jshint',
-    'jscs'
+    'jscs',
+    'bats'
   ]);
 
 };
