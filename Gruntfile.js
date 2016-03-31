@@ -63,7 +63,7 @@ module.exports = function(grunt) {
 
     // Basic BATS test
     bats: {
-      files: ['test/test.bats'],
+      files: ['test/basic/install.bats'],
     }
 
   };
