@@ -36,9 +36,26 @@ before-install() {
 #
 #
 before-script() {
+
   # Global install some npm
   npm install -g grunt-cli
   npm install -g npm
+
+  # Install kalabox
+  sudo apt-get -y update
+  sudo apt-get -y install iptables cgroup-lite bridge-utils
+  curl -fsSL -o /tmp/kalabox.deb "http://installer.kalabox.io/kalabox-latest.deb"
+  sudo dpkg -i /tmp/kalabox.deb
+
+  # Download latest cli
+  sudo curl -fsSL -o /usr/local/bin/kbox "http://cli.kalabox.io/kbox-linux-x64-latest-dev"
+  sudo chmod +x /usr/local/bin/kbox
+
+  # Basic install checks
+  export DOCKER_HOST=tcp://10.13.37.100:2375
+  /usr/share/kalabox/bin/docker ps --all
+  kbox version
+
 }
 
 # script
