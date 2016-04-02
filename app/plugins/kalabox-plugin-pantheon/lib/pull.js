@@ -14,8 +14,14 @@ module.exports = function(kbox, app) {
   var engine = kbox.engine;
 
   // Grab the terminus client
-  var Terminus = require('./terminus.js');
-  var terminus = new Terminus(kbox, app);
+
+  // Only run when app type is pantheon.
+  if (app.config.type === 'pantheon') {
+
+    var Terminus = require('./terminus.js');
+    var terminus = new Terminus(kbox, app);
+
+  }
 
   /*
    * Check to see if this is the first time we are going to do a pull or not
