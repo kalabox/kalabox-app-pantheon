@@ -100,10 +100,23 @@ module.exports = function(grunt) {
     'bump:prerelease'
   ]);
 
-  grunt.registerTask('test', [
+  // Standards and code
+  grunt.registerTask('test:code', [
+    'jshint',
+    'jscs'
+  ]);
+
+  // Functional tests
+  grunt.registerTask('test:func', [
     'jshint',
     'jscs',
     'bats'
+  ]);
+
+  // All tests
+  grunt.registerTask('test', [
+    'test:code',
+    'test:func'
   ]);
 
 };
