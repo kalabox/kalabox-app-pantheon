@@ -17,7 +17,7 @@ module.exports = function(kbox, app) {
   /*
    * Build the site after post-create happens
    */
-  kbox.core.events.on('post-create-app', function(app, done) {
+  app.events.on('post-create', function(done) {
 
     // Get our push and pull stuff
     var puller = require('./pull.js')(kbox, app);
@@ -54,7 +54,7 @@ module.exports = function(kbox, app) {
    * NOTE: this is a nifty implementation where we inception some events
    * to target exactly what we want
    */
-  app.events.on('pre-app-rebuild', function() {
+  app.events.on('pre-rebuild', function() {
 
     // We want to edit our engine remove things
     kbox.core.events.on('pre-engine-destroy', function(data) {
