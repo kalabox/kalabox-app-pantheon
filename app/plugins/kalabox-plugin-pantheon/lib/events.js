@@ -35,12 +35,16 @@ module.exports = function(kbox, app) {
 
     // Pull our DB
     .then(function() {
-      return puller.pullDB(pantheonConf.site, pantheonConf.env);
+      if (!_.get(app.results, 'nodb', false)) {
+        return puller.pullDB(pantheonConf.site, pantheonConf.env);
+      }
     })
 
     // Get our files
     .then(function() {
-      return puller.pullFiles(pantheonConf.site, pantheonConf.env);
+      if (!_.get(app.results, 'nofiles', false)) {
+        return puller.pullFiles(pantheonConf.site, pantheonConf.env);
+      }
     })
 
     .nodeify(done);
