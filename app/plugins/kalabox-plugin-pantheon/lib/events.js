@@ -12,7 +12,7 @@ module.exports = function(kbox, app) {
 
   // Set our pantheon stuff into the env
   var identifier = 'app_pantheon_config';
-  kbox.core.env.setEnvFromObj(app.config.pluginconfig.pantheon, identifier);
+  app.env.setEnvFromObj(app.config.pluginconfig.pantheon, identifier);
 
   /*
    * Build the site after post-create happens

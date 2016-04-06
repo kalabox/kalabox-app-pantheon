@@ -128,6 +128,6 @@ module.exports = function(kbox, app) {
   var framework = getConfig().framework;
 
   // Set some fun ENV action
-  kbox.core.env.setEnvFromObj(getEnv(framework), 'app_pantheon');
+  app.env.setEnvFromObj(getEnv(framework), 'app_pantheon');
 
 };
