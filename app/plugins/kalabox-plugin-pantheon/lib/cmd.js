@@ -5,9 +5,6 @@ module.exports = function(kbox, app) {
   // npm modules
   var _ = require('lodash');
 
-  // Kalabox mods
-  var env = kbox.core.env;
-
   /*
    * Cli container def
    */
@@ -17,7 +14,8 @@ module.exports = function(kbox, app) {
       project: app.name,
       opts: {
         mode: kbox.core.deps.get('mode') === 'gui' ? 'collect' : 'attach',
-        services: ['cli']
+        services: ['cli'],
+        app: app
       }
     };
   };
@@ -37,7 +35,7 @@ module.exports = function(kbox, app) {
     log.info(runDef);
 
     return kbox.Promise.retry(function() {
-      env.setEnv('KALABOX_CLI_WORKING_DIR', '/code');
+      app.env.setEnv('KALABOX_CLI_WORKING_DIR', '/code');
       return kbox.engine.run(runDef);
     });
   };
