@@ -141,7 +141,8 @@ module.exports = function(kbox, app) {
               compose: app.composeCore,
               project: app.name,
               opts: {
-                services: ['appserver']
+                services: ['appserver'],
+                app: app
               }
             };
           };
@@ -200,6 +201,7 @@ module.exports = function(kbox, app) {
         opts: {
           mode: kbox.core.deps.get('mode') === 'gui' ? 'collect' : 'attach',
           services: ['terminus'],
+          app: app
         }
       };
     };
@@ -293,7 +295,8 @@ module.exports = function(kbox, app) {
           project: app.name,
           opts: {
             services: ['cli'],
-            mode: kbox.core.deps.get('mode') === 'gui' ? 'collect' : 'attach'
+            mode: kbox.core.deps.get('mode') === 'gui' ? 'collect' : 'attach',
+            app: app
           }
         };
       };

@@ -39,7 +39,8 @@ Terminus.prototype.__request = function(cmd, options) {
       project: self.app.name,
       opts: {
         services: ['terminus'],
-        mode: 'collect'
+        mode: 'collect',
+        app: self.app
       }
     };
   };
@@ -105,6 +106,7 @@ Terminus.prototype.__request = function(cmd, options) {
       })
 
       // Return valid JSON objects
+      //
       .map(function(response) {
         try {
           JSON.parse(response);

@@ -100,6 +100,7 @@ module.exports = function(kbox, app) {
         opts: {
           mode: kbox.core.deps.get('mode') === 'gui' ? 'collect' : 'attach',
           services: ['terminus'],
+          app: app
         }
       };
     };
