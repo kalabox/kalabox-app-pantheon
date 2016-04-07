@@ -80,4 +80,22 @@ module.exports = function(kbox, app) {
 
   });
 
+  /*
+   * build an object of services to use
+   */
+  app.events.on('services', function() {
+
+    // Get our services module
+    var services = require('./services.js')(kbox, app);
+
+    // Get our services info
+    return services.getServicesInfo()
+
+    // And then define it
+    .then(function(services) {
+      app.services = services;
+    });
+
+  });
+
 };
