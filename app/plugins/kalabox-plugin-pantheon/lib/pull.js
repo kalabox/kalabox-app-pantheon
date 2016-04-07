@@ -148,21 +148,20 @@ module.exports = function(kbox, app) {
           };
 
           // Construct our rm definition
-          // We need this for backdrop
           var rmRun = getAppRunner();
           rmRun.opts.entrypoint = 'rm';
           rmRun.opts.cmd = [
             '-rf',
-            '/code/' + process.env.KALABOX_APP_PANTHEON_FILEMOUNT
+            '/code/' + app.env.getEnv('KALABOX_APP_PANTHEON_FILEMOUNT')
           ];
 
-          // Construct our extract definition
+          // Construct our link definition
           var linkRun = getAppRunner();
           linkRun.opts.entrypoint = 'ln';
           linkRun.opts.cmd = [
             '-nsf',
             '/media',
-            '/code/' + process.env.KALABOX_APP_PANTHEON_FILEMOUNT
+            '/code/' + app.env.getEnv('KALABOX_APP_PANTHEON_FILEMOUNT')
           ];
 
           // Do the Remove
