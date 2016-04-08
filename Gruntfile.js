@@ -62,8 +62,6 @@ module.exports = function(grunt) {
     },
 
     // Basic BATS test
-
-    // Shell tasks for building
     shell: {
       func: {
         options: {
@@ -71,7 +69,11 @@ module.exports = function(grunt) {
             maxBuffer: 20 * 1024 * 1024
           }
         },
-        command: 'node_modules/bats/libexec/bats --pretty ./test/*.bats'
+        command: [
+          'node_modules/bats/libexec/bats',
+          '--pretty',
+          './test/verify_install.bats'
+        ].join(' ')
       }
     }
 

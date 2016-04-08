@@ -1,49 +1,52 @@
 #!/usr/bin/env bats
 
+# Load out environment
+load env
+
 # Check that the Kalabox CLI is in the PATH
 @test "Check that kalabox-cli is in PATH" {
-  run which kbox
+  run which $KBOX
   [ "$status" -eq 0 ]
 }
 
-# Check that 'kbox' returns without error
-@test "Check that 'kbox' returns without error" {
-  run kbox
+# Check that '$KBOX' returns without error
+@test "Check that '$KBOX' returns without error" {
+  run $KBOX
   [ "$status" -eq 1 ]
 }
 
-# Check that 'kbox config' returns without error
-@test "Check that 'kbox config' returns without error" {
-  run kbox config
+# Check that '$KBOX config' returns without error
+@test "Check that '$KBOX config' returns without error" {
+  run $KBOX config
   [ "$status" -eq 0 ]
 }
 
-# Check that 'kbox create' returns without error
-@test "Check that 'kbox create' returns without error" {
-  run kbox create
+# Check that '$KBOX create' returns without error
+@test "Check that '$KBOX create' returns without error" {
+  run $KBOX create
   [ "$status" -eq 1 ]
 }
 
-# Check that 'kbox create' contains 'pantheon' as a choice
-@test "Check that 'kbox create' contains 'pantheon' as a choice" {
-  kbox create | grep pantheon
+# Check that '$KBOX create' contains 'pantheon' as a choice
+@test "Check that '$KBOX create' contains 'pantheon' as a choice" {
+  $KBOX create | grep pantheon
 }
 
-# Check that 'kbox env' returns without error
-@test "Check that 'kbox env' returns without error" {
-  run kbox env
+# Check that '$KBOX env' returns without error
+@test "Check that '$KBOX env' returns without error" {
+  run $KBOX env
   [ "$status" -eq 0 ]
 }
 
-# Check that 'kbox list' returns without error
-@test "Check that 'kbox list' returns without error" {
-  run kbox list
+# Check that '$KBOX list' returns without error
+@test "Check that '$KBOX list' returns without error" {
+  run $KBOX list
   [ "$status" -eq 0 ]
 }
 
-# Check that 'kbox version' returns without error
-@test "Check that 'kbox version' returns without error" {
-  run kbox version
+# Check that '$KBOX version' returns without error
+@test "Check that '$KBOX version' returns without error" {
+  run $KBOX version
   [ "$status" -eq 0 ]
 }
 
