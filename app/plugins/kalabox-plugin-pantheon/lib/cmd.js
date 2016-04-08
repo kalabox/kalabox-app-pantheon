@@ -8,7 +8,7 @@ module.exports = function(kbox, app) {
   /*
    * Cli container def
    */
-  var cliContainer = function() {
+  var defaultCliContainer = function() {
     return {
       compose: app.composeCore,
       project: app.name,
@@ -21,12 +21,27 @@ module.exports = function(kbox, app) {
   };
 
   /*
+   * Terminus container def
+   */
+  var terminusContainer = function() {
+    return {
+      compose: app.composeCore,
+      project: app.name,
+      opts: {
+        mode: kbox.core.deps.get('mode') === 'gui' ? 'collect' : 'attach',
+        services: ['terminus'],
+        app: app
+      }
+    };
+  };
+
+  /*
    * Helper to run commands on the cli container
    */
-  var run = function(entrypoint, cmd) {
+  var run = function(entrypoint, cmd, opts) {
 
     // Build run definition
-    var runDef = cliContainer();
+    var runDef = opts || defaultCliContainer();
     runDef.opts.entrypoint = entrypoint;
     runDef.opts.cmd = cmd;
 
@@ -46,6 +61,14 @@ module.exports = function(kbox, app) {
   var git = function(cmd) {
     cmd.unshift('git');
     return run('usermap', cmd);
+  };
+
+  /*
+   * Run drush commands
+   */
+  var drush = function(cmd) {
+    cmd.unshift('drush');
+    return run('usermap', cmd, terminusContainer());
   };
 
   /*
@@ -108,7 +131,8 @@ module.exports = function(kbox, app) {
   // Return our things
   return {
     git: git,
-    rsync: rsync
+    rsync: rsync,
+    drush: drush
   };
 
 };

@@ -3,16 +3,11 @@
 module.exports = function(kbox, app) {
 
   // Grab the terminus client
-  // Only run when app type is pantheon.
-  if (app.config.type === 'pantheon') {
+  var Terminus = require('./terminus.js');
+  var terminus = new Terminus(kbox, app);
 
-    var Terminus = require('./terminus.js');
-    var terminus = new Terminus(kbox, app);
-
-    // Grab some kalabox modules
-    var engine = kbox.engine;
-
-  }
+  // Grab some kalabox modules
+  var engine = kbox.engine;
 
   /*
    * Push up our sites code

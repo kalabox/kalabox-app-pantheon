@@ -256,6 +256,11 @@ module.exports = function(kbox, app) {
           }
         })
 
+        // Then rebuild caches and registries as appropriate
+        .then(function() {
+          return puller.rebuild();
+        })
+
         .nodeify(done);
 
       });

@@ -5,13 +5,18 @@ set -e
 : ${KALABOX_UID:='1000'}
 : ${KALABOX_GID:='50'}
 
-# Do this so our mounted VB volumes work
-# @todo: silent fail perm setting?
+# Correctly map users
 echo "Remapping apache permissions for VB sharing compat..."
 usermod -u "$KALABOX_UID" www-data
 groupmod -g "$KALABOX_GID" www-data || usermod -G staff www-data
+
+# Make sure our tmp directory exists
+mkdir -p /var/www/tmp
+
+# Make sure we have correct ownership
 chown -Rf www-data:www-data /code
 chown -Rf www-data:www-data /media
+chown -Rf www-data:www-data /var/www/tmp
 
 # Set up our certs for the appserver with nginx
 if [ ! -f "/certs/appserver.pem" ]; then

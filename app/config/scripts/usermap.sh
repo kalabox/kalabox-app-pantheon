@@ -5,13 +5,13 @@ set -e
 : ${KALABOX_UID:='1000'}
 : ${KALABOX_GID:='50'}
 
+# Move any config over and git correct perms
+export HOME=/root
+chown -Rf $KALABOX_UID:$KALABOX_GID /root
+
 # Add local user to match host
 addgroup --force-badname --gecos "" "$KALABOX_GID" > /dev/null || true
-adduser --force-badname --gecos "" --disabled-password --home "/config" --gid "$KALABOX_GID" "$KALABOX_UID" > /dev/null
-
-# Move any config over and git correct perms
-export HOME=/config
-chown -Rf $KALABOX_UID:$KALABOX_UID /config
+adduser --force-badname --quiet --gecos "" --disabled-password --home "/root" --gid "$KALABOX_GID" "$KALABOX_UID" > /dev/null
 
 # Wait until our solr crt is ready and then whitelist it
 # @todo: i wish we had a better way to do this
@@ -25,7 +25,6 @@ if [[ "$@" == *"drush search-api"* ]] || [[ "$@" == *"drush solr-"* ]]; then
   echo "solr/binding.crt" >> /etc/ca-certificates.conf
   update-ca-certificates > /dev/null
 fi
-
 
 # Run the command
 echo "$KALABOX_UID ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
