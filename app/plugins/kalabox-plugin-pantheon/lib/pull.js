@@ -14,14 +14,8 @@ module.exports = function(kbox, app) {
   var engine = kbox.engine;
 
   // Grab the terminus client
-
-  // Only run when app type is pantheon.
-  if (app.config.type === 'pantheon') {
-
-    var Terminus = require('./terminus.js');
-    var terminus = new Terminus(kbox, app);
-
-  }
+  var Terminus = require('./terminus.js');
+  var terminus = new Terminus(kbox, app);
 
   /*
    * Check to see if this is the first time we are going to do a pull or not
@@ -263,6 +257,26 @@ module.exports = function(kbox, app) {
   };
 
   /*
+   * Do a cache/registry rebuild if needed
+   */
+  var rebuild = function() {
+
+    // Grab the drush client
+    var drush = require('./cmd.js')(kbox, app).drush;
+
+    // Switch based on framework
+    // @todo: what does this look like on wordpress/backdrop
+    switch (app.config.pluginconfig.pantheon.framework) {
+      case 'drupal': return drush(['rr']);
+      case 'drupal8': return drush(['cr']);
+      //case 'wordpress': return wp(['']);
+      //case 'backdrop': return drush(['cr'])
+      default: return true;
+    }
+
+  };
+
+  /*
    * Pull files via an archive
    */
   var pullFilesArchive = function(site, env, newBackup) {
@@ -354,7 +368,8 @@ module.exports = function(kbox, app) {
     pullCode: pullCode,
     pullDB: pullDB,
     pullFiles: pullFiles,
-    pullScreenshot: pullScreenshot
+    pullScreenshot: pullScreenshot,
+    rebuild: rebuild
   };
 
 };
