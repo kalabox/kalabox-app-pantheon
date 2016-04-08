@@ -62,8 +62,17 @@ module.exports = function(grunt) {
     },
 
     // Basic BATS test
-    bats: {
-      files: ['test/basic/install.bats'],
+
+    // Shell tasks for building
+    shell: {
+      func: {
+        options: {
+          execOptions: {
+            maxBuffer: 20 * 1024 * 1024
+          }
+        },
+        command: 'node_modules/bats/libexec/bats --pretty ./test/*.bats'
+      }
     }
 
   };
@@ -108,9 +117,7 @@ module.exports = function(grunt) {
 
   // Functional tests
   grunt.registerTask('test:func', [
-    'jshint',
-    'jscs',
-    'bats'
+    'shell:func'
   ]);
 
   // All tests

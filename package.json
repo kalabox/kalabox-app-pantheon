@@ -17,11 +17,12 @@
     "email": "mike@kalamuna.com"
   },
   "devDependencies": {
+    "bats": "git+https://github.com/sstephenson/bats.git#master",
     "grunt": "^0.4.5",
-    "grunt-bats": "0.0.4",
     "grunt-bump": "^0.7.0",
     "grunt-contrib-jshint": "~0.10.0",
     "grunt-jscs": "~0.8.1",
+    "grunt-shell": "^1.2.1",
     "jshint-stylish": "~1.0.0",
     "matchdep": "^0.3.0"
   }
