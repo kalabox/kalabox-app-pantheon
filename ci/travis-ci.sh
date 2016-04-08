@@ -51,8 +51,6 @@ before-script() {
   sudo curl -fsSL -o /usr/local/bin/kbox "http://cli.kalabox.io/kbox-linux-x64-latest-dev"
   sudo chmod +x /usr/local/bin/kbox
 
-  cat /etc/resolver/kbox
-
 }
 
 # script

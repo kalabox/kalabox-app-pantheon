@@ -47,12 +47,12 @@
   [ "$status" -eq 0 ]
 }
 
-# Check that '.kbox' domains can be pinged
-@test "Check that '10.13.37.100' can be pinged" {
-  ping -c 1 10.13.37.100
+# Check that DNS has been set
+@test "Check that '10.13.37.100' exists in '/etc/resolver/kbox'" {
+  cat /etc/resolver/kbox | grep 10.13.37.100
 }
 
-# Check that '.kbox' domains can be pinged
-@test "Check that '.kbox' domains can be pinged" {
-  ping -c 1 something.kbox
+# Check that '10.13.37.100' can be pinged
+@test "Check that '10.13.37.100' can be pinged" {
+  ping -c 1 10.13.37.100
 }
