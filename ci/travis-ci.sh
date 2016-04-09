@@ -21,7 +21,10 @@ before-install() {
   echo "TRAVIS_REPO_SLUG: ${TRAVIS_REPO_SLUG}"
   echo "TRAVIS_BUILD_DIR: ${TRAVIS_BUILD_DIR}"
   echo "TRAVIS_OS_NAME: ${TRAVIS_OS_NAME}"
+
   echo "PATH: ${PATH}"
+
+  echo "DOCKER_HOST: ${DOCKER_HOST}"
 
   # Add our key
   if [ $TRAVIS_PULL_REQUEST == "false" ] &&

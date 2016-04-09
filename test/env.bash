@@ -19,9 +19,6 @@
 # Docker helpers
 #
 
-# Set the docker host so we can run docker commands on linux
-: ${DOCKER_HOST:=10.13.37.100:2375}
-
 # The "docker" binary, use `docker-machine ssh Kalabox2` on non-linux
 if [ -f "$HOME/.kalabox/bin/docker-machine" ]; then
   : ${DOCKER:="$HOME/.kalabox/bin/docker-machine ssh Kalabox2 docker"}
