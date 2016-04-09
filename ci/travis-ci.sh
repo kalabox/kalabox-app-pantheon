@@ -62,8 +62,23 @@ before-script() {
 #
 script() {
 
-  # Test the things
-  run_command grunt test
+  #
+  # Run code tests
+  #
+  run_command grunt test:code
+
+  #
+  # Run all our functional tests
+  #
+
+  # Verify install
+  run_command grunt test:install
+
+  # Ensure images
+  run_command grunt test:images
+
+  # Create and verify sites
+  run_command grunt test:drupal7
 
 }
 

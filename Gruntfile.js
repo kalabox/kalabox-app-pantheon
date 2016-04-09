@@ -6,6 +6,10 @@ module.exports = function(grunt) {
   // SETUP CONFIG
   //--------------------------------------------------------------------------
 
+  // Helpers to make things cleaner
+  var funcOpts = {execOptions: {maxBuffer: 20 * 1024 * 1024}};
+  var funcCommand = 'node_modules/bats/libexec/bats --pretty';
+
   // setup task config
   var config = {
 
@@ -62,17 +66,20 @@ module.exports = function(grunt) {
     },
 
     // Basic BATS test
+
     shell: {
-      func: {
-        options: {
-          execOptions: {
-            maxBuffer: 20 * 1024 * 1024
-          }
-        },
+      install: {
+        options: funcOpts,
+        command: funcCommand + ' ./test/install.bats'
+      },
+      images: {
+        options: funcOpts,
+        command: funcCommand + ' ./test/images.bats'
+      },
+      drupal7: {
+        options: funcOpts,
         command: [
-          'node_modules/bats/libexec/bats',
-          '--pretty',
-          './test/verify_install.bats',
+          funcCommand,
           './test/drupal7/create.bats'
         ].join(' ')
       }
@@ -97,32 +104,56 @@ module.exports = function(grunt) {
   // SETUP WORKFLOWS
   //--------------------------------------------------------------------------
 
+  /*
+   * Bump Taskz
+   */
   // Bump our minor version
   grunt.registerTask('bigrelease', [
     'bump:minor'
   ]);
-
   // Bump our patch version
   grunt.registerTask('release', [
     'bump:patch'
   ]);
-
   // Do a prerelease version
   grunt.registerTask('prerelease', [
     'bump:prerelease'
   ]);
 
+  /*
+   * Code tests
+   */
   // Standards and code
   grunt.registerTask('test:code', [
     'jshint',
     'jscs'
   ]);
 
-  // Functional tests
+  /*
+   * Functional tests
+   */
+  // All functional tests
   grunt.registerTask('test:func', [
-    'shell:func'
+    'shell:install',
+    'shell:images',
+    'shell:drupal7'
+  ]);
+  // Verify the install
+  grunt.registerTask('test:install', [
+    'shell:install'
+  ]);
+  // Build the images
+  grunt.registerTask('test:images', [
+    'shell:images'
+  ]);
+  // Test Drupal7
+  grunt.registerTask('test:drupal7', [
+    'shell:drupal7'
   ]);
 
+  /*
+   * All tests
+   */
   // All tests
   grunt.registerTask('test', [
     'test:code',
