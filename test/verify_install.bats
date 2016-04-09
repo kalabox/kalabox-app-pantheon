@@ -1,6 +1,10 @@
 #!/usr/bin/env bats
 
-# Load out environment
+#
+# Basic tests to verify that Kalabox has been installed
+#
+
+# Load up environment
 load env
 
 # Check that the Kalabox CLI is in the PATH
@@ -48,6 +52,16 @@ load env
 @test "Check that '$KBOX version' returns without error" {
   run $KBOX version
   [ "$status" -eq 0 ]
+}
+
+# Check that core dns container exists
+@test "Check that core dns container exists and is running." {
+  $DOCKER inspect kalabox_dns_1 | grep "\"Running\": true"
+}
+
+# Check that core proxy container exists
+@test "Check that core proxy container exists and is running." {
+  $DOCKER inspect kalabox_proxy_1 | grep "\"Running\": true"
 }
 
 # Check that DNS has been set

@@ -72,7 +72,8 @@ module.exports = function(grunt) {
         command: [
           'node_modules/bats/libexec/bats',
           '--pretty',
-          './test/verify_install.bats'
+          './test/verify_install.bats',
+          './test/drupal7/create.bats'
         ].join(' ')
       }
     }
