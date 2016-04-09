@@ -8,7 +8,7 @@ module.exports = function(grunt) {
 
   // Helpers to make things cleaner
   var funcOpts = {execOptions: {maxBuffer: 20 * 1024 * 1024}};
-  var funcCommand = 'node_modules/bats/libexec/bats --pretty';
+  var funcCommand = 'node_modules/bats/libexec/bats ${CI:+--tap}';
 
   // setup task config
   var config = {

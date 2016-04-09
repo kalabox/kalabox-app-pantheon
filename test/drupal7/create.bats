@@ -8,7 +8,7 @@
 load ../env
 
 # Check to see if our site exists already
-NOT_THERE=$("$KBOX" list | grep "$PANTHEON_DRUPAL7_NAME" > /dev/null && echo $? || true)
+EXISTS=$("$KBOX" list | grep "$PANTHEON_DRUPAL7_NAME" > /dev/null && echo $? || true)
 
 #
 # Setup some things
@@ -19,14 +19,14 @@ setup() {
 }
 
 #
-# General create tests
+# Create test
 #
 
 # Create a drupal7 site
 @test "Create a Pantheon Drupal 7 site without an error." {
 
   # Run the create command if our site doesn't already exist
-  if [ $NOT_THERE != 0 ]; then
+  if [ ! $EXISTS ]; then
 
     # Create a drupal 7 site
     run $KBOX create pantheon \
@@ -44,16 +44,115 @@ setup() {
 
   # We already have what we need so lets skip
   else
-    skip
+    skip "Looks like we already have a D7 site ready to go!"
   fi
 
 }
 
-# Check that this pantheon site contains the correct containers and they
-# are in the correct state
-#@test "Check that $PANTHEON_DRUPAL7_SITE_appserver_1 is in the correct state." {
-  #$DOCKER inspect "${PANTHEON_DRUPAL7_SITE}_appserver_1"
-#}
+#
+# Verify that services are all in the correct state
+#
+
+# Check that the data container exists and is in the correct state.
+@test "Check that the data container exists and is in the correct state." {
+  $DOCKER inspect ${PANTHEON_DRUPAL7_NAME}_data_1 | grep "\"Status\": \"exited\""
+}
+
+# Check that the terminus container exists and is in the correct state.
+@test "Check that the terminus container exists and is in the correct state." {
+  $DOCKER inspect ${PANTHEON_DRUPAL7_NAME}_terminus_1 | grep "\"Status\": \"exited\""
+}
+
+# Check that the terminus container exists and is in the correct state.
+@test "Check that the cli container exists and is in the correct state." {
+  $DOCKER inspect ${PANTHEON_DRUPAL7_NAME}_cli_1 | grep "\"Status\": \"exited\""
+}
+
+# Check that the appserver container exists and is in the correct state.
+@test "Check that the appserver container exists and is in the correct state." {
+  $DOCKER inspect ${PANTHEON_DRUPAL7_NAME}_appserver_1 | grep "\"Status\": \"running\""
+}
+
+# Check that the db container exists and is in the correct state.
+@test "Check that the db container exists and is in the correct state." {
+  $DOCKER inspect ${PANTHEON_DRUPAL7_NAME}_db_1 | grep "\"Status\": \"running\""
+}
+
+# Check that the edge container exists and is in the correct state.
+@test "Check that the edge container exists and is in the correct state." {
+  $DOCKER inspect ${PANTHEON_DRUPAL7_NAME}_edge_1 | grep "\"Status\": \"running\""
+}
+
+# Check that the solr container exists and is in the correct state.
+@test "Check that the solr container exists and is in the correct state." {
+  $DOCKER inspect ${PANTHEON_DRUPAL7_NAME}_solr_1 | grep "\"Status\": \"running\""
+}
+
+# Check that the redis container exists and is in the correct state.
+@test "Check that the redis container exists and is in the correct state." {
+  $DOCKER inspect ${PANTHEON_DRUPAL7_NAME}_redis_1 | grep "\"Status\": \"running\""
+}
+
+#
+# Verify some basic things about the install
+#
+
+# Check that we have a git repo and its in a good spot
+@test "Check that site shows up in $KBOX list with correct properties" {
+
+  # Grep a bunch of things
+  $KBOX list | grep "\"name\": \"$PANTHEON_DRUPAL7_NAME\""
+  $KBOX list | grep "\"url\": \"http://${PANTHEON_DRUPAL7_NAME}.kbox\""
+  $KBOX list | grep "\"type\": \"pantheon\""
+  $KBOX list | grep "\"version\": \"0.12\""
+  $KBOX list | grep "\"location\": \"${KBOX_APP_DIR}/${PANTHEON_DRUPAL7_NAME}\""
+  $KBOX list | grep "\"running\": true"
+
+}
+
+# Check that we have a git repo and its in a good spot
+@test "Check that we have a git repo and it is in a good state." {
+
+  # We need to actually go into this app dir until
+  # https://github.com/kalabox/kalabox/issues/1221
+  # is resolved
+  cd $KBOX_APP_DIR/$PANTHEON_DRUPAL7_NAME
+
+  # Check that we are on the master branch
+  $KBOX git status | grep "On branch master"
+
+}
+
+# Check that we have drupal tables in our database
+@test "Check that $ON_OSX we have tables in our database." {
+
+  # SKip this test on OSX
+  if [ $ON_OSX == true ]; then
+    skip "This test currently fails on OSX"
+  fi
+
+  # See if we have tables in the PANTHEON database
+  $DOCKER exec ${PANTHEON_DRUPAL7_NAME}_appserver_1 mysql -e SHOW TABLES; pantheon
+
+}
+
+# Check that files symlink is correct.
+@test "Check that the files -> /media symlink is correct." {
+  $DOCKER exec ${PANTHEON_DRUPAL7_NAME}_appserver_1 ls -lsa /code/sites/default | grep /media
+}
+
+# Check that our files directory is non-empty
+@test "Check that our files directory is non-empty." {
+  $DOCKER exec ${PANTHEON_DRUPAL7_NAME}_appserver_1 find "/media" -type f;
+}
+
+# Check that we have the correct DNS entries
+@test "Check that we have the correct DNS entries." {
+  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:http://${PANTHEON_DRUPAL7_NAME}.kbox 0 5 | grep 10.13.37.100
+  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:https://${PANTHEON_DRUPAL7_NAME}.kbox 0 5 | grep 10.13.37.100
+  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:http://edge.${PANTHEON_DRUPAL7_NAME}.kbox 0 5 | grep 10.13.37.100
+  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:https://edge.${PANTHEON_DRUPAL7_NAME}.kbox 0 5 | grep 10.13.37.100
+}
 
 #
 # BURN IT TO THE GROUND!!!!

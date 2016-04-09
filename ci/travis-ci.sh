@@ -77,7 +77,7 @@ script() {
   # Ensure images
   run_command grunt test:images
 
-  # Create and verify sites
+  # Do basic tests for each framework
   run_command grunt test:drupal7
 
 }

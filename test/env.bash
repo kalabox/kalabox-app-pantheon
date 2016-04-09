@@ -4,8 +4,18 @@
 # Local Dev Helpers
 #
 
-# Uncomment to override $TRAVIS_BUILD_DIR, useful for local testing
-: ${TRAVIS_BUILD_DIR:=/Users/pirog/Desktop/work/kalabox-cli/node_modules/kalabox-app-pantheon}
+# If we are not on travis we want to emulate
+# You will want to set these to values that make sense for your local setup
+if [ ! $TRAVIS ]; then
+  : ${TRAVIS_BUILD_DIR:=/Users/pirog/Desktop/work/kalabox-cli/node_modules/kalabox-app-pantheon}
+fi
+
+# Check to see if we are on Darwin
+if [[ $(uname) == "Darwin" ]]; then
+  : ${ON_OSX:=true}
+else
+  : ${ON_OSX:=false}
+fi
 
 #
 # Kbox helpers
