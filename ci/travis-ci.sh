@@ -73,12 +73,11 @@ script() {
 
   # Verify install
   run_command grunt test:install
-
   # Ensure images
   run_command grunt test:images
 
-  # Do basic tests for each framework
-  run_command grunt test:drupal7
+  # Do the KALABOX_TEST_GROUP
+  run_command grunt test:$KALABOX_TEST_GROUP
 
 }
 

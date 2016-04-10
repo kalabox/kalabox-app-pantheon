@@ -10,6 +10,9 @@ load ../env
 #
 # Setup some things
 #
+# @todo: Do we want to make sure we create a D7 site if one doesn't already exist like we do in
+# create.js? or should we just assume its there already?
+#
 setup() {
 
   # Create a directory to put our test builds
@@ -18,7 +21,7 @@ setup() {
   # We need to actually go into this app dir until
   # https://github.com/kalabox/kalabox/issues/1221
   # is resolved
-  cd $KBOX_APP_DIR/$PANTHEON_DRUPAL7_NAME
+  cd $KBOX_APP_DIR/$PANTHEON_WORDPRESS_NAME
 
   # Version to check
   BOWER_VERSION=1.7
@@ -33,6 +36,7 @@ setup() {
   PHP_VERSION=5.6
   RSYNC_VERSION=3.1
   TERMINUS_VERSION=0.10
+  WP_CLI_VERSION=0.23
 }
 
 #
@@ -107,10 +111,15 @@ setup() {
   [ "$status" -eq 0 ]
   [[ $output == *"$RSYNC_VERSION"* ]]
 }
-@test "Check that '$KBOX terminus' returns the correct major version without an error." {
+@test "Check that '$KBOX terminus cli version' returns the correct major version without an error." {
   run $KBOX terminus cli version
   [ "$status" -eq 0 ]
   [[ $output == *"$TERMINUS_VERSION"* ]]
+}
+@test "Check that '$KBOX wp cli version' returns the correct major version without an error." {
+  run $KBOX wp cli version
+  [ "$status" -eq 0 ]
+  [[ $output == *"$WP_CLI_VERSION"* ]]
 }
 
 #
@@ -118,6 +127,6 @@ setup() {
 #
 teardown() {
   echo;
-  #$KBOX $PANTHEON_DRUPAL7_NAME destroy -- -y
+  #$KBOX $PANTHEON_WORDPRESS_NAME destroy -- -y
   #rm -rf $KBOX_APP_DIR
 }

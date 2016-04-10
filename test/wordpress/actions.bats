@@ -1,7 +1,7 @@
 #!/usr/bin/env bats
 
 #
-# Basic tests to verify basic Drupal 7 app actions
+# Basic tests to verify basic Wordpress app actions
 #
 
 # Load up environment
@@ -26,19 +26,19 @@ setup() {
 #   stop             Stop a running kbox application.
 #
 @test "Check that we can run '$KBOX config' without an error." {
-  $KBOX $PANTHEON_DRUPAL7_NAME config
+  $KBOX $PANTHEON_WORDPRESS_NAME config
 }
 @test "Check that we can run '$KBOX stop' without an error." {
-  $KBOX $PANTHEON_DRUPAL7_NAME stop
+  $KBOX $PANTHEON_WORDPRESS_NAME stop
 }
 @test "Check that we can run '$KBOX start' without an error." {
-  $KBOX $PANTHEON_DRUPAL7_NAME start
+  $KBOX $PANTHEON_WORDPRESS_NAME start
 }
 @test "Check that we can run '$KBOX restart' without an error." {
-  $KBOX $PANTHEON_DRUPAL7_NAME restart
+  $KBOX $PANTHEON_WORDPRESS_NAME restart
 }
 @test "Check that we can run '$KBOX services' without an error." {
-  $KBOX $PANTHEON_DRUPAL7_NAME services
+  $KBOX $PANTHEON_WORDPRESS_NAME services
 }
 
 #
@@ -48,10 +48,10 @@ setup() {
 #   push             Push up new code and optionally data and files.
 #
 @test "Check that we can run '$KBOX pull' without an error." {
-  $KBOX $PANTHEON_DRUPAL7_NAME pull -- --database $PANTHEON_DRUPAL7_ENV --files $PANTHEON_DRUPAL7_ENV
+  $KBOX $PANTHEON_WORDPRESS_NAME pull -- --database $PANTHEON_WORDPRESS_ENV --files $PANTHEON_WORDPRESS_ENV
 }
 @test "Check that we can run '$KBOX push' without an error." {
-  $KBOX $PANTHEON_DRUPAL7_NAME push -- --message "Pushing test commit from build $TRAVIS_COMMIT" --database $PANTHEON_DRUPAL7_ENV --files $PANTHEON_DRUPAL7_ENV
+  $KBOX $PANTHEON_WORDPRESS_NAME push -- --message "Pushing test commit from build $TRAVIS_COMMIT" --database $PANTHEON_WORDPRESS_ENV --files $PANTHEON_WORDPRESS_ENV
 }
 
 #
@@ -63,11 +63,11 @@ setup() {
 #
 @test "Check that after '$KBOX restart' DNS is set correctly." {
   run \
-  $KBOX $PANTHEON_DRUPAL7_NAME restart && \
-  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:http://${PANTHEON_DRUPAL7_NAME}.kbox 0 5 | grep 10.13.37.100 && \
-  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:https://${PANTHEON_DRUPAL7_NAME}.kbox 0 5 | grep 10.13.37.100 && \
-  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:http://edge.${PANTHEON_DRUPAL7_NAME}.kbox 0 5 | grep 10.13.37.100 && \
-  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:https://edge.${PANTHEON_DRUPAL7_NAME}.kbox 0 5 | grep 10.13.37.100
+  $KBOX $PANTHEON_WORDPRESS_NAME restart && \
+  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:http://${PANTHEON_WORDPRESS_NAME}.kbox 0 5 | grep 10.13.37.100 && \
+  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:https://${PANTHEON_WORDPRESS_NAME}.kbox 0 5 | grep 10.13.37.100 && \
+  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:http://edge.${PANTHEON_WORDPRESS_NAME}.kbox 0 5 | grep 10.13.37.100 && \
+  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:https://edge.${PANTHEON_WORDPRESS_NAME}.kbox 0 5 | grep 10.13.37.100
   [ "$status" -eq 0 ]
 }
 
@@ -76,6 +76,6 @@ setup() {
 #
 teardown() {
   echo;
-  #$KBOX $PANTHEON_DRUPAL7_NAME destroy -- -y
+  #$KBOX $PANTHEON_WORDPRESS_NAME destroy -- -y
   #rm -rf $KBOX_APP_DIR
 }

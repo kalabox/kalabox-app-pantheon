@@ -85,6 +85,36 @@ module.exports = function(grunt) {
           './test/drupal7/commands.bats',
           './test/drupal7/finish.bats'
         ].join(' ')
+      },
+      drupal8: {
+        options: funcOpts,
+        command: [
+          funcCommand,
+          './test/drupal8/create.bats',
+          './test/drupal8/actions.bats',
+          './test/drupal8/commands.bats',
+          './test/drupal8/finish.bats'
+        ].join(' ')
+      },
+      backdrop: {
+        options: funcOpts,
+        command: [
+          funcCommand,
+          './test/backdrop/create.bats',
+          './test/backdrop/actions.bats',
+          './test/backdrop/commands.bats',
+          './test/backdrop/finish.bats'
+        ].join(' ')
+      },
+      wordpress: {
+        options: funcOpts,
+        command: [
+          funcCommand,
+          './test/wordpress/create.bats',
+          './test/wordpress/actions.bats',
+          './test/wordpress/commands.bats',
+          './test/wordpress/finish.bats'
+        ].join(' ')
       }
     }
 
@@ -135,12 +165,6 @@ module.exports = function(grunt) {
   /*
    * Functional tests
    */
-  // All functional tests
-  grunt.registerTask('test:func', [
-    'shell:install',
-    'shell:images',
-    'shell:drupal7'
-  ]);
   // Verify the install
   grunt.registerTask('test:install', [
     'shell:install'
@@ -149,9 +173,39 @@ module.exports = function(grunt) {
   grunt.registerTask('test:images', [
     'shell:images'
   ]);
-  // Test Drupal7
+  // Basic Drupal 7 tests
   grunt.registerTask('test:drupal7', [
     'shell:drupal7'
+  ]);
+  // Basic Drupal 8 tests
+  grunt.registerTask('test:drupal8', [
+    'shell:drupal8'
+  ]);
+  // Basic Backdrop tests
+  grunt.registerTask('test:backdrop', [
+    'shell:backdrop'
+  ]);
+  // Basic Wordpress tests
+  grunt.registerTask('test:wordpress', [
+    'shell:wordpress'
+  ]);
+
+  // All Basic tests
+  grunt.registerTask('test:basic', [
+    'shell:install',
+    'shell:images'
+  ]);
+  // All Framework tests
+  grunt.registerTask('test:frameworks', [
+    'shell:drupal7',
+    'shell:drupal8',
+    'shell:backdrop',
+    'shell:wordpress'
+  ]);
+  // All Common tests
+  grunt.registerTask('test:common', [
+    'shell:install',
+    'shell:images'
   ]);
 
   /*

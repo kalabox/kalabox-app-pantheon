@@ -10,6 +10,9 @@ load ../env
 #
 # Setup some things
 #
+# @todo: Do we want to make sure we create a D7 site if one doesn't already exist like we do in
+# create.js? or should we just assume its there already?
+#
 setup() {
 
   # Create a directory to put our test builds
@@ -18,7 +21,7 @@ setup() {
   # We need to actually go into this app dir until
   # https://github.com/kalabox/kalabox/issues/1221
   # is resolved
-  cd $KBOX_APP_DIR/$PANTHEON_DRUPAL7_NAME
+  cd $KBOX_APP_DIR/$PANTHEON_BACKDROP_NAME
 
   # Version to check
   BOWER_VERSION=1.7
@@ -118,6 +121,6 @@ setup() {
 #
 teardown() {
   echo;
-  #$KBOX $PANTHEON_DRUPAL7_NAME destroy -- -y
+  #$KBOX $PANTHEON_BACKDROP_NAME destroy -- -y
   #rm -rf $KBOX_APP_DIR
 }

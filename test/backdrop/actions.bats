@@ -1,7 +1,7 @@
 #!/usr/bin/env bats
 
 #
-# Basic tests to verify basic Drupal 7 app actions
+# Basic tests to verify basic Backdrop app actions
 #
 
 # Load up environment
@@ -26,19 +26,19 @@ setup() {
 #   stop             Stop a running kbox application.
 #
 @test "Check that we can run '$KBOX config' without an error." {
-  $KBOX $PANTHEON_DRUPAL7_NAME config
+  $KBOX $PANTHEON_BACKDROP_NAME config
 }
 @test "Check that we can run '$KBOX stop' without an error." {
-  $KBOX $PANTHEON_DRUPAL7_NAME stop
+  $KBOX $PANTHEON_BACKDROP_NAME stop
 }
 @test "Check that we can run '$KBOX start' without an error." {
-  $KBOX $PANTHEON_DRUPAL7_NAME start
+  $KBOX $PANTHEON_BACKDROP_NAME start
 }
 @test "Check that we can run '$KBOX restart' without an error." {
-  $KBOX $PANTHEON_DRUPAL7_NAME restart
+  $KBOX $PANTHEON_BACKDROP_NAME restart
 }
 @test "Check that we can run '$KBOX services' without an error." {
-  $KBOX $PANTHEON_DRUPAL7_NAME services
+  $KBOX $PANTHEON_BACKDROP_NAME services
 }
 
 #
@@ -48,10 +48,10 @@ setup() {
 #   push             Push up new code and optionally data and files.
 #
 @test "Check that we can run '$KBOX pull' without an error." {
-  $KBOX $PANTHEON_DRUPAL7_NAME pull -- --database $PANTHEON_DRUPAL7_ENV --files $PANTHEON_DRUPAL7_ENV
+  $KBOX $PANTHEON_BACKDROP_NAME pull -- --database $PANTHEON_BACKDROP_ENV --files $PANTHEON_BACKDROP_ENV
 }
 @test "Check that we can run '$KBOX push' without an error." {
-  $KBOX $PANTHEON_DRUPAL7_NAME push -- --message "Pushing test commit from build $TRAVIS_COMMIT" --database $PANTHEON_DRUPAL7_ENV --files $PANTHEON_DRUPAL7_ENV
+  $KBOX $PANTHEON_BACKDROP_NAME push -- --message "Pushing test commit from build $TRAVIS_COMMIT" --database $PANTHEON_BACKDROP_ENV --files $PANTHEON_BACKDROP_ENV
 }
 
 #
@@ -63,11 +63,11 @@ setup() {
 #
 @test "Check that after '$KBOX restart' DNS is set correctly." {
   run \
-  $KBOX $PANTHEON_DRUPAL7_NAME restart && \
-  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:http://${PANTHEON_DRUPAL7_NAME}.kbox 0 5 | grep 10.13.37.100 && \
-  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:https://${PANTHEON_DRUPAL7_NAME}.kbox 0 5 | grep 10.13.37.100 && \
-  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:http://edge.${PANTHEON_DRUPAL7_NAME}.kbox 0 5 | grep 10.13.37.100 && \
-  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:https://edge.${PANTHEON_DRUPAL7_NAME}.kbox 0 5 | grep 10.13.37.100
+  $KBOX $PANTHEON_BACKDROP_NAME restart && \
+  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:http://${PANTHEON_BACKDROP_NAME}.kbox 0 5 | grep 10.13.37.100 && \
+  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:https://${PANTHEON_BACKDROP_NAME}.kbox 0 5 | grep 10.13.37.100 && \
+  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:http://edge.${PANTHEON_BACKDROP_NAME}.kbox 0 5 | grep 10.13.37.100 && \
+  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:https://edge.${PANTHEON_BACKDROP_NAME}.kbox 0 5 | grep 10.13.37.100
   [ "$status" -eq 0 ]
 }
 
@@ -76,6 +76,6 @@ setup() {
 #
 teardown() {
   echo;
-  #$KBOX $PANTHEON_DRUPAL7_NAME destroy -- -y
+  #$KBOX $PANTHEON_BACKDROP_NAME destroy -- -y
   #rm -rf $KBOX_APP_DIR
 }
