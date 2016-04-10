@@ -40,17 +40,38 @@ setup() {
 @test "Check that we can run '$KBOX restart' without an error." {
   $KBOX $PANTHEON_DRUPAL7_NAME restart
 }
-#
-# We should find a better place to test this because we don't want to
-# replace the services we built from local dockerfiles in images.bats with
-# the ones from docker hub.
-#
-@test "Check that we can run '$KBOX rebuild' without an error." {
-  skip "Find a better place to test this."
-  $KBOX $PANTHEON_DRUPAL7_NAME rebuild
-}
 @test "Check that we can run '$KBOX services' without an error." {
   $KBOX $PANTHEON_DRUPAL7_NAME services
+}
+
+#
+# Basic interactive action verification
+#
+#   pull             Pull down new code and optionally data and files.
+#   push             Push up new code and optionally data and files.
+#
+@test "Check that we can run '$KBOX pull' without an error." {
+  $KBOX $PANTHEON_DRUPAL7_NAME pull -- --database $PANTHEON_DRUPAL7_ENV --files $PANTHEON_DRUPAL7_ENV
+}
+@test "Check that we can run '$KBOX push' without an error." {
+  $KBOX $PANTHEON_DRUPAL7_NAME push -- --message "Pushing test commit from build $TRAVIS_COMMIT" --database $PANTHEON_DRUPAL7_ENV --files $PANTHEON_DRUPAL7_ENV
+}
+
+#
+# Do a deeper dive on some commands
+#
+#    restart          Stop and then start a running kbox application.
+#
+# Verify DNS
+#
+@test "Check that after '$KBOX restart' DNS is set correctly." {
+  run \
+  $KBOX $PANTHEON_DRUPAL7_NAME restart && \
+  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:http://${PANTHEON_DRUPAL7_NAME}.kbox 0 5 | grep 10.13.37.100 && \
+  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:https://${PANTHEON_DRUPAL7_NAME}.kbox 0 5 | grep 10.13.37.100 && \
+  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:http://edge.${PANTHEON_DRUPAL7_NAME}.kbox 0 5 | grep 10.13.37.100 && \
+  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:https://edge.${PANTHEON_DRUPAL7_NAME}.kbox 0 5 | grep 10.13.37.100
+  [ "$status" -eq 0 ]
 }
 
 #
