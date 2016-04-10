@@ -74,7 +74,7 @@ PANTHEON_CLI="kalabox/cli:stable"
 
 # Check that we can build $PANTHEON_SOLR without an error.
 @test "Check that we can build the solr image without an error." {
-  skip "https://archive.apache.org/dist/lucene/solr/3.6.2/apache-solr-3.6.2.tgz is currently down for maintenance."
+  # skip "https://archive.apache.org/dist/lucene/solr/3.6.2/apache-solr-3.6.2.tgz is currently down for maintenance."
   run $DOCKER build -t kalabox/$PANTHEON_SOLR:dev $PANTHEON_DOCKERFILES_DIR/$PANTHEON_SOLR
   [ "$status" -eq 0 ]
 }

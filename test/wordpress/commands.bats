@@ -26,7 +26,6 @@ setup() {
   # Version to check
   BOWER_VERSION=1.7
   COMPOSER_VERSION=1.0
-  DRUSH_VERSION=8.0
   GIT_VERSION=2.6
   GRUNT_VERSION=0.1
   GULP_VERSION=1.2
@@ -65,11 +64,6 @@ setup() {
   run $KBOX composer --version
   [ "$status" -eq 0 ]
   [[ $output == *"$COMPOSER_VERSION"* ]]
-}
-@test "Check that '$KBOX drush' returns the correct major version without an error." {
-  run $KBOX drush --version
-  [ "$status" -eq 0 ]
-  [[ $output == *"$DRUSH_VERSION"* ]]
 }
 @test "Check that '$KBOX git' returns the correct major version without an error." {
   run $KBOX git --version
