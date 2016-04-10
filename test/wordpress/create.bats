@@ -138,7 +138,7 @@ setup() {
 
 # Check that files symlink is correct.
 @test "Check that the files -> /media symlink is correct." {
-  $DOCKER exec ${PANTHEON_WORDPRESS_NAME}_appserver_1 ls -lsa /code/sites/default | grep /media
+  $DOCKER exec ${PANTHEON_WORDPRESS_NAME}_appserver_1 ls -lsa /code/wp-content/uploads | grep /media
 }
 
 # Check that our files directory is non-empty
