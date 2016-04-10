@@ -3,6 +3,13 @@
 #
 # Basic tests to verify Drupal7 creates
 #
+# NOTE: Let's not use any `kbox` commands here if we can. This way
+# we aren't getting failed tests because the kbox part of the commands are
+# failing vs the actual passed through commands aka
+#
+# BAD   : $KBOX git status
+# GOOD  :
+#
 
 # Load up environment
 load ../env
@@ -112,19 +119,12 @@ setup() {
 
 # Check that we have a git repo and its in a good spot
 @test "Check that we have a git repo and it is in a good state." {
-
-  # We need to actually go into this app dir until
-  # https://github.com/kalabox/kalabox/issues/1221
-  # is resolved
-  cd $KBOX_APP_DIR/$PANTHEON_DRUPAL7_NAME
-
-  # Check that we are on the master branch
-  $KBOX git status | grep "On branch master"
-
+  cd $KBOX_APP_DIR/$PANTHEON_DRUPAL7_NAME/code
+  git status
 }
 
 # Check that we have drupal tables in our database
-@test "Check that $ON_OSX we have tables in our database." {
+@test "Check that we have tables in our pantheon database." {
 
   # SKip this test on OSX
   if [ $ON_OSX == true ]; then
@@ -132,7 +132,7 @@ setup() {
   fi
 
   # See if we have tables in the PANTHEON database
-  $DOCKER exec ${PANTHEON_DRUPAL7_NAME}_appserver_1 mysql -e SHOW TABLES; pantheon
+  $DOCKER exec ${PANTHEON_DRUPAL7_NAME}_appserver_1 mysql -e 'SHOW TABLES;' pantheon
 
 }
 

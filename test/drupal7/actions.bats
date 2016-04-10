@@ -19,8 +19,39 @@ setup() {
 }
 
 #
-# Create test
+# Basic non-interactive action verification
 #
+#   config           Display the kbox application's configuration.
+#   rebuild          Rebuilds your app while maintaining your app data.
+#   restart          Stop and then start a running kbox application.
+#   services         Display connection info for services.
+#   start            Start an installed kbox application.
+#   stop             Stop a running kbox application.
+#
+@test "Check that we can run '$KBOX config' without an error." {
+  $KBOX $PANTHEON_DRUPAL7_NAME config
+}
+@test "Check that we can run '$KBOX stop' without an error." {
+  $KBOX $PANTHEON_DRUPAL7_NAME stop
+}
+@test "Check that we can run '$KBOX start' without an error." {
+  $KBOX $PANTHEON_DRUPAL7_NAME start
+}
+@test "Check that we can run '$KBOX restart' without an error." {
+  $KBOX $PANTHEON_DRUPAL7_NAME restart
+}
+#
+# We should find a better place to test this because we don't want to
+# replace the services we built from local dockerfiles in images.bats with
+# the ones from docker hub.
+#
+@test "Check that we can run '$KBOX rebuild' without an error." {
+  skip "Find a better place to test this."
+  $KBOX $PANTHEON_DRUPAL7_NAME rebuild
+}
+@test "Check that we can run '$KBOX services' without an error." {
+  $KBOX $PANTHEON_DRUPAL7_NAME services
+}
 
 #
 # BURN IT TO THE GROUND!!!!

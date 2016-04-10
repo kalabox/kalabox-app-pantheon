@@ -5,9 +5,18 @@
 #
 
 # If we are not on travis we want to emulate
-# You will want to set these to values that make sense for your local setup
+# You will want to set these to values that make sense for your local setup although
+# it probably makes the most sense to just do this
+#
+# `export TRAVIS_BUILD_DIR=/path/to/kalabox-app-pantheon`
+#
+# before you run tests.
+#
+
+# Set some defaults if we are LOCAL
 if [ ! $TRAVIS ]; then
   : ${TRAVIS_BUILD_DIR:=/Users/pirog/Desktop/work/kalabox-cli/node_modules/kalabox-app-pantheon}
+  : ${TRAVIS_COMMIT:=LOCAL}
 fi
 
 # Check to see if we are on Darwin
@@ -40,8 +49,13 @@ fi
 # Pantheon helpers
 #
 
-# Uncomment to set a local $PANTHEON_PASSWORD
-# This is set automatically in travis
+#
+# Uncomment to set a local creds
+# It probably makes the most sense to just do this
+#
+# `export PANTHEON_EMAIL=me@thing.com`
+# `export PANTHEON_PASSWORD=*****`
+#
 #: ${PANTHEON_PASSWORD:=changeme}
 : ${PANTHEON_EMAIL:=mike@kalabox.io}
 

@@ -80,7 +80,8 @@ module.exports = function(grunt) {
         options: funcOpts,
         command: [
           funcCommand,
-          './test/drupal7/create.bats'
+          './test/drupal7/create.bats',
+          './test/drupal7/actions.bats'
         ].join(' ')
       }
     }
