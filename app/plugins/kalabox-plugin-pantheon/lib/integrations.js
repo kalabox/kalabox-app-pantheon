@@ -10,50 +10,48 @@ module.exports = function(kbox, app) {
   var Terminus = require('./terminus.js');
   var terminus = new Terminus(kbox, app);
 
-  app.events.on('post-activate', function() {
+  // Set the integrations pull method.
+  kbox.integrations.get('pantheon').setMethod('pull', function(opts) {
+    var self = this;
+    // Default option handling.
+    opts = opts || {};
+    opts.files = opts.files || 'none';
+    opts.database = opts.database || 'none';
 
-    // Set the integrations pull method.
-    kbox.integrations.get('pantheon').setMethod('pull', function(opts) {
-      var self = this;
-      // Default option handling.
-      opts = opts || {};
-      opts.files = opts.files || 'none';
-      opts.database = opts.database || 'none';
-
-      // Pull.
-      return kbox.Promise.try(function() {
-        // Grab pantheon config so we can mix in interactives
-        var config = app.config.pluginconfig.pantheon;
-        // Grab pantheon aliases
-        return terminus.getSiteAliases()
-        // Pull screensho
-        .then(function() {
-          return puller.pullScreenshot(config.site, config.env);
-        })
-        // Pull our code
-        .then(function() {
-          self.update('Pulling code.');
-          return puller.pullCode(config.site, config.env);
-        })
-        // Pull our DB if selected
-        .then(function() {
-          if (opts.database && opts.database !== 'none') {
-            self.update('Pulling database.');
-            return puller.pullDB(config.site, opts.database);
-          }
-        })
-        // Pull our files if selected
-        .then(function() {
-          if (opts.files && opts.files !== 'none') {
-            self.update('Pulling files.');
-            return puller.pullFiles(config.site, opts.files);
-          }
-        })
-        .then(function() {
-          self.update('Done pulling.');
-        });
+    // Pull.
+    return kbox.Promise.try(function() {
+      // Grab pantheon config so we can mix in interactives
+      var config = app.config.pluginconfig.pantheon;
+      // Grab pantheon aliases
+      return terminus.getSiteAliases()
+      // Pull screensho
+      .then(function() {
+        return puller.pullScreenshot(config.site, config.env);
+      })
+      // Pull our code
+      .then(function() {
+        self.update('Pulling code.');
+        return puller.pullCode(config.site, config.env);
+      })
+      // Pull our DB if selected
+      .then(function() {
+        if (opts.database && opts.database !== 'none') {
+          self.update('Pulling database.');
+          return puller.pullDB(config.site, opts.database);
+        }
+      })
+      // Pull our files if selected
+      .then(function() {
+        if (opts.files && opts.files !== 'none') {
+          self.update('Pulling files.');
+          return puller.pullFiles(config.site, opts.files);
+        }
+      })
+      .then(function() {
+        self.update('Done pulling.');
       });
     });
+  });
 
     // Set the integrations push method.
     kbox.integrations.get('pantheon').setMethod('push', function(opts) {
@@ -98,7 +96,5 @@ module.exports = function(kbox, app) {
         self.update('Done pushing.');
       });
     });
-
-  });
 
 };
