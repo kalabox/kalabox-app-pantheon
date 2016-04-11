@@ -66,7 +66,6 @@ module.exports = function(grunt) {
     },
 
     // Basic BATS test
-
     shell: {
       install: {
         options: funcOpts,

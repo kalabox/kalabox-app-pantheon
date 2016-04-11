@@ -75,6 +75,6 @@ fi
 : ${PANTHEON_BACKDROP_ENV=dev}
 
 # Wordpress
-: ${PANTHEON_WORDPRESS_NAME=backdrop}
+: ${PANTHEON_WORDPRESS_NAME=wordpress}
 : ${PANTHEON_WORDPRESS_SITE=kalabox-wordpress}
 : ${PANTHEON_WORDPRESS_ENV=dev}
