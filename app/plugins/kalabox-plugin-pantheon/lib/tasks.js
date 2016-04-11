@@ -174,181 +174,185 @@ module.exports = function(kbox, app) {
     ];
   };
 
-  // kbox pull
-  kbox.tasks.add(function(task) {
+  app.events.on('load-tasks', function() {
 
-    // Define our task metadata
-    task.path = [app.name, 'pull'];
-    task.category = 'appAction';
-    task.description = 'Pull down new code and optionally data and files.';
-    task.kind = 'delegate';
-    // Build list of options for desc
-    var getOptions = 'Options are ' + supportedPullEnvs.join(', ');
-    task.options.push({
-      name: 'database',
-      kind: 'string',
-      description: 'Pull DB from an env. ' + getOptions + ' and none'
-    });
-    task.options.push({
-      name: 'files',
-      kind: 'string',
-      description: 'Pull files from an env. ' + getOptions + ' and none'
-    });
+    // kbox pull
+    kbox.tasks.add(function(task) {
 
-    // This is what we run yo!
-    task.func = function(done) {
-
-      // Grab the CLI options that are available
-      var options = this.options;
-      var questions = getPullQuestions();
-
-      // Filter out interactive questions based on passed in options
-      questions = kbox.util.cli.filterQuestions(questions, options);
-
-      // Launch the inquiry
-      inquirer.prompt(questions, function(answers) {
-
-        // Get our pull module
-        var puller = require('./pull.js')(kbox, app);
-
-        // Collect our answers
-        var choices = _.merge({}, options, answers);
-
-        // Set defaults if user passed in legacy --database or --files
-        choices = setDefaultChoices(choices);
-
-        // Report to metrics.
-        return kbox.metrics.reportAction('pull')
-
-        // Pull screenshot
-        .then(function() {
-          return puller.pullScreenshot(pantheonConf.site, pantheonConf.env);
-        })
-
-        // Pull our code
-        .then(function() {
-          return puller.pullCode(pantheonConf.site, pantheonConf.env);
-        })
-
-        // Pull our DB if selected
-        .then(function() {
-          if (choices.database && choices.database !== 'none') {
-
-            // Get our args
-            var site = pantheonConf.site;
-            var database = choices.database;
-            var newBackup = choices.newbackup;
-
-            return puller.pullDB(site, database, newBackup);
-          }
-        })
-
-        // Pull our files if selected
-        .then(function() {
-          if (choices.files && choices.files !== 'none') {
-
-            // Get our args
-            var site = pantheonConf.site;
-            var files = choices.files;
-            var newBackup = choices.newbackup;
-
-            return puller.pullFiles(site, files, newBackup);
-          }
-        })
-
-        // Then rebuild caches and registries as appropriate
-        .then(function() {
-          return puller.rebuild();
-        })
-
-        .nodeify(done);
-
+      // Define our task metadata
+      task.path = [app.name, 'pull'];
+      task.category = 'appAction';
+      task.description = 'Pull down new code and optionally data and files.';
+      task.kind = 'delegate';
+      // Build list of options for desc
+      var getOptions = 'Options are ' + supportedPullEnvs.join(', ');
+      task.options.push({
+        name: 'database',
+        kind: 'string',
+        description: 'Pull DB from an env. ' + getOptions + ' and none'
+      });
+      task.options.push({
+        name: 'files',
+        kind: 'string',
+        description: 'Pull files from an env. ' + getOptions + ' and none'
       });
 
-    };
-  });
+      // This is what we run yo!
+      task.func = function(done) {
 
-  // kbox push
-  kbox.tasks.add(function(task) {
+        // Grab the CLI options that are available
+        var options = this.options;
+        var questions = getPullQuestions();
 
-    // Task metadata
-    task.path = [app.name, 'push'];
-    task.category = 'appAction';
-    task.description = 'Push up new code and optionally data and files.';
-    task.kind = 'delegate';
-    task.options.push({
-      name: 'message',
-      alias: 'm',
-      kind: 'string',
-      description: 'Tell us about your change'
+        // Filter out interactive questions based on passed in options
+        questions = kbox.util.cli.filterQuestions(questions, options);
+
+        // Launch the inquiry
+        inquirer.prompt(questions, function(answers) {
+
+          // Get our pull module
+          var puller = require('./pull.js')(kbox, app);
+
+          // Collect our answers
+          var choices = _.merge({}, options, answers);
+
+          // Set defaults if user passed in legacy --database or --files
+          choices = setDefaultChoices(choices);
+
+          // Report to metrics.
+          return kbox.metrics.reportAction('pull')
+
+          // Pull screenshot
+          .then(function() {
+            return puller.pullScreenshot(pantheonConf.site, pantheonConf.env);
+          })
+
+          // Pull our code
+          .then(function() {
+            return puller.pullCode(pantheonConf.site, pantheonConf.env);
+          })
+
+          // Pull our DB if selected
+          .then(function() {
+            if (choices.database && choices.database !== 'none') {
+
+              // Get our args
+              var site = pantheonConf.site;
+              var database = choices.database;
+              var newBackup = choices.newbackup;
+
+              return puller.pullDB(site, database, newBackup);
+            }
+          })
+
+          // Pull our files if selected
+          .then(function() {
+            if (choices.files && choices.files !== 'none') {
+
+              // Get our args
+              var site = pantheonConf.site;
+              var files = choices.files;
+              var newBackup = choices.newbackup;
+
+              return puller.pullFiles(site, files, newBackup);
+            }
+          })
+
+          // Then rebuild caches and registries as appropriate
+          .then(function() {
+            return puller.rebuild();
+          })
+
+          .nodeify(done);
+
+        });
+
+      };
     });
-    // Build list of options for desc
-    var getOptions = 'Options are ' + supportedPushEnvs.join(', ');
-    task.options.push({
-      name: 'database',
-      kind: 'string',
-      description: 'Push DB to specific env. ' + getOptions + ' and none'
-    });
-    task.options.push({
-      name: 'files',
-      kind: 'string',
-      description: 'Push files to a spefic env. ' + getOptions + ' and none'
-    });
 
-    // This is how we do it
-    // https://www.youtube.com/watch?v=0hiUuL5uTKc
-    task.func = function(done) {
+    // kbox push
+    kbox.tasks.add(function(task) {
 
-      // Grab the CLI options that are available
-      var options = this.options;
-      var questions = getPushQuestions();
-
-      // Filter out interactive questions based on passed in options
-      questions = kbox.util.cli.filterQuestions(questions, options);
-
-      // Launch the inquiry
-      inquirer.prompt(questions, function(answers) {
-
-        // Get our push module
-        var pusher = require('./push.js')(kbox, app);
-
-        // Collect our choices
-        var choices = _.merge({}, options, answers);
-
-        // Set defaults if user passed in legacy --database or --files
-        choices = setDefaultChoices(choices);
-
-        // Report to metrics.
-        return kbox.metrics.reportAction('push')
-
-        // Push our code
-        .then(function() {
-          return pusher.pushCode(
-            pantheonConf.site,
-            pantheonConf.env,
-            choices.message
-          );
-        })
-
-        // Push our DB is selected
-        .then(function() {
-          if (choices.database && choices.database !== 'none') {
-            return pusher.pushDB(pantheonConf.site, choices.database);
-          }
-        })
-
-        // Push our files if selected
-        .then(function() {
-          if (choices.files && choices.files !== 'none') {
-            return pusher.pushFiles(pantheonConf.site, choices.files);
-          }
-        })
-
-        .nodeify(done);
-
+      // Task metadata
+      task.path = [app.name, 'push'];
+      task.category = 'appAction';
+      task.description = 'Push up new code and optionally data and files.';
+      task.kind = 'delegate';
+      task.options.push({
+        name: 'message',
+        alias: 'm',
+        kind: 'string',
+        description: 'Tell us about your change'
+      });
+      // Build list of options for desc
+      var getOptions = 'Options are ' + supportedPushEnvs.join(', ');
+      task.options.push({
+        name: 'database',
+        kind: 'string',
+        description: 'Push DB to specific env. ' + getOptions + ' and none'
+      });
+      task.options.push({
+        name: 'files',
+        kind: 'string',
+        description: 'Push files to a spefic env. ' + getOptions + ' and none'
       });
 
-    };
+      // This is how we do it
+      // https://www.youtube.com/watch?v=0hiUuL5uTKc
+      task.func = function(done) {
+
+        // Grab the CLI options that are available
+        var options = this.options;
+        var questions = getPushQuestions();
+
+        // Filter out interactive questions based on passed in options
+        questions = kbox.util.cli.filterQuestions(questions, options);
+
+        // Launch the inquiry
+        inquirer.prompt(questions, function(answers) {
+
+          // Get our push module
+          var pusher = require('./push.js')(kbox, app);
+
+          // Collect our choices
+          var choices = _.merge({}, options, answers);
+
+          // Set defaults if user passed in legacy --database or --files
+          choices = setDefaultChoices(choices);
+
+          // Report to metrics.
+          return kbox.metrics.reportAction('push')
+
+          // Push our code
+          .then(function() {
+            return pusher.pushCode(
+              pantheonConf.site,
+              pantheonConf.env,
+              choices.message
+            );
+          })
+
+          // Push our DB is selected
+          .then(function() {
+            if (choices.database && choices.database !== 'none') {
+              return pusher.pushDB(pantheonConf.site, choices.database);
+            }
+          })
+
+          // Push our files if selected
+          .then(function() {
+            if (choices.files && choices.files !== 'none') {
+              return pusher.pushFiles(pantheonConf.site, choices.files);
+            }
+          })
+
+          .nodeify(done);
+
+        });
+
+      };
+    });
+
   });
 
 };
