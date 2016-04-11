@@ -21,7 +21,10 @@ before-install() {
   echo "TRAVIS_REPO_SLUG: ${TRAVIS_REPO_SLUG}"
   echo "TRAVIS_BUILD_DIR: ${TRAVIS_BUILD_DIR}"
   echo "TRAVIS_OS_NAME: ${TRAVIS_OS_NAME}"
+
   echo "PATH: ${PATH}"
+
+  echo "DOCKER_HOST: ${DOCKER_HOST}"
 
   # Add our key
   if [ $TRAVIS_PULL_REQUEST == "false" ] &&
@@ -59,8 +62,22 @@ before-script() {
 #
 script() {
 
-  # Test the things
-  run_command grunt test
+  #
+  # Run code tests
+  #
+  run_command grunt test:code
+
+  #
+  # Run all our functional tests
+  #
+
+  # Verify install
+  run_command grunt test:install
+  # Ensure images
+  run_command grunt test:images
+
+  # Do the KALABOX_TEST_GROUP
+  run_command grunt test:$KALABOX_TEST_GROUP
 
 }
 
