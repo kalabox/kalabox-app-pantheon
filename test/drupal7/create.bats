@@ -100,6 +100,12 @@ setup() {
   $DOCKER inspect ${PANTHEON_DRUPAL7_NAME}_redis_1 | grep "\"Status\": \"running\""
 }
 
+# Check that the Pantheon
+# @todo: let's move this to an eventual env.bats
+@test "Check that our appserver has the correct PANTHEON_SITE env value" {
+  $DOCKER inspect ${PANTHEON_DRUPAL7_NAME}_appserver_1 | grep PANTHEON_SITE=7587b3ea-95b6-44ab-b36b-6ebd9c3e9866
+}
+
 #
 # Verify some basic things about the install
 #
