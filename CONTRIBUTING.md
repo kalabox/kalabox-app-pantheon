@@ -75,15 +75,15 @@ NOTE: You might want to make sure you get npm set up so you can install global m
 
 ```
 cd /path/to/kalabox-cli/node_modules
-rm -rf kalabox-app-pantheon
-git clone https://github.com/kalabox/kalabox-app-pantheon.git
-cd kalabox-app-pantheon
+rm -rf kalabox-app-php
+git clone https://github.com/kalabox/kalabox-app-php.git
+cd kalabox-app-php
 npm install
 ```
 
 #### 3. Testing out changes
 
-Inside of `kalabox-app-pantheon` you will see an `app` folder. This contains
+Inside of `kalabox-app-php` you will see an `app` folder. This contains
 the "template" for all apps created for Pantheon. Make a change in the template
 and then `kbox create pantheon` to see the changes in a running app.
 
@@ -113,7 +113,7 @@ kbox rebuild
 Testing
 -------
 
-We have code linting and functional testing for kalabox-app-pantheon.
+We have code linting and functional testing for kalabox-app-php.
 The linting uses jshint and jscs. The functional testing uses BATS.
 
 #### Running Tests
