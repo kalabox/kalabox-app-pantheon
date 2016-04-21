@@ -24,8 +24,16 @@ setup() {
 @test "Check that we can run '$KBOX rebuild' without an error." {
   $KBOX $PANTHEON_BACKDROP_NAME rebuild
 }
+@test "Check that the app's directory exists before destroy is run." {
+  run ls -l $KBOX_APP_DIR/$PANTHEON_BACKDROP_NAME
+  [ "$status" -eq 0 ]
+}
 @test "Check that we can run '$KBOX destroy' without an error." {
   $KBOX $PANTHEON_BACKDROP_NAME destroy -- -y
+}
+@test "Check that the app's directory was removed." {
+  run ls -l $KBOX_APP_DIR/$PANTHEON_BACKDROP_NAME
+  [ "$status" -eq 1 ]
 }
 
 #
