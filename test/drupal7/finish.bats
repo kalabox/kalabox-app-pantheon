@@ -22,15 +22,23 @@ setup() {
   $KBOX $PANTHEON_DRUPAL7_NAME rebuild
 }
 @test "Check that the app's directory exists before destroy is run." {
-  run ls -l $KBOX_APP_DIR/$PANTHEON_DRUPAL7_NAME
-  [ "$status" -eq 0 ]
+  if [ ! -d "$KBOX_APP_DIR/$PANTHEON_DRUPAL7_NAME" ]; then
+    run foo
+    [ "$status" -eq 0 ]
+  else
+    skip "OK"
+  fi
 }
 @test "Check that we can run '$KBOX destroy' without an error." {
   $KBOX $PANTHEON_DRUPAL7_NAME destroy -- -y
 }
 @test "Check that the app's directory was removed." {
-  run ls -l $KBOX_APP_DIR/$PANTHEON_DRUPAL7_NAME
-  [ "$status" -eq 1 ]
+  if [ -d "$KBOX_APP_DIR/$PANTHEON_DRUPAL7_NAME" ]; then
+    run foo
+    [ "$status" -eq 0 ]
+  else
+    skip "OK"
+  fi
 }
 
 #
