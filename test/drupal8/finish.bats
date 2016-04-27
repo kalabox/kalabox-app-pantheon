@@ -24,8 +24,24 @@ setup() {
 @test "Check that we can run '$KBOX rebuild' without an error." {
   $KBOX $PANTHEON_DRUPAL8_NAME rebuild
 }
+@test "Check that the app's directory exists before destroy is run." {
+  if [ ! -d "$KBOX_APP_DIR/$PANTHEON_DRUPAL8_NAME" ]; then
+    run foo
+    [ "$status" -eq 0 ]
+  else
+    skip "OK"
+  fi
+}
 @test "Check that we can run '$KBOX destroy' without an error." {
   $KBOX $PANTHEON_DRUPAL8_NAME destroy -- -y
+}
+@test "Check that the app's directory was removed." {
+  if [ -d "$KBOX_APP_DIR/$PANTHEON_DRUPAL8_NAME" ]; then
+    run foo
+    [ "$status" -eq 0 ]
+  else
+    skip "OK"
+  fi
 }
 
 #
