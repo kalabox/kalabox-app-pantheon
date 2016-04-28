@@ -67,15 +67,6 @@ rsync:
   mapping: files:/media
 
 #
-# This will drop you into a bash shell on your appserver
-#
-terminal:
-  service: appserver
-  stripfirst: true
-  entrypoint: bash
-  description: "'ssh' into your appserver"
-
-#
 # Adds a terminus command to your pantheon app.
 #
 # This will share the session that lives on your host at
