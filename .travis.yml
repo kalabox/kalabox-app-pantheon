@@ -48,3 +48,4 @@ env:
     - KALABOX_TEST_GROUP=drupal8
     - KALABOX_TEST_GROUP=backdrop
     - KALABOX_TEST_GROUP=wordpress
+    - KALABOX_TEST_GROUP=drush
