@@ -7,6 +7,13 @@
 # Load up environment
 load env
 
+#
+# Setup some things
+#
+setup() {
+  echo
+}
+
 # Check that the Kalabox CLI is in the PATH
 @test "Check that kalabox-cli is in PATH" {
   run which $KBOX
@@ -72,4 +79,12 @@ load env
 # Check that '10.13.37.100' can be pinged
 @test "Check that '10.13.37.100' can be pinged" {
   ping -c 1 10.13.37.100
+}
+
+#
+# BURN IT TO THE GROUND!!!!
+# Add a small delay before we run other things
+#
+teardown() {
+  sleep 1
 }
