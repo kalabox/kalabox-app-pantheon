@@ -32,8 +32,8 @@ setup() {
   # We need to actually go into this app dir until
   # https://github.com/kalabox/kalabox/issues/1221
   # is resolved
-  if [ -d "$KBOX_APP_DIR/$PANTHEON_WORDPRESS_NAME" ]; then
-    cd $KBOX_APP_DIR/$PANTHEON_WORDPRESS_NAME
+  if [ -d "$KBOX_APP_DIR/$PANTHEON_DRUPAL7_NAME" ]; then
+    cd $KBOX_APP_DIR/$PANTHEON_DRUPAL7_NAME
   fi
 
 }
@@ -54,10 +54,10 @@ setup() {
 @test "Create a Pantheon Drupal 7 site without an error." {
 
   # Check to see if our site exists already
-  SITE_EXISTS=$("$KBOX" list | grep "$PANTHEON_DRUPAL7_NAME" > /dev/null && echo $? || true)
+  D7_SITE_EXISTS=$("$KBOX" list | grep "$PANTHEON_DRUPAL7_NAME" > /dev/null && echo $? || true)
 
   # Run the create command if our site doesn't already exist
-  if [ ! $SITE_EXISTS ]; then
+  if [ ! $D7_SITE_EXISTS ]; then
 
     # Create a D7 site
     run $KBOX create pantheon \

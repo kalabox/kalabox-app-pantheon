@@ -54,10 +54,10 @@ setup() {
 @test "Create a Pantheon Wordpress site without an error." {
 
   # Check to see if our site exists already
-  SITE_EXISTS=$("$KBOX" list | grep "$PANTHEON_WORDPRESS_NAME" > /dev/null && echo $? || true)
+  WORDPRESS_SITE_EXISTS=$("$KBOX" list | grep "$PANTHEON_WORDPRESS_NAME" > /dev/null && echo $? || true)
 
   # Run the create command if our site doesn't already exist
-  if [ ! $SITE_EXISTS ]; then
+  if [ ! $WORDPRESS_SITE_EXISTS ]; then
 
     # Create a D8 site
     run $KBOX create pantheon \
@@ -200,10 +200,10 @@ setup() {
 # Check that we have the correct DNS entries
 #
 @test "Check that we have the correct DNS entries." {
-  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:http://${PANTHEON_WORDPRESS_NAME}.kbox 0 5 | grep 10.13.38.100
-  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:https://${PANTHEON_WORDPRESS_NAME}.kbox 0 5 | grep 10.13.38.100
-  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:http://edge.${PANTHEON_WORDPRESS_NAME}.kbox 0 5 | grep 10.13.38.100
-  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:https://edge.${PANTHEON_WORDPRESS_NAME}.kbox 0 5 | grep 10.13.38.100
+  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:http://${PANTHEON_WORDPRESS_NAME}.kbox 0 5 | grep 10.13.37.100
+  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:https://${PANTHEON_WORDPRESS_NAME}.kbox 0 5 | grep 10.13.37.100
+  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:http://edge.${PANTHEON_WORDPRESS_NAME}.kbox 0 5 | grep 10.13.37.100
+  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:https://edge.${PANTHEON_WORDPRESS_NAME}.kbox 0 5 | grep 10.13.37.100
 }
 
 #
@@ -284,10 +284,10 @@ setup() {
 @test "Check that after '$KBOX restart' DNS is set correctly." {
   run \
   $KBOX $PANTHEON_WORDPRESS_NAME restart && \
-  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:http://${PANTHEON_WORDPRESS_NAME}.kbox 0 5 | grep 10.13.38.100 && \
-  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:https://${PANTHEON_WORDPRESS_NAME}.kbox 0 5 | grep 10.13.38.100 && \
-  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:http://edge.${PANTHEON_WORDPRESS_NAME}.kbox 0 5 | grep 10.13.38.100 && \
-  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:https://edge.${PANTHEON_WORDPRESS_NAME}.kbox 0 5 | grep 10.13.38.100
+  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:http://${PANTHEON_WORDPRESS_NAME}.kbox 0 5 | grep 10.13.37.100 && \
+  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:https://${PANTHEON_WORDPRESS_NAME}.kbox 0 5 | grep 10.13.37.100 && \
+  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:http://edge.${PANTHEON_WORDPRESS_NAME}.kbox 0 5 | grep 10.13.37.100 && \
+  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:https://edge.${PANTHEON_WORDPRESS_NAME}.kbox 0 5 | grep 10.13.37.100
   [ "$status" -eq 0 ]
 }
 
