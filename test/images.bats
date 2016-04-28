@@ -8,6 +8,13 @@
 load env
 
 #
+# Setup some things
+#
+setup() {
+  echo
+}
+
+#
 # Function to rety docker builds if they fail
 #
 kbox-retry-build() {
@@ -32,13 +39,6 @@ kbox-retry-build() {
     exit 666
   fi
 
-}
-
-#
-# Setup some things
-#
-setup() {
-  echo
 }
 
 # Array of images to build
