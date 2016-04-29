@@ -80,6 +80,29 @@ setup() {
 }
 
 #
+# Check that we can run a drush command with redis enabled
+#
+@test "Check that we can run a drush command with redis enabled." {
+
+  # Install redis
+  $KBOX drush dl redis-7.x-2.15 -y
+
+  # Move over the settings file
+  cp -f $TRAVIS_BUILD_DIR/test/fixtures/drupal7-redis-settings.php $KBOX_APP_DIR/$PANTHEON_DRUPAL7_NAME/code/sites/default/settings.php
+
+  # Enable Redis
+  $KBOX drush en redis -y
+
+  # Run another drush command
+  run $KBOX drush status
+
+  # Check status code
+  [ "$status" -eq 0 ]
+  [[ $output != *"Fatal error: Class 'Redis' not found"* ]]
+
+}
+
+#
 # BURN IT TO THE GROUND!!!!
 #
 teardown() {
