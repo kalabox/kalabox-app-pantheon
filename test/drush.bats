@@ -56,6 +56,33 @@ setup() {
 }
 
 #
+# Drush command checks
+#
+
+#
+# Check that `drush up` works
+# See: https://github.com/kalabox/kalabox/issues/1297
+#
+@test "Verify that drush up works" {
+
+  # Disable and uninstall views if it exists
+  kbox.dev drush dis views -y
+  kbox.dev drush pmu views -y
+
+  # Download an older version of views
+  kbox.dev drush dl views-7.x-3.0 -y
+
+  # Enable views
+  kbox.dev drush en views -y
+
+  # Attempt the update and check for an error
+  run kbox.dev drush up -y
+  [ "$status" -eq 0 ]
+  [[ $output != *"Unable to create"* ]]
+
+}
+
+#
 # Redis tests
 #
 
