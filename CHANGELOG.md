@@ -1,7 +1,12 @@
-v0.12.0-alpha11
-==================
+v0.12.0-beta1
+=============
 
-#### Breaking changes
+#### New Features
+
+#### Bug fixes
+
+v0.12.0-alpha12
+===============
 
 #### Enhancements
 
@@ -17,3 +22,4 @@ v0.12.0-alpha11
 #### Bug fixes
 
 * Fixed `Class 'Redis' not found` error when running `kbox drush` commands with redis enabled [#1259](https://github.com/kalabox/kalabox/issues/1259)
+* Fixed testing to use new `cgroup-bin` pkg instead of `cgroup-lite`
