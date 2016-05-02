@@ -1,5 +1,5 @@
 v0.12.0-beta1
-==================
+=============
 
 ### New Features
 
@@ -9,7 +9,7 @@ v0.12.0-beta1
 sites. [#585](https://github.com/kalabox/kalabox/issues/585)
 
 v0.12.0-alpha12
-==================
+===============
 
 #### Enhancements
 
