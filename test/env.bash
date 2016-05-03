@@ -62,21 +62,21 @@ fi
 : ${PANTHEON_DOCKERFILES_DIR:=${TRAVIS_BUILD_DIR}/app/dockerfiles/}
 
 # Drupal7
-: ${PANTHEON_DRUPAL7_NAME:=seven}
+: ${PANTHEON_DRUPAL7_NAME:=pantheonseven}
 : ${PANTHEON_DRUPAL7_SITE:=kalabox-drupal7}
 : ${PANTHEON_DRUPAL7_ENV:=dev}
 
 # Drupal8
-: ${PANTHEON_DRUPAL8_NAME:=eight}
+: ${PANTHEON_DRUPAL8_NAME:=pantheoneight}
 : ${PANTHEON_DRUPAL8_SITE:=kalabox-drupal8}
 : ${PANTHEON_DRUPAL8_ENV:=dev}
 
 # Backdrop
-: ${PANTHEON_BACKDROP_NAME:=backdrop}
+: ${PANTHEON_BACKDROP_NAME:=pantheonbackdrop}
 : ${PANTHEON_BACKDROP_SITE:=kalabox-backdrop}
 : ${PANTHEON_BACKDROP_ENV:=dev}
 
 # Wordpress
-: ${PANTHEON_WORDPRESS_NAME:=wordpress}
+: ${PANTHEON_WORDPRESS_NAME:=pantheonwordpress}
 : ${PANTHEON_WORDPRESS_SITE:=kalabox-wordpress}
 : ${PANTHEON_WORDPRESS_ENV:=dev}

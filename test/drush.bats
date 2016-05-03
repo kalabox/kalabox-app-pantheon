@@ -1,7 +1,7 @@
 #!/usr/bin/env bats
 
 #
-# Basic tests to verify Drupal7 creates
+# Basic tests to verify drush things
 #
 
 # Load up environment
@@ -52,6 +52,33 @@ setup() {
   else
     skip "Looks like we already have a D7 site ready to go!"
   fi
+
+}
+
+#
+# Drush command checks
+#
+
+#
+# Check that `drush up` works
+# See: https://github.com/kalabox/kalabox/issues/1297
+#
+@test "Verify that drush up works" {
+
+  # Disable and uninstall views if it exists
+  $KBOX drush dis views -y
+  $KBOX drush pmu views -y
+
+  # Download an older version of views
+  $KBOX drush dl views-7.x-3.0 -y
+
+  # Enable views
+  $KBOX drush en views -y
+
+  # Attempt the update and check for an error
+  run $KBOX drush up -y
+  [ "$status" -eq 0 ]
+  [[ $output != *"Unable to create"* ]]
 
 }
 

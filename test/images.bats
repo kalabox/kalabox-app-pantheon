@@ -26,7 +26,7 @@ kbox-retry-build() {
 
   # Try a few times
   NEXT_WAIT_TIME=0
-  until $DOCKER build -t $IMAGE:$TAG $DOCKERFILE || [ $NEXT_WAIT_TIME -eq 5 ]; do
+  until $DOCKER build -t $IMAGE:$TAG $DOCKERFILE || [ $NEXT_WAIT_TIME -eq 10 ]; do
     sleep $(( NEXT_WAIT_TIME++ ))
   done
 
@@ -35,7 +35,7 @@ kbox-retry-build() {
   # @todo: this can be better since this could false negative
   #        on the final retry
   #
-  if [ $NEXT_WAIT_TIME -eq 5 ]; then
+  if [ $NEXT_WAIT_TIME -eq 10 ]; then
     exit 666
   fi
 

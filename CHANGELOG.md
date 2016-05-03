@@ -1,9 +1,11 @@
 v0.12.0-beta1
 =============
 
-#### New Features
+### New Features
 
-#### Bug fixes
+### Bug Fixes
+
+* Fixed bug where `kbox drush up` was not able to create a backups directory [#1297](https://github.com/kalabox/kalabox/issues/1297)
 
 v0.12.0-alpha12
 ===============
