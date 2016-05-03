@@ -131,22 +131,22 @@ export PANTHEON_EMAIL=me@thing.com
 export PANTHEON_PASSWORD=changeme
 
 # Specify the Drupal 7 site you want to test
-export PANTHEON_DRUPAL7_NAME=seven
+export PANTHEON_DRUPAL7_NAME=pantheonseven
 export PANTHEON_DRUPAL7_SITE=kalabox-drupal7
 export PANTHEON_DRUPAL7_ENV=dev
 
 # Specify the Drupal 8 site you want to test
-export PANTHEON_DRUPAL8_NAME=eight
+export PANTHEON_DRUPAL8_NAME=pantheoneight
 export PANTHEON_DRUPAL8_SITE=kalabox-drupal8
 export PANTHEON_DRUPAL8_ENV=dev
 
 # Specify the Backdrop site you want to test
-export PANTHEON_BACKDROP_NAME=backdrop
+export PANTHEON_BACKDROP_NAME=pantheonbackdrop
 export PANTHEON_BACKDROP_SITE=kalabox-backdrop
 export PANTHEON_BACKDROP_ENV=dev
 
 # Specify the Wordpress site you want to test
-export PANTHEON_WORDPRESS_NAME=wordpress
+export PANTHEON_WORDPRESS_NAME=pantheonwordpress
 export PANTHEON_WORDPRESS_SITE=kalabox-wordpress
 export PANTHEON_WORDPRESS_ENV=dev
 ```

@@ -250,14 +250,13 @@
 # $options['variables']['anonymous'] = 'Visitor';
 
 /**
- * Override the default drush backup-dir with one that has the correct write
- * permissions on Kalabox and that will be shared out to `config/drush`
- * from the users app root.
+ * Override the default drush backup-dir with one that will be shared out to
+ * `config/drush` in the users app on their host machine.
  *
  * See: https://github.com/kalabox/kalabox/issues/1297
  *
  */
-$options['backup-dir'] = '/root/.drush';
+$options['backup-dir'] = getenv('HOME') . '/.drush/backups';
 
 /**
  * Command-specific execution options:
