@@ -59,9 +59,28 @@ setup() {
 # Drush command checks
 #
 
+##
+#
+# Verify that drush uli returns the correct hostname
+#
+# See: https://github.com/kalabox/kalabox/issues/1287
+#
+#
+@test "Verify that drush uli returns the correct hostname" {
+
+  # Run drush uli
+  run $KBOX drush uli
+  [ "$status" -eq 0 ]
+  [[ $output == *"http://${PANTHEON_DRUPAL7_NAME}.kbox"* ]]
+
+}
+
+##
 #
 # Check that `drush up` works
+#
 # See: https://github.com/kalabox/kalabox/issues/1297
+#
 #
 @test "Verify that drush up works" {
 

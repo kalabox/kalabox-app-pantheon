@@ -73,6 +73,7 @@ terminus:
   volumes_from:
     - data
   environment:
+    HOSTNAME: $KALABOX_APP_HOSTNAME
     HOME: /home/$KALABOX_ENGINE_ID
     KALABOX_UID: $KALABOX_ENGINE_ID
     KALABOX_GID: $KALABOX_ENGINE_GID
