@@ -56,6 +56,47 @@ setup() {
 }
 
 #
+# Check drush customization pathways
+#
+
+##
+#
+# Verify that we can drop in a custom alias
+#
+# See: https://github.com/kalabox/kalabox/issues/1298
+#
+#
+@test "Verify that we can drop in a custom alias file." {
+
+  # Move over the alias file
+  cp -f $TRAVIS_BUILD_DIR/test/fixtures/test.aliases.drushrc.php $KBOX_APP_DIR/$PANTHEON_DRUPAL7_NAME/config/drush/test.aliases.drushrc.php
+
+  # Grep the alias list
+  $KBOX drush sa | grep kbox-test
+
+}
+
+##
+#
+# Verify that we can drop in a custom command file
+#
+# See: https://github.com/kalabox/kalabox/issues/1298
+#
+#
+@test "Verify that we can drop in a custom command file." {
+
+  # Move over the alias file
+  cp -f $TRAVIS_BUILD_DIR/test/fixtures/xkcd.drush.inc $KBOX_APP_DIR/$PANTHEON_DRUPAL7_NAME/config/drush/xkcd.drush.inc
+
+  # Clear the drush cache
+  $KBOX drush cc drush
+
+  # Grep the command list
+  $KBOX drush | grep xkcd-fetch
+
+}
+
+#
 # Drush command checks
 #
 
