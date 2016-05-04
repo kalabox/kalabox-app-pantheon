@@ -259,6 +259,14 @@
 $options['backup-dir'] = getenv('HOME') . '/.drush/backups';
 
 /**
+ * Explicitly set the URI here
+ *
+ * See: https://github.com/kalabox/kalabox/issues/1287
+ *
+ */
+$options['uri'] = getenv('HOSTNAME');
+
+/**
  * Command-specific execution options:
  *
  * Most execution options can be shared between multiple Drush commands; these

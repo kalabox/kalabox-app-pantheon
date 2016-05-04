@@ -8,6 +8,7 @@ v0.12.0-beta1
 * Fixed bug where `kbox drush up` was not able to create a backups directory [#1297](https://github.com/kalabox/kalabox/issues/1297)
 * Upped APC memory limit to handle out of memory errors on larger
 sites. [#585](https://github.com/kalabox/kalabox/issues/585)
+* Fixed bug where `kbox drush uli` was returning `http://default` instead of the correct hostname. [#1287](https://github.com/kalabox/kalabox/issues/1287)
 
 v0.12.0-alpha12
 ===============
