@@ -9,6 +9,7 @@ v0.12.0-beta1
 * Upped APC memory limit to handle out of memory errors on larger
 sites. [#585](https://github.com/kalabox/kalabox/issues/585)
 * Fixed bug where `kbox drush uli` was returning `http://default` instead of the correct hostname. [#1287](https://github.com/kalabox/kalabox/issues/1287)
+* Added tests to verify drush is customizable at `config/drush` [#1298](https://github.com/kalabox/kalabox/issues/1298)
 
 v0.12.0-alpha12
 ===============
