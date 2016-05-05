@@ -26,6 +26,9 @@ before-install() {
 
   echo "DOCKER_HOST: ${DOCKER_HOST}"
 
+  # Check out sshkeygen options
+  ssh-keygen -
+
   # Add our key
   if [ $TRAVIS_PULL_REQUEST == "false" ] &&
     [ -z "$TRAVIS_TAG" ] &&
