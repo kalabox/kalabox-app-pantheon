@@ -406,6 +406,19 @@ setup() {
 }
 
 #
+# Verify the SSH key and then remove
+#
+@test "Check that we can remove the SSH key we posted." {
+
+  # Get the fingerprint
+  SSH_KEY_FINGERPRINT=$(ssh-keygen -l -f ~/.ssh/pantheon.kalabox.id_rsa.pub | awk -F' ' '{print $2}' | sed 's/://g')
+
+  # Delete the SSH key
+  $KBOX terminus ssh-keys delete --fingerprint=$SSH_KEY_FINGERPRINT --yes
+
+}
+
+#
 # Attempt the destroy
 #
 @test "Check that we can run '$KBOX destroy' without an error." {

@@ -8,11 +8,10 @@ v0.12.0-beta2
 #### Bug Fixes
 
 * Fixed bug where you couldn't read properties `git_url` and `id` [#1318](https://github.com/kalabox/kalabox/issues/1318)
+* Added tests to make sure we remove testing SSH keys from Pantheon. [#1321](https://github.com/kalabox/kalabox/issues/1321)
 
 v0.12.0-beta1
 =============
-
-### New Features
 
 ### Bug Fixes
 
