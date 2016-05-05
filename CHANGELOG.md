@@ -1,7 +1,12 @@
-v0.12.0-beta1
+v0.12.0-beta2
 =============
 
-### New Features
+### Bug Fixes
+
+* Added tests to make sure we remove testing SSH keys from Pantheon. [#1321](https://github.com/kalabox/kalabox/issues/1321)
+
+v0.12.0-beta1
+=============
 
 ### Bug Fixes
 
