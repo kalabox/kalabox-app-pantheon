@@ -7,7 +7,7 @@
 FROM drush/drush:8
 
 # Terminus versions
-ENV TERMINUS_VERSIONS 0.11.1
+ENV TERMINUS_VERSION 0.11.1
 
 # Install all the CLI magic
 RUN \
@@ -25,6 +25,10 @@ RUN \
   apt-get -y autoremove && \
   rm -rf && rm -rf /var/lib/cache/* && \
   rm -rf /var/lib/log/* && rm -rf /tmp/*
+
+# Verify that terminus is installed and good
+RUN \
+  terminus cli version
 
 # Set up our kalabox specific stuff
 COPY ssh-config /root/.ssh/config
