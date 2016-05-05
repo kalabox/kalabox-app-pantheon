@@ -416,6 +416,10 @@ setup() {
   # Delete the SSH key
   $KBOX terminus ssh-keys delete --fingerprint=$SSH_KEY_FINGERPRINT --yes
 
+  # Sleep for a bit to make sure when we query our ssh-keys the above is
+  # gone
+  sleep 5
+
   # Verify it is no longer listed
   run $KBOX terminus ssh-keys list | grep $SSH_KEY_FINGERPRINT
   [ "$status" -eq 1 ]
