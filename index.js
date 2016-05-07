@@ -29,28 +29,22 @@ module.exports = function(kbox) {
   var packageData = function() {
 
     // Get relevant config options
-    var config = require(path.join(__dirname, 'lib', 'config.json'));
-    var isBinary = kbox.core.deps.get('globalConfig').isBinary;
+    var version = require(path.join(__dirname, 'package.json')).version;
     var locked = kbox.core.deps.get('globalConfig').locked;
 
-    // Return an internal path
-    if (!isBinary && !locked) {
-      var srcRoot = kbox.core.deps.get('globalConfig').srcRoot;
-      var modFold = path.join(srcRoot, 'node_modules');
-      return {
-        path: path.join(modFold, config.path.base, config.path.path)
-      };
-    }
-    // Return a url of an archive
-    else {
-      var branch = (!locked) ? config.url.dev : config.url.version;
-      var url = [config.url.base, 'tarball', 'v' + branch].join('/');
-      return {
-        url: url,
-        path: config.url.path,
-        folder: config.url.folder
-      };
-    }
+    // Define our download versions
+    var devUrl = 'http://apps.kalabox.io/kalabox-app-pantheon-latest.tar.gz';
+    var prodUrl = [
+      'https://github.com',
+      'kalabox/kalabox-app-pantheon/releases/download',
+      'v' + version,
+      'kalabox-app-pantheon-' + version + '.tar.gz'
+    ];
+
+    // Return our pkg data
+    return {
+      url: (locked) ? prodUrl.join('/') : devUrl
+    };
 
   };
 
