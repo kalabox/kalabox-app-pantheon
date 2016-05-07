@@ -9,7 +9,7 @@ CVS
 .DS_Store
 .idea/
 *.log
-node_modules/*
+node_modules
 *.tar
 *.id_rsa
 string
