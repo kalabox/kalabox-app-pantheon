@@ -7,10 +7,13 @@ module.exports = function(grunt) {
   //--------------------------------------------------------------------------
 
   // Helpers to make things cleaner
-  var funcOpts = {execOptions: {maxBuffer: 20 * 1024 * 1024}};
-  var funcCommand = 'node_modules/bats/libexec/bats ${CI:+--tap}';
+  var pkg = grunt.file.readJSON('./package.json');
+  var dev = (grunt.option('dev')) ? '-dev' : '';
+  var version = pkg.version + dev;
+  var testOpts = {execOptions: {maxBuffer: 20 * 1024 * 1024}};
+  var testCommand = 'node_modules/bats/libexec/bats ${CI:+--tap}';
 
-  // setup task config
+  // Setup task config
   var config = {
 
     // Arrays of relevant code classified by type
@@ -24,20 +27,70 @@ module.exports = function(grunt) {
           'app/plugins/*/*.js',
           'app/plugins/*/lib/*.js'
         ]
+      },
+      versions: {
+        src: [
+          'package.json',
+          'app/package.json'
+        ],
+      }
+    },
+
+    // Clean out the build dirs
+    clean: {
+      build: ['build', 'dist'],
+    },
+
+    // Copy relevant things
+    copy: {
+      app: {
+        src: ['**/*'],
+        dest: 'build',
+        cwd: 'app',
+        expand: true,
+        options: {
+          process: function(content, srcPath) {
+
+            // Switch it up
+            switch (srcPath) {
+
+              // Return a dev version
+              // @todo: what happens if another project has the same
+              //        version?
+              case 'app/package.json':
+                return content.replace(pkg.version, version);
+
+              // Return the same
+              default:
+                return content;
+
+            }
+          },
+        }
+      }
+    },
+
+    // Compress build
+    compress: {
+      build: {
+        options: {
+          archive: 'dist/kalabox-app-pantheon.tar.gz'
+        },
+        expand: true,
+        cwd: 'build/',
+        src: ['**'],
+        dest: './'
       }
     },
 
     // This handles automatic version bumping
     bump: {
       options: {
-        files: [
-          'package.json',
-          'app/package.json'
-        ],
+        files: ['<%= files.versions.src %>'],
         updateConfigs: [],
         commit: true,
         commitMessage: 'Release v%VERSION%',
-        commitFiles: ['package.json', 'app/package.json'],
+        commitFiles: ['<%= files.versions.src %>'],
         createTag: true,
         tagName: 'v%VERSION%',
         tagMessage: 'Version %VERSION%',
@@ -65,35 +118,48 @@ module.exports = function(grunt) {
       }
     },
 
-    // Basic BATS test
+    // Shell things
     shell: {
+
+      // Tests
       install: {
-        options: funcOpts,
-        command: funcCommand + ' ./test/install.bats'
+        options: testOpts,
+        command: testCommand + ' ./test/install.bats'
       },
       images: {
-        options: funcOpts,
-        command: funcCommand + ' ./test/images.bats'
+        options: testOpts,
+        command: testCommand + ' ./test/images.bats'
       },
       drupal7: {
-        options: funcOpts,
-        command: funcCommand + ' ./test/drupal7.bats'
+        options: testOpts,
+        command: testCommand + ' ./test/drupal7.bats'
       },
       drupal8: {
-        options: funcOpts,
-        command: funcCommand + ' ./test/drupal8.bats'
+        options: testOpts,
+        command: testCommand + ' ./test/drupal8.bats'
       },
       backdrop: {
-        options: funcOpts,
-        command: funcCommand + ' ./test/backdrop.bats'
+        options: testOpts,
+        command: testCommand + ' ./test/backdrop.bats'
       },
       wordpress: {
-        options: funcOpts,
-        command: funcCommand + ' ./test/wordpress.bats'
+        options: testOpts,
+        command: testCommand + ' ./test/wordpress.bats'
       },
       drush: {
-        options: funcOpts,
-        command: funcCommand + ' ./test/drush.bats'
+        options: testOpts,
+        command: testCommand + ' ./test/drush.bats'
+      },
+
+      // Build
+      build: {
+        options: {
+          execOptions: {
+            maxBuffer: 20 * 1024 * 1024,
+            cwd: 'build'
+          }
+        },
+        command: 'npm install --production'
       }
     }
 
@@ -130,6 +196,17 @@ module.exports = function(grunt) {
   // Do a prerelease version
   grunt.registerTask('prerelease', [
     'bump:prerelease'
+  ]);
+
+  /*
+   * Pkg tasks
+   */
+  // Build out an app
+  grunt.registerTask('pkg', [
+    'clean:build',
+    'copy:app',
+    'shell:build',
+    'compress:build'
   ]);
 
   /*
