@@ -1,3 +1,14 @@
+v0.12.0-beta3
+============
+
+#### New Features
+
+
+
+#### Bug Fixes
+
+* Fixed a redis typo in kalabox-compose.yml
+
 v0.12.0-beta2
 =============
 
