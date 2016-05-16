@@ -210,7 +210,7 @@ redis:
   # Uncomment this and comment 'image' above if you want to edit your
   # local dockerfile and build from there. This is useful for development
   #
-  # build: dockerfiles/pantheon-solr
+  # build: dockerfiles/redis
 
   volumes:
     - $KALABOX_APP_ROOT_BIND/config/redis/redis.conf:/usr/local/etc/redis/redis.conf
