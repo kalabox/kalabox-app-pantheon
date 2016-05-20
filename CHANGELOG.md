@@ -1,7 +1,30 @@
-v0.12.0-beta1
+v0.12.0-beta3
+============
+
+#### New Features
+
+
+
+#### Bug Fixes
+
+* Fixed a redis typo in kalabox-compose.yml
+
+v0.12.0-beta2
 =============
 
-### New Features
+#### New Features
+
+* Upgraded to terminus to `0.11.1`. [#1318](https://github.com/kalabox/kalabox/issues/1318)
+* Refactored app to include connectors previously found in core. [#1223](https://github.com/kalabox/kalabox/issues/1223)
+
+#### Bug Fixes
+
+* Fixed bug where you couldn't read properties `git_url` and `id` [#1318](https://github.com/kalabox/kalabox/issues/1318)
+* Improved deployment [#1223](https://github.com/kalabox/kalabox/issues/1223)
+* Added tests to make sure we remove testing SSH keys from Pantheon. [#1321](https://github.com/kalabox/kalabox/issues/1321)
+
+v0.12.0-beta1
+=============
 
 ### Bug Fixes
 

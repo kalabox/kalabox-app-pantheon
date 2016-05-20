@@ -29,23 +29,43 @@ notifications:
     - mike@kalabox.io
     - riley@kalabox.io
     on_success: always
-deploy:
-  provider: npm
-  email: mike@kalamuna.com
-  api_key:
-    secure: LqETVZKmboyL3rFtpENXSR8oAN4P5KZHh9XtUambSRXEWkWO2vfyfjjBPZfgll2XdvFikCR2ymujbl4bpnPzY2gyGtGm6wsL0ngCCtzs/mIF5JuKU6v/lO0dKPyj6PC+CB3ZY32Ax4HjsWIKw9v+On/kdz1PimkYWH0fgtrnXkoTs01NgTp1l3c1ASrqjtRjmTYWgsYDHRGKUukYH+wZSSTj4bfln0UcOr907Qzsj1oKWCyK5Hc0InWO4TCrULJa4F6qG70WNnStgbSkz010vutIOtmk11HgDzbaLbetEbF5KNv59jED2WY3/mJbjK3l2vrObM1NG09Je0xKh7fcadENrFTKaLXjxgy0TFOGih6M9qu455/pi68f76tI3d6AcLj9jhylyrYcqpWWyHQfhlluRC3g4YF4+HDh5dG5gqUD5TxMj/r8P2UG8BjlS/Ytn0eYxJsJ9l8g5OdBx7jP0iXArtIyPQeNkhXlUS9aumLufxgOmCrIX2CZTHF97GxosD6nNoYTd7ADfwl6Z5ByucDRDQAycBoMO6ALjM3rIu/WgNg8yr/+jj8DqikW5ye6mnVa03wSOSShfu3VvIA2UrbTW4FU5/H/oNM+BrkUldg+w7rl3LxQSO/fA38Vre1DEdveOomxRMEjNJKmhE1yn9zRE0Zb0wb+yfQOfCFYkuw=
-  on:
-    tags: true
-    branch: v0.12
-    repo: kalabox/kalabox-app-pantheon
 env:
   global:
-    - secure: ZSZ1mYuKnX+zRIfRVWC4rvVYTcWLoYQxAfqv7zNaGNlZcvivyMQOXNrEgx2VLR5Uii4rK8Xh08G68KFafhyBWkLZtCDy38hCkmNCIaFlbX/MAGdvGZkjO2F3jVynez1910qpNACFGRzSkberHGT1tG2mzD/hiCVSBE38pTBU87lrbzKADYQnPGVtSzHGJWdfO/uimO2/TCzf+S/roN5vpTPw3znKPJ4HQhBSCqPb6ai4kjCuXhbvCIxZpQvSDbt+AzKBGLUDySiO4gkXAuHiafcQZkeBQ9oOd2aMGU429JdDqykS1C8mTqL4c8068k/FZl0WC5ylgCW+a9wb4WFCdrb05ehZHT5wKeNPMWD/oENXycnrC4YZE41r/AYb7ktQkGgy10BvCrnifxl81wTu8V9x5A+7SkMN6+2J1MVDJeuLEraM6cBG8gwt6PsBvFCViD/PTcq4+1CIWUmKO4gA/F/x8C/xdLf/n6AUJDnyfCl38dIfvapHeAF3Zju4AagVqTDnfaDQ2EiOzyjDsGzks9RVPyfK+i3aZIqsHyXvsY1EgoW318NUgzhUHs8uTHPd/7gFg0yLsbpC7ooYdugz0vb6dPLcTgxcsVMLg8onKsqfeErTOkjpgLVYqmNPaXAWk0Lk9vxuaHmrNBB4NlQS74QkU4qpxKFzgsVhlDzqUvQ=
-    - secure: TcqlJlszXmykORVqXHzQRpjsEGh4HiRcgTjW2SgeRHjY6HXLm4psHA37tdkrRDFJFKdcKYza2O4NzjTgHlZOorocI+EmQCe7iMU4mXQbTY/rF8cqvp034I2SAIgnT+ITBVVDDd8TTzRYEpzw+/ZQr42Rs1y1PTv4gauo51giLU/qPhcck3tl6lr6qoksP6cg1q2LN4alRFg4hyt2x6GseRNzG+AQzhTp+5BIxuyKZcGw7vG2Df0R6s2HzKQQ9sY2H4+o+/DyzPLU26FWyeeQgV9QG/JVHG/C4k8+5rKyuHrGbmSjJO0xWt1PY/o0n1hn7m1ZiAdpHZl/6jN6BcJju2MgmmAEJkbzY2cdZW5acYknG5tp7ZJK3Lc1vOSaGmBeP+dt+ZWFpwqLHQhmIiIRYFJdjc1zed3aRx1+9OSj6gWCQJdOLo2Js0NYqv72rWy7qV3h6vMgvq1Zr3aN42ji69LaqkQvH8IP55retMtyJa0PA/n7eCiXOS6yDXTaVmfGZ1Ra4q7BW6ghyZQ4ymSDFzp4kkpdseEvPYm3ZjTTJj6gU2HpsEZFdRM5+2FRGGuITLxqJBf0xB4w9L++LpcnJpj57QradqLe3vGU+GiO4yz4yYxVa2vCcZkIWVZz6SnpacKbaHQux+f+FPy65isqTYCUE6W924zpC/P365qc2Fg=
-    - DOCKER_HOST: tcp://10.13.37.100:2375
+  - secure: ZSZ1mYuKnX+zRIfRVWC4rvVYTcWLoYQxAfqv7zNaGNlZcvivyMQOXNrEgx2VLR5Uii4rK8Xh08G68KFafhyBWkLZtCDy38hCkmNCIaFlbX/MAGdvGZkjO2F3jVynez1910qpNACFGRzSkberHGT1tG2mzD/hiCVSBE38pTBU87lrbzKADYQnPGVtSzHGJWdfO/uimO2/TCzf+S/roN5vpTPw3znKPJ4HQhBSCqPb6ai4kjCuXhbvCIxZpQvSDbt+AzKBGLUDySiO4gkXAuHiafcQZkeBQ9oOd2aMGU429JdDqykS1C8mTqL4c8068k/FZl0WC5ylgCW+a9wb4WFCdrb05ehZHT5wKeNPMWD/oENXycnrC4YZE41r/AYb7ktQkGgy10BvCrnifxl81wTu8V9x5A+7SkMN6+2J1MVDJeuLEraM6cBG8gwt6PsBvFCViD/PTcq4+1CIWUmKO4gA/F/x8C/xdLf/n6AUJDnyfCl38dIfvapHeAF3Zju4AagVqTDnfaDQ2EiOzyjDsGzks9RVPyfK+i3aZIqsHyXvsY1EgoW318NUgzhUHs8uTHPd/7gFg0yLsbpC7ooYdugz0vb6dPLcTgxcsVMLg8onKsqfeErTOkjpgLVYqmNPaXAWk0Lk9vxuaHmrNBB4NlQS74QkU4qpxKFzgsVhlDzqUvQ=
+  - secure: TcqlJlszXmykORVqXHzQRpjsEGh4HiRcgTjW2SgeRHjY6HXLm4psHA37tdkrRDFJFKdcKYza2O4NzjTgHlZOorocI+EmQCe7iMU4mXQbTY/rF8cqvp034I2SAIgnT+ITBVVDDd8TTzRYEpzw+/ZQr42Rs1y1PTv4gauo51giLU/qPhcck3tl6lr6qoksP6cg1q2LN4alRFg4hyt2x6GseRNzG+AQzhTp+5BIxuyKZcGw7vG2Df0R6s2HzKQQ9sY2H4+o+/DyzPLU26FWyeeQgV9QG/JVHG/C4k8+5rKyuHrGbmSjJO0xWt1PY/o0n1hn7m1ZiAdpHZl/6jN6BcJju2MgmmAEJkbzY2cdZW5acYknG5tp7ZJK3Lc1vOSaGmBeP+dt+ZWFpwqLHQhmIiIRYFJdjc1zed3aRx1+9OSj6gWCQJdOLo2Js0NYqv72rWy7qV3h6vMgvq1Zr3aN42ji69LaqkQvH8IP55retMtyJa0PA/n7eCiXOS6yDXTaVmfGZ1Ra4q7BW6ghyZQ4ymSDFzp4kkpdseEvPYm3ZjTTJj6gU2HpsEZFdRM5+2FRGGuITLxqJBf0xB4w9L++LpcnJpj57QradqLe3vGU+GiO4yz4yYxVa2vCcZkIWVZz6SnpacKbaHQux+f+FPy65isqTYCUE6W924zpC/P365qc2Fg=
+  - DOCKER_HOST: tcp://10.13.37.100:2375
   matrix:
-    - KALABOX_TEST_GROUP=drupal7
-    - KALABOX_TEST_GROUP=drupal8
-    - KALABOX_TEST_GROUP=backdrop
-    - KALABOX_TEST_GROUP=wordpress
-    - KALABOX_TEST_GROUP=drush
+  - KALABOX_TEST_GROUP=drupal7
+  - KALABOX_TEST_GROUP=drupal8
+  - KALABOX_TEST_GROUP=backdrop
+  - KALABOX_TEST_GROUP=wordpress
+  - KALABOX_TEST_GROUP=drush
+deploy:
+  - provider: npm
+    email: mike@kalamuna.com
+    api_key:
+      secure: LqETVZKmboyL3rFtpENXSR8oAN4P5KZHh9XtUambSRXEWkWO2vfyfjjBPZfgll2XdvFikCR2ymujbl4bpnPzY2gyGtGm6wsL0ngCCtzs/mIF5JuKU6v/lO0dKPyj6PC+CB3ZY32Ax4HjsWIKw9v+On/kdz1PimkYWH0fgtrnXkoTs01NgTp1l3c1ASrqjtRjmTYWgsYDHRGKUukYH+wZSSTj4bfln0UcOr907Qzsj1oKWCyK5Hc0InWO4TCrULJa4F6qG70WNnStgbSkz010vutIOtmk11HgDzbaLbetEbF5KNv59jED2WY3/mJbjK3l2vrObM1NG09Je0xKh7fcadENrFTKaLXjxgy0TFOGih6M9qu455/pi68f76tI3d6AcLj9jhylyrYcqpWWyHQfhlluRC3g4YF4+HDh5dG5gqUD5TxMj/r8P2UG8BjlS/Ytn0eYxJsJ9l8g5OdBx7jP0iXArtIyPQeNkhXlUS9aumLufxgOmCrIX2CZTHF97GxosD6nNoYTd7ADfwl6Z5ByucDRDQAycBoMO6ALjM3rIu/WgNg8yr/+jj8DqikW5ye6mnVa03wSOSShfu3VvIA2UrbTW4FU5/H/oNM+BrkUldg+w7rl3LxQSO/fA38Vre1DEdveOomxRMEjNJKmhE1yn9zRE0Zb0wb+yfQOfCFYkuw=
+    on:
+      tags: true
+      branch: v0.12
+      repo: kalabox/kalabox-app-pantheon
+  - provider: s3
+    access_key_id: AKIAILURVAJDJA4ICBPQ
+    secret_access_key:
+      secure: Q7deScSi8rAcKfwQbdDF9b3W25Q4rE4ki6BvvVUaSv2hmD+uBsh9c30lqLDtw6lhPOFdihq8sir6eXZY3xJs5IptGKitjCgs2+dxFSCO2n+AlFUB42O3tva57mZ92dZfAyLfIVnbvl37l3mbGMrChFn7yQQJkt14jx3LqSzDEjMROs2j4jVFMGgRhIdHoxKDxPdcqA0+O+9dDH3YEHqEEWmJaHrFhZ3cN8yuKav/T5TBpxA7lg7WeZkMe2wepwrbXyvBE36NKiUYnn0p5hDejC4BttDGQXZvdLVpLFYxEhOJ75RuLpMp4JHtYS4wTfdB39DC0HfVy3cJzzrVSXjosdES+VhV8hqVCyoLoQiVEQmr15CYoLeFBjDb0if+ZvFP7S6kgldYxhVkhL53PuUPpfFlG8Z1SEN+tG1LLp4DTw1YMJzTW5JPIpjHmr2/JazTpIaAJ9hE2NPAAV9oc9w3OXlS+8+Wd2XS7SyN1yH9bOXI6Rws035bRvWW90EGzrfr1RnrIhtEtBCF6w7HH9T0g+vT8ClFb/gpe0TXya8AB1XKOglWY/ltvbqU8zs5rpSqlwRmfxME8cVF35MzmyCJ/P6Od8hmgQwmv27MZqyaSNgK3xtEelgdEulVmzHCTa6G8LcPN2GVjHFKUUDR4iVdVFBnIVEGUBwOo8+CIswrCek=
+    bucket: apps.kalabox.io
+    local-dir: dev_build
+    acl: public_read
+    region: us-west-2
+    skip_cleanup: true
+    on:
+      repo: kalabox/kalabox-app-pantheon
+      branch: v0.12
+  - provider: releases
+    api_key:
+      secure: ijAJXFDijXJpwcAtLVbpskEJVTFdQ1WBCNN246qZKiUAFvEDiFHfjEdm/UQAfSCUd5V1VLRLmOWx0X/b580ItZIJditA4W9Q3ym98GwcdeMTv8NBbklG61ogVkTLR86kpbWZKNJ1s9EsW4fAtn1Su4EjvXQnaTg0M/aoETyelfeta50LdwMV0vhRXG81LGtLcoU/bC4rO89yNVKTKPntTZIbn0I/Yu6pMewxbyLcP5KBS+D1uMrmLe//N6zSbH/s1t0UOy2lxv++pb+PpwQRDtqaVhLJ1Ut0DB/iqigm1uEkdpltLOfYLJBFot4mgWpSZrbz/m1hvM6ZxoXfa1VUVWijG7ktjNIWtaU6Cz+G+S5mhadSSOd6iAaka3wd4vK6BR2wndPoz0/1Vg/DpZFHh+/F207e3V/OhiRWYPbgjdx5JjoXd0DrW+3HHaoleZ8Ze67T8ews9epjqHVSnfYtELwC+dPoJDKcsxgnN1a540gh/YDGtdKKFC/8KSDcasjafeaRbBG75VzTzAlVtbaoFVFT9Pz7B+2CpELVusve2+sZGMa/dG9qSKcJlSNZX6FkrZLYDVh4t5719kKSq2gixBkxtQLiiHL400ZSdPu8LDAFLPyo0W/PARIdDPqMaRzKSX4beQaf+GUfz0MhyWh4WJ0cjjOtDTl0zq6dn+jlGHw=
+    file: prod_build/kalabox-app-pantheon-$TRAVIS_TAG.tar.gz
+    skip_cleanup: true
+    on:
+      repo: kalabox/kalabox-app-pantheon
+      tags: true

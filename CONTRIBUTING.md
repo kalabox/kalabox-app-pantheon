@@ -47,7 +47,7 @@ critera
 Contributing to other Kalabox projects
 --------------------------------------
 
-The rest of this guide is dedicated to working on the CLI portion of
+The rest of this guide is dedicated to working on the Pantheon portion of
 Kalabox. If you are actually interesting in working on other Kalabox projects
 please check out their respective CONTRIBUTION.mds.
 
@@ -74,25 +74,39 @@ development.
 NOTE: You might want to make sure you get npm set up so you can install global modules without sudo. Agree to install command line tools if it prompts you when you run the git step.
 
 ```
+# Navigate into your CLI direc
 cd /path/to/kalabox-cli/node_modules
-rm -rf kalabox-app-php
-git clone https://github.com/kalabox/kalabox-app-php.git
-cd kalabox-app-php
+
+# Remove the Pantheon app that auto-pulls when you install the CLI source
+# and replace it with the source repo
+rm -rf kalabox-app-pantheon
+git clone https://github.com/kalabox/kalabox-app-pantheon.git
+
+# Install its dependencies
+cd kalabox-app-pantheon
+npm install
+
+# Install the app's dependencies
+cd app
 npm install
 ```
 
 #### 3. Testing out changes
 
-Inside of `kalabox-app-php` you will see an `app` folder. This contains
-the "template" for all apps created for Pantheon. Make a change in the template
-and then `kbox create pantheon` to see the changes in a running app.
+Inside of `kalabox-app-pantheon` you will see an `app` folder. This contains
+the "template" for all apps created for Pantheon. To use this folder directly
+when you create your pantheon app run
+
+```bash
+kbox create pantheon -- --from=/path/to/kalabox-cli/node_modules/kalabox-app-pantheon/app
+```
 
 Sometimes its generally easier to create an app and work there first before
 merging your changes back into the template. Here are a few good workflows.
 
 ```
 # Testing config changes
-kbox create pantheon -- --name=myapp
+kbox create pantheon -- --name=myapp --from=/path/to/kalabox-cli/node_modules/kalabox-app-pantheon/app
 cd myapp
 #
 # 1. Edit config files
@@ -100,7 +114,7 @@ cd myapp
 kbox restart
 
 # Testing dockerfile changes
-kbox create pantheon -- --name=myapp
+kbox create pantheon -- --name=myapp --from=/path/to/kalabox-cli/node_modules/kalabox-app-pantheon/app
 cd myapp
 #
 # 1. Edit `kalabox-compose.yml` or `kalabox-cli.yml` so you are building from

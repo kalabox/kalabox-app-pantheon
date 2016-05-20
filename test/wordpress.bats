@@ -26,7 +26,7 @@ setup() {
   NPM_VERSION=2.14
   PHP_VERSION=7.
   RSYNC_VERSION=3.1
-  TERMINUS_VERSION=0.10
+  TERMINUS_VERSION=0.11.1
   WP_CLI_VERSION=0.23
 
   # We need to actually go into this app dir until
@@ -426,6 +426,19 @@ setup() {
 #
 @test "Check that we can run '$KBOX rebuild' without an error." {
   $KBOX $PANTHEON_WORDPRESS_NAME rebuild
+}
+
+#
+# Verify the SSH key and then remove
+#
+@test "Check that we can remove the SSH key we posted." {
+
+  # Get the fingerprint
+  SSH_KEY_FINGERPRINT=$(ssh-keygen -l -f ~/.ssh/pantheon.kalabox.id_rsa.pub | awk -F' ' '{print $2}' | sed 's/://g')
+
+  # Delete the SSH key
+  $KBOX terminus ssh-keys delete --fingerprint=$SSH_KEY_FINGERPRINT --yes
+
 }
 
 #
