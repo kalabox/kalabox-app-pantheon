@@ -10,6 +10,7 @@ v0.12.0-beta1
 sites. [#585](https://github.com/kalabox/kalabox/issues/585)
 * Fixed bug where `kbox drush uli` was returning `http://default` instead of the correct hostname. [#1287](https://github.com/kalabox/kalabox/issues/1287)
 * Added tests to verify drush is customizable at `config/drush` [#1298](https://github.com/kalabox/kalabox/issues/1298)
+* Switched mysql user to handle changes in upstream official mariadb container
 
 v0.12.0-alpha12
 ===============
