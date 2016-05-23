@@ -8,6 +8,7 @@ v0.12.0-beta3
 #### Bug Fixes
 
 * Fixed a redis typo in kalabox-compose.yml
+* Changed to a more robust PhantomJS download URL provided by Medium within their wrapper for installing via npm on github. [#1359](https://github.com/kalabox/kalabox/issues/1359)
 
 v0.12.0-beta2
 =============
