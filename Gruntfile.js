@@ -49,6 +49,7 @@ module.exports = function(grunt) {
         cwd: 'app',
         expand: true,
         options: {
+          mode: true,
           process: function(content, srcPath) {
 
             // Switch it up
