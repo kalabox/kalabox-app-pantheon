@@ -44,7 +44,7 @@ before-script() {
 
   # Install kalabox
   sudo apt-get -y update
-  sudo apt-get -y install iptables cgroup-bin bridge-utils curl
+  sudo apt-get -y install iptables cgroup-bin bridge-utils curl git
   curl -fsSL -o /tmp/kalabox.deb "http://installer.kalabox.io/kalabox-latest.deb"
   sudo dpkg -i /tmp/kalabox.deb
 
@@ -52,6 +52,11 @@ before-script() {
   sudo curl -fsSL -o /usr/local/bin/kbox "http://cli.kalabox.io/kbox-linux-x64-latest-dev"
   sudo chmod +x /usr/local/bin/kbox
 
+  # Download latest ui
+  git clone https://github.com/kalabox/kalabox-ui.git ${TRAVIS_BUILD_DIR}/kalabox-ui
+  cd ${TRAVIS_BUILD_DIR}/kalabox-ui
+  npm install
+  cd ${TRAVIS_BUILD_DIR}
 }
 
 # script
@@ -76,6 +81,10 @@ script() {
 
   # Do the KALABOX_TEST_GROUP
   run_command grunt test:$KALABOX_TEST_GROUP
+
+  # Run protractor tests
+  cd ${TRAVIS_BUILD_DIR}/kalabox-ui
+  DISPLAY=:99.0 grunt e2e --verbose
 
 }
 
