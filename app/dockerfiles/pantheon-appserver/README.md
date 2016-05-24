@@ -44,7 +44,7 @@ RUN \
   dpkg -i /tmp/wkhtmltox-0.12.2_linux-jessie-amd64.deb && \
   mkdir -p /srv/bin && ln -s /usr/local/bin/wkhtmltopdf /srv/bin/wkhtmltopdf && \
   cd /srv/bin && \
-  curl -fsSL "https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2" | tar -xjv && \
+  curl -fsSL "https://github.com/Medium/phantomjs/releases/download/v2.1.1/phantomjs-2.1.1-linux-x86_64.tar.bz2" | tar -xjv && \
   mv phantomjs-2.1.1-linux-x86_64/bin/phantomjs /srv/bin/phantomjs && \
   rm -rf phantomjs-2.1.1-linux-x86_64 && rm -f phantomjs-2.1.1-linux-x86_64.tar.bz2 && \
   chmod +x /srv/bin/phantomjs && \
