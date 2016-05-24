@@ -13,6 +13,7 @@ v0.12.0-beta2
 * Added tests to make sure we remove testing SSH keys from Pantheon. [#1321](https://github.com/kalabox/kalabox/issues/1321)
 * Fixed a redis typo in kalabox-compose.yml
 * Changed to a more robust PhantomJS download URL provided by Medium within their wrapper for installing via npm on github. [#1359](https://github.com/kalabox/kalabox/issues/1359)
+* Fixed an issue where the build process was not perserving script executable permissions [#1341](https://github.com/kalabox/kalabox/issues/1341)
 
 v0.12.0-beta1
 =============
