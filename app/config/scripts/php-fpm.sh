@@ -15,5 +15,8 @@ chown -Rf www-data:www-data /code
 chown -Rf www-data:www-data /media
 chown -Rf www-data:www-data /php
 
+# Additional setup
+mkdir -p /src/logs
+
 # Run fpm with command options
 php-fpm "$@"

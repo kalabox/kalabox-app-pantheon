@@ -1,3 +1,10 @@
+Kalabox Pantheon appserver
+===================
+
+A container that approximates the appserver used on Pantheon.
+
+```
+
 # Pantheon appserver mock for Kalabox
 # docker build -t kalabox/pantheon-appserver .
 # docker run -d -e PHP_VERSION=55 -e FRAMEWORK=backdrop kalabox/pantheon-appserver
@@ -55,3 +62,5 @@ CMD ["--login", "/root/start.sh"]
 
 EXPOSE 80
 EXPOSE 443
+
+```
