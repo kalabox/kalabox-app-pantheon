@@ -22,12 +22,14 @@ RUN apt-get update && apt-get install -y \
   && pecl install imagick \
   && pecl install oauth-1.2.3 \
   && pecl install redis \
+  && pecl install xdebug \
   && docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr \
   && docker-php-ext-configure imap --with-imap-ssl --with-kerberos \
   && docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu/ \
   && docker-php-ext-enable imagick \
   && docker-php-ext-enable oauth \
   && docker-php-ext-enable redis \
+  && docker-php-ext-enable xdebug \
   && docker-php-ext-install \
     gd \
     imap \
@@ -64,6 +66,7 @@ RUN php-fpm -m | grep "gd" \
   && php-fpm -m | grep "PDO" \
   && php-fpm -m | grep "redis" \
   && php-fpm -m | grep "soap" \
+  && php-fpm -m | grep "xdebug" \
   && php-fpm -m | grep "xml" \
   && php-fpm -m | grep "Zend OPcache" \
   && /srv/bin/wkhtmltopdf -V \
