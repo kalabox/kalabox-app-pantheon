@@ -20,6 +20,7 @@ RUN apt-get update && apt-get install -y \
     libpng12-dev \
     libpq-dev \
     libxml2-dev \
+    mysql-client \
     xfonts-base \
     xfonts-75dpi \
   && pecl install apc \
@@ -57,21 +58,3 @@ RUN apt-get update && apt-get install -y \
   && apt-get -y autoclean \
   && apt-get -y autoremove \
   && rm -rf /var/lib/apt/* && rm -rf && rm -rf /var/lib/cache/* && rm -rf /var/lib/log/* && rm -rf /tmp/*
-
-# Verify our things
-RUN php-fpm -m | grep "apc" \
-  && php-fpm -m | grep "gd" \
-  && php-fpm -m | grep "imagick" \
-  && php-fpm -m | grep "imap" \
-  && php-fpm -m | grep "ldap" \
-  && php-fpm -m | grep "mbstring" \
-  && php-fpm -m | grep "mcrypt" \
-  && php-fpm -m | grep "mysql" \
-  && php-fpm -m | grep "OAuth" \
-  && php-fpm -m | grep "PDO" \
-  && php-fpm -m | grep "redis" \
-  && php-fpm -m | grep "soap" \
-  && php-fpm -m | grep "xdebug" \
-  && php-fpm -m | grep "xml" \
-  && /srv/bin/wkhtmltopdf -V \
-  && /srv/bin/phantomjs

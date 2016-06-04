@@ -78,12 +78,12 @@ appserver:
 
   # Comment this and uncomment 'build' below if you want to edit your
   # local dockerfile and build from there. This is useful for development
-  # image: kalabox/pantheon-appserver:$KALABOX_APP_PANTHEON_CONFIG_PHP
+  image: kalabox/pantheon-appserver:$KALABOX_APP_PANTHEON_CONFIG_PHP
 
   # Uncomment this and comment 'image' above if you want to edit your
   # local dockerfile and build from there. This is useful for development
   #
-  build: ./dockerfiles/pantheon-appserver/$KALABOX_APP_PANTHEON_CONFIG_PHP
+  # build: ./dockerfiles/pantheon-appserver/$KALABOX_APP_PANTHEON_CONFIG_PHP
 
   hostname: $KALABOX_APP_HOSTNAME
   volumes:
