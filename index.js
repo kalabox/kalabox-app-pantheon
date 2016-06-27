@@ -28,22 +28,9 @@ module.exports = function(kbox) {
    */
   var packageData = function() {
 
-    // Get relevant config options
-    var version = require(path.join(__dirname, 'package.json')).version;
-    var locked = kbox.core.deps.get('globalConfig').locked;
-
-    // Define our download versions
-    var devUrl = 'http://apps.kalabox.io/kalabox-app-pantheon-latest.tar.gz';
-    var prodUrl = [
-      'https://github.com',
-      'kalabox/kalabox-app-pantheon/releases/download',
-      'v' + version,
-      'kalabox-app-pantheon-' + version + '.tar.gz'
-    ];
-
     // Return our pkg data
     return {
-      url: (locked) ? prodUrl.join('/') : devUrl
+      dir: path.join(__dirname, 'app')
     };
 
   };

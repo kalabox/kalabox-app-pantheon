@@ -75,13 +75,66 @@ kbox-retry-build() {
   [ "$status" -eq 0 ]
 }
 
-# Check that we can build appserver without an error.
-@test "Check that we can build the appserver image without an error." {
-  IMAGE=pantheon-appserver
-  run kbox-retry-build kalabox/$IMAGE dev $PANTHEON_DOCKERFILES_DIR/$IMAGE
+# Check that we can build the nginx image without an error.
+@test "Check that we can build the nginx image without an error." {
+  IMAGE=nginx
+  run kbox-retry-build kalabox/$IMAGE stable $PANTHEON_DOCKERFILES_DIR/$IMAGE
   [ "$status" -eq 0 ]
 }
 
+# Check that we can build 5.3 appserver without an error.
+@test "Check that we can build the php 5.3 appserver image without an error." {
+  IMAGE=pantheon-appserver
+  TAG=53
+  run kbox-retry-build kalabox/$IMAGE $TAG $PANTHEON_DOCKERFILES_DIR/$IMAGE/$TAG
+  [ "$status" -eq 0 ]
+}
+
+# Check that the he php 5.3 image has the correct PHP extensions.
+@test "Check that the php 5.3 image has the correct PHP extensions." {
+  IMAGE=pantheon-appserver
+  TAG=53
+  $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "apc" && \
+  $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "curl" && \
+  $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "gd" && \
+  $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "imagick" && \
+  $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "imap" && \
+  $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "ldap" && \
+  $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "mbstring" && \
+  $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "mcrypt" && \
+  $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "OAuth" && \
+  $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "pdo_mysql" && \
+  $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "redis" && \
+  $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "xdebug" && \
+  $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "zip"
+}
+
+# Check that we can build appserver without an error.
+@test "Check that we can build the php 5.5 appserver image without an error." {
+  IMAGE=pantheon-appserver
+  TAG=55
+  run kbox-retry-build kalabox/$IMAGE $TAG $PANTHEON_DOCKERFILES_DIR/$IMAGE/$TAG
+  [ "$status" -eq 0 ]
+}
+
+# Check that the he php 5.5 image has the correct PHP extensions.
+@test "Check that the php 5.5 image has the correct PHP extensions." {
+  IMAGE=pantheon-appserver
+  TAG=55
+  $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "curl" && \
+  $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "gd" && \
+  $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "imagick" && \
+  $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "imap" && \
+  $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "ldap" && \
+  $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "mbstring" && \
+  $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "mcrypt" && \
+  $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "OAuth" && \
+  $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "pdo_mysql" && \
+  $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "redis" && \
+  $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "xdebug" && \
+  $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "Zend OPcache" && \
+  $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "zip"
+}
 # Check that we can build the edge image without an error.
 @test "Check that we can build the edge image without an error." {
   IMAGE=pantheon-edge

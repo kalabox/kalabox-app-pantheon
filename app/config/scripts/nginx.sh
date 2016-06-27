@@ -6,17 +6,14 @@ set -e
 : ${KALABOX_GID:='50'}
 
 # Correctly map users
-echo "Remapping apache permissions for VB sharing compat..."
+echo "Remapping permissions for VB sharing compat..."
 usermod -u "$KALABOX_UID" www-data
 groupmod -g "$KALABOX_GID" www-data || usermod -G staff www-data
-
-# Make sure our tmp directory exists
-mkdir -p /var/www/tmp
 
 # Make sure we have correct ownership
 chown -Rf www-data:www-data /code
 chown -Rf www-data:www-data /media
-chown -Rf www-data:www-data /var/www/tmp
+chown -Rf www-data:www-data /php
 
 # Set up our certs for the appserver with nginx
 if [ ! -f "/certs/appserver.pem" ]; then
@@ -36,7 +33,5 @@ cp /certs/binding.crt /usr/share/ca-certificates/solr/binding.crt
 echo "solr/binding.crt" >> /etc/ca-certificates.conf
 update-ca-certificates --fresh
 
-
-# Run all the services
-/root/.phpbrew/php/${PHPBREW_PHP}/sbin/php-fpm
-nginx
+# Run the NGINX
+nginx "$@"

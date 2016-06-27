@@ -55,6 +55,7 @@ data:
     - /var/lib/mysql
     - /code
     - /backups
+    - /php
 
 #
 # This defines a Pantheon appserver.
@@ -77,12 +78,88 @@ appserver:
 
   # Comment this and uncomment 'build' below if you want to edit your
   # local dockerfile and build from there. This is useful for development
-  image: kalabox/pantheon-appserver:$KALABOX_APP_PANTHEON_CONFIG_IMAGES
+  image: kalabox/pantheon-appserver:$KALABOX_APP_PANTHEON_CONFIG_PHP
 
   # Uncomment this and comment 'image' above if you want to edit your
   # local dockerfile and build from there. This is useful for development
   #
-  # build: ./dockerfiles/pantheon-appserver
+  # build: ./dockerfiles/pantheon-appserver/$KALABOX_APP_PANTHEON_CONFIG_PHP
+
+  hostname: $KALABOX_APP_HOSTNAME
+  volumes:
+    - $KALABOX_APP_ROOT_BIND:/src
+  volumes_from:
+    - data
+  entrypoint: /src/config/scripts/php-fpm.sh
+  command: --fpm-config /src/config/php/www.conf -c /src/config/php -d xdebug.remote_host=$KALABOX_ENGINE_REMOTE_IP
+  working_dir: /code
+  links:
+    - db:database
+    - redis:redis
+    - solr:solr
+  environment:
+    AUTH_KEY: $KALABOX_APP_PANTHEON_AUTH_KEY
+    AUTH_SALT: $KALABOX_APP_PANTHEON_AUTH_SALT
+    BACKDROP_SETTINGS: $KALABOX_APP_PANTHEON_PRESSFLOW_SETTINGS
+    CACHE_HOST: $KALABOX_APP_PANTHEON_CACHE_HOST
+    CACHE_PASSWORD: $KALABOX_APP_PANTHEON_CACHE_PASSWORD
+    CACHE_PORT: $KALABOX_APP_PANTHEON_CACHE_PORT
+    DB_HOST: $KALABOX_APP_PANTHEON_DB_HOST
+    DB_NAME: $KALABOX_APP_PANTHEON_DB_NAME
+    DB_PASSWORD: $KALABOX_APP_PANTHEON_DB_PASSWORD
+    DB_PORT: $KALABOX_APP_PANTHEON_DB_PORT
+    DB_USER: $KALABOX_APP_PANTHEON_DB_USER
+    DOCROOT: $KALABOX_APP_PANTHEON_DOCROOT
+    DOMAIN: $KALABOX_DOMAIN
+    DRUPAL_HASH_SALT: $KALABOX_APP_PANTHEON_DRUPAL_HASH_SALT
+    FILEMOUNT: $KALABOX_APP_PANTHEON_FILEMOUNT
+    FRAMEWORK: $KALABOX_APP_PANTHEON_FRAMEWORK
+    KALABOX_GID: $KALABOX_ENGINE_GID
+    KALABOX_UID: $KALABOX_ENGINE_ID
+    LOGGED_IN_KEY: $KALABOX_APP_PANTHEON_LOGGED_IN_KEY
+    LOGGED_IN_SALT: $KALABOX_APP_PANTHEON_LOGGED_IN_SALT
+    MYSQL_HOST: $KALABOX_APP_PANTHEON_DB_HOST
+    NONCE_SALT: $KALABOX_APP_PANTHEON_NONCE_SALT
+    PANTHEON_ACCOUNT: $KALABOX_APP_PANTHEON_PANTHEON_ACCOUNT
+    PANTHEON_ENVIRONMENT: $KALABOX_APP_PANTHEON_PANTHEON_ENVIRONMENT
+    PANTHEON_INDEX_HOST: $KALABOX_APP_PANTHEON_PANTHEON_INDEX_HOST
+    PANTHEON_INDEX_PORT: $KALABOX_APP_PANTHEON_PANTHEON_INDEX_PORT
+    PANTHEON_SITE: $KALABOX_APP_PANTHEON_PANTHEON_SITE
+    PANTHEON_SITE_NAME: $KALABOX_APP_PANTHEON_PANTHEON_SITE_NAME
+    PHP_IDE_CONFIG: serverName=$KALABOX_APP_HOSTNAME
+    PHP_VERSION: $KALABOX_APP_PANTHEON_CONFIG_PHP
+    PRESSFLOW_SETTINGS: $KALABOX_APP_PANTHEON_PRESSFLOW_SETTINGS
+    SECURE_AUTH_KEY: $KALABOX_APP_PANTHEON_SECURE_AUTH_KEY
+    SECURE_AUTH_SALT: $KALABOX_APP_PANTHEON_SECURE_AUTH_SALT
+    TERM: xterm
+
+#
+# This defines a Pantheon appserver.
+#
+# We are currently running the same services as the Pantheon appserver with
+# the current exception of apache tika.
+#
+# We also populate this service with similar environmental variables to what
+# you would find on the pantheon appserver so you can make use of things
+# like:
+#
+#   PRESSFLOW_SETTINGS
+#   PANTHEON_ENVIRONMENT
+#   CACHE_HOST
+#
+# Check your services config in kalabox.yml on how to access this directly
+# instead of going through the edge service.
+#
+web:
+
+  # Comment this and uncomment 'build' below if you want to edit your
+  # local dockerfile and build from there. This is useful for development
+  image: nginx:1.8.1
+
+  # Uncomment this and comment 'image' above if you want to edit your
+  # local dockerfile and build from there. This is useful for development
+  #
+  # build: ./dockerfiles/nginx
 
   hostname: $KALABOX_APP_HOSTNAME
   ports:
@@ -90,49 +167,17 @@ appserver:
     - "444"
   volumes:
     - $KALABOX_APP_ROOT_BIND:/src
-    - $KALABOX_APP_ROOT_BIND/config/nginx/$KALABOX_APP_PANTHEON_FRAMEWORK.conf:/etc/nginx/conf.d/default.conf
     - $KALABOX_APP_ROOT_BIND/config/nginx/nginx.conf:/etc/nginx/nginx.conf
+    - $KALABOX_APP_ROOT_BIND/config/nginx/$KALABOX_APP_PANTHEON_FRAMEWORK.conf:/etc/nginx/conf.d/default.conf
   volumes_from:
     - data
-  links:
-    - db:database
-    - redis:redis
-    - solr:solr
+  entrypoint: /src/config/scripts/nginx.sh
+  command: -g "daemon off;"
   environment:
-    TERM: xterm
-    KALABOX_UID: $KALABOX_ENGINE_ID
     KALABOX_GID: $KALABOX_ENGINE_GID
-    REMOTE_IP: $KALABOX_ENGINE_REMOTE_IP
-    DOMAIN: $KALABOX_DOMAIN
-    FRAMEWORK: $KALABOX_APP_PANTHEON_FRAMEWORK
-    PHP_VERSION: $KALABOX_APP_PANTHEON_CONFIG_PHP
-    DOCROOT: $KALABOX_APP_PANTHEON_DOCROOT
-    FILEMOUNT: $KALABOX_APP_PANTHEON_FILEMOUNT
-    DRUPAL_HASH_SALT: $KALABOX_APP_PANTHEON_DRUPAL_HASH_SALT
-    DB_HOST: $KALABOX_APP_PANTHEON_DB_HOST
-    DB_PORT: $KALABOX_APP_PANTHEON_DB_PORT
-    DB_USER: $KALABOX_APP_PANTHEON_DB_USER
-    MYSQL_HOST: $KALABOX_APP_PANTHEON_DB_HOST
-    DB_PASSWORD: $KALABOX_APP_PANTHEON_DB_PASSWORD
-    DB_NAME: $KALABOX_APP_PANTHEON_DB_NAME
-    PANTHEON_ACCOUNT: $KALABOX_APP_PANTHEON_PANTHEON_ACCOUNT
-    PANTHEON_SITE: $KALABOX_APP_PANTHEON_PANTHEON_SITE
-    PANTHEON_SITE_NAME: $KALABOX_APP_PANTHEON_PANTHEON_SITE_NAME
-    PANTHEON_ENVIRONMENT: $KALABOX_APP_PANTHEON_PANTHEON_ENVIRONMENT
-    PRESSFLOW_SETTINGS: $KALABOX_APP_PANTHEON_PRESSFLOW_SETTINGS
-    BACKDROP_SETTINGS: $KALABOX_APP_PANTHEON_PRESSFLOW_SETTINGS
-    CACHE_HOST: $KALABOX_APP_PANTHEON_CACHE_HOST
-    CACHE_PORT: $KALABOX_APP_PANTHEON_CACHE_PORT
-    CACHE_PASSWORD: $KALABOX_APP_PANTHEON_CACHE_PASSWORD
-    PANTHEON_INDEX_HOST: $KALABOX_APP_PANTHEON_PANTHEON_INDEX_HOST
-    PANTHEON_INDEX_PORT: $KALABOX_APP_PANTHEON_PANTHEON_INDEX_PORT
-    AUTH_KEY: $KALABOX_APP_PANTHEON_AUTH_KEY
-    SECURE_AUTH_KEY: $KALABOX_APP_PANTHEON_SECURE_AUTH_KEY
-    LOGGED_IN_KEY: $KALABOX_APP_PANTHEON_LOGGED_IN_KEY
-    AUTH_SALT: $KALABOX_APP_PANTHEON_AUTH_SALT
-    SECURE_AUTH_SALT: $KALABOX_APP_PANTHEON_SECURE_AUTH_SALT
-    LOGGED_IN_SALT: $KALABOX_APP_PANTHEON_LOGGED_IN_SALT
-    NONCE_SALT: $KALABOX_APP_PANTHEON_NONCE_SALT
+    KALABOX_UID: $KALABOX_ENGINE_ID
+    TERM: xterm
+
 #
 # This defines a Pantheon database server.
 #
@@ -172,7 +217,7 @@ edge:
 
   # Comment this and uncomment 'build' below if you want to edit your
   # local dockerfile and build from there. This is useful for development
-  image: kalabox/pantheon-edge:$KALABOX_APP_PANTHEON_CONFIG_IMAGES
+  image: kalabox/pantheon-edge:dev
 
   # Uncomment this and comment 'image' above if you want to edit your
   # local dockerfile and build from there. This is useful for development
@@ -180,7 +225,7 @@ edge:
   # build: dockerfiles/pantheon-edge
 
   links:
-    - appserver:web
+    - web:web
   volumes:
     - $KALABOX_APP_ROOT_BIND:/src
     - $KALABOX_APP_ROOT_BIND/config/varnish/default.vcl:/etc/varnish/default.vcl
@@ -229,7 +274,7 @@ solr:
 
   # Comment this and uncomment 'build' below if you want to edit your
   # local dockerfile and build from there. This is useful for development
-  image: kalabox/pantheon-solr:$KALABOX_APP_PANTHEON_CONFIG_IMAGES
+  image: kalabox/pantheon-solr:dev
 
   # Uncomment this and comment 'image' above if you want to edit your
   # local dockerfile and build from there. This is useful for development

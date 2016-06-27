@@ -93,11 +93,6 @@ pluginconfig:
   #
   sharing:
     share: data:/code
-    ignore:
-      - "!*modules*"
-      - "sites/default/files"
-      - "files"
-      - "wp-content/uploads"
 
   #
   # services plugin config.
@@ -116,7 +111,7 @@ pluginconfig:
   #     - secure: [true|false] - http vs https.
   #
   services:
-    appserver:
+    web:
       - port: 8888/tcp
         default: true
       - port: 444/tcp
