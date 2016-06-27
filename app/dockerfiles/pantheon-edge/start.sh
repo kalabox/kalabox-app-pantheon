@@ -10,4 +10,4 @@ if [ ! -f "/certs/edge-ssl-termination.pem" ]; then
 fi
 
 varnishd -a :80 -f /etc/varnish/default.vcl -s malloc,128m
-nginx
+nginx -g "daemon off;"

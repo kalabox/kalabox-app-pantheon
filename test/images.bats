@@ -75,10 +75,26 @@ kbox-retry-build() {
   [ "$status" -eq 0 ]
 }
 
+# Check that we can build the nginx image without an error.
+@test "Check that we can build the nginx image without an error." {
+  IMAGE=nginx
+  run kbox-retry-build kalabox/$IMAGE stable $PANTHEON_DOCKERFILES_DIR/$IMAGE
+  [ "$status" -eq 0 ]
+}
+
 # Check that we can build appserver without an error.
-@test "Check that we can build the appserver image without an error." {
+@test "Check that we can build the php 5.3 appserver image without an error." {
   IMAGE=pantheon-appserver
-  run kbox-retry-build kalabox/$IMAGE dev $PANTHEON_DOCKERFILES_DIR/$IMAGE
+  TAG=53
+  run kbox-retry-build kalabox/$IMAGE $TAG $PANTHEON_DOCKERFILES_DIR/$IMAGE/$TAG
+  [ "$status" -eq 0 ]
+}
+
+# Check that we can build appserver without an error.
+@test "Check that we can build the php 5.5 appserver image without an error." {
+  IMAGE=pantheon-appserver
+  TAG=55
+  run kbox-retry-build kalabox/$IMAGE $TAG $PANTHEON_DOCKERFILES_DIR/$IMAGE/$TAG
   [ "$status" -eq 0 ]
 }
 
