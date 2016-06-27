@@ -33,8 +33,6 @@ script:
 
   # Run code tests
   - grunt test:code
-  # Verify install
-  - grunt test:install
   # Ensure images
   - grunt test:images
   # Do the KALABOX_TEST_GROUP
