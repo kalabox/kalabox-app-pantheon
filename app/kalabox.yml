@@ -93,11 +93,6 @@ pluginconfig:
   #
   sharing:
     share: data:/code
-    ignore:
-      - "!*modules*"
-      - "sites/default/files"
-      - "files"
-      - "wp-content/uploads"
 
   #
   # services plugin config.
