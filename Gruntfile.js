@@ -27,12 +27,6 @@ module.exports = function(grunt) {
           'app/plugins/*/*.js',
           'app/plugins/*/lib/*.js'
         ]
-      },
-      versions: {
-        src: [
-          'package.json',
-          'app/package.json'
-        ],
       }
     },
 
@@ -85,18 +79,18 @@ module.exports = function(grunt) {
     // This handles automatic version bumping
     bump: {
       options: {
-        files: ['<%= files.versions.src %>'],
+        files: ['package.json', 'app/package.json'],
         updateConfigs: [],
         commit: true,
         commitMessage: 'Release v%VERSION%',
-        commitFiles: ['<%= files.versions.src %>'],
+        commitFiles: ['package.json', 'app/package.json'],
         createTag: true,
         tagName: 'v%VERSION%',
         tagMessage: 'Version %VERSION%',
         pushTo: 'origin',
         gitDescribeOptions: '--tags --always --abbrev=1 --dirty=-d',
         globalReplace: false,
-        prereleaseName: 'beta',
+        prereleaseName: 'unstable',
         metadata: '',
         regExp: false
       }

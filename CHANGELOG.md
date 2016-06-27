@@ -1,5 +1,10 @@
 v0.13.0-unstable.1
-=============
+==================
+
+* Upgraded to terminus to `0.11.2`. [#1369](https://github.com/kalabox/kalabox/issues/1369)
+* Added `ldap` to appserver. [#1328](https://github.com/kalabox/kalabox/issues/1328)
+* Fixed php extension to include `imagick`. [#1333](https://github.com/kalabox/kalabox/issues/1333)
+* Upgraded terminus to `0.11.2` and downgraded CLI php `5.6`. [#1369](https://github.com/kalabox/kalabox/issues/1369)
 
 v0.12.0-beta2
 =============
