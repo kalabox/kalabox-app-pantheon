@@ -4,7 +4,7 @@
 # docker run -d -e PHP_VERSION=55 -e FRAMEWORK=backdrop kalabox/pantheon-appserver
 #
 
-FROM drush/drush:8
+FROM drush/drush:8-php5
 
 # Terminus versions
 ENV TERMINUS_VERSION 0.11.1
