@@ -121,10 +121,6 @@ module.exports = function(grunt) {
     shell: {
 
       // Tests
-      install: {
-        options: testOpts,
-        command: testCommand + ' ./test/install.bats'
-      },
       images: {
         options: testOpts,
         command: testCommand + ' ./test/images.bats'
@@ -224,10 +220,6 @@ module.exports = function(grunt) {
   /*
    * Functional tests
    */
-  // Verify the install
-  grunt.registerTask('test:install', [
-    'shell:install'
-  ]);
   // Build the images
   grunt.registerTask('test:images', [
     'shell:images'
@@ -262,7 +254,6 @@ module.exports = function(grunt) {
   ]);
   // All Func tests
   grunt.registerTask('test:func', [
-    'test:install',
     'test:images',
     'test:frameworks',
     'test:drush'
