@@ -26,7 +26,7 @@ RUN apt-get update && apt-get install -y \
   && pecl install apc \
   && pecl install imagick-3.3.0 \
   && pecl install oauth-1.2.3 \
-  && pecl install redis \
+  && pecl install redis-2.2.8 \
   && pecl install xdebug-2.2.7 \
   && docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr \
   && docker-php-ext-configure imap --with-imap-ssl --with-kerberos \
@@ -57,5 +57,3 @@ RUN apt-get update && apt-get install -y \
   && apt-get -y clean \
   && apt-get -y autoclean \
   && apt-get -y autoremove \
-  && rm -rf /var/lib/apt/* || true \
-  && rm -rf && rm -rf /var/lib/cache/* && rm -rf /var/lib/log/* && rm -rf /tmp/*
