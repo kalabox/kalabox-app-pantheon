@@ -65,9 +65,18 @@ module.exports = function(grunt) {
 
     // Compress build
     compress: {
-      build: {
+      tar: {
         options: {
           archive: 'dist/kalabox-app-pantheon.tar.gz'
+        },
+        expand: true,
+        cwd: 'build/',
+        src: ['**'],
+        dest: './'
+      },
+      zip: {
+        options: {
+          archive: 'dist/kalabox-app-pantheon.zip'
         },
         expand: true,
         cwd: 'build/',
@@ -199,7 +208,8 @@ module.exports = function(grunt) {
     'clean:build',
     'copy:app',
     'shell:build',
-    'compress:build'
+    'compress:tar',
+    'compress:zip'
   ]);
 
   /*
