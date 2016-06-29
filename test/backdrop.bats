@@ -423,6 +423,7 @@ setup() {
 # Attempt the destroy
 #
 @test "Check that we can run '$KBOX destroy' without an error." {
+  skip "Skip for now"
   $KBOX $PANTHEON_BACKDROP_NAME destroy -- -y
 }
 
