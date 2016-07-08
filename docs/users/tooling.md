@@ -1,121 +1,278 @@
 Development Tools
 =================
 
-Each Pantheon app you create also comes with a number of development tools you can use. Here is what you get with each Pantheon app:
-
-  * [bower](#bower)
-  * [composer](#composer)
-  * [drush](#drush)
-  * [git](#git)
-  * [grunt](#grunt)
-  * [gulp](#gulp)
-  * [mysql](#mysql)
-  * [node](#node)
-  * [npm](#npm)
-  * [php](#php)
-  * [rsync](#rsync)
-  * [terminus](#terminus)
-  * [wp](#wp)
-  * [xdebug](#xdebug)
+Each Pantheon app you create also comes with a number of development tools you can use. Remember that these development tools run inside of their own containers so the experience will be slightly different than running the same tools natively. Please see the documentation below for some the differences for each command. If you are interested in read more about how this all works, check out the core Kalabox docs on [tooling](http://docs.kalbaox.io/users/config/#tooling)
 
 !!! tip "Read about the Kalabox first"
     The "Pantheon on Kalabox" docs discuss **only** the Pantheon use case. For this reason it is **highly recommended** you also read the generic [Kalabox docs](http://docs.kalabox.io)
 
+General considerations
+----------------------
+
+Here are a couple of small things to take into consideration for all your commands.
+
+  * Your entire app directory is mounted inside each container at `/src`
+  * Your entire `HOME` directory is mounted inside each container at `/user`
+
+Here are a few examples of how these can be used:
+
+```bash
+# Export your database with drush to a files called dump.sql in your app root
+kbox drush sql-dump --result-file=/src/test.sql
+
+# Use an alternate SSH key with rsync
+kbox rsync -Pav -e 'ssh -i /user/.ssh/mykey.rsa' username@hostname:/from/dir/ /to/dir/
+```
+
 bower
 -----
 
-Description
+Runs [bower](https://bower.io/) commands.
 
-`kbox bower`
+```bash
+# Install bower packages
+kbox bower install
+
+# Get the bower version
+kbox bower --version
+```
 
 composer
 --------
 
-Description
+Runs [composer](https://getcomposer.org/doc/) commands.
 
 `kbox composer`
+
+  * You can edit the php-cli config locally at `config/terminus/php.ini`. Just make sure you `kbox restart` afterwards.
+
+```bash
+# Install dependencies with composer
+kbox composer install
+
+# Get the composer version
+kbox composer --version
+```
 
 drush
 -----
 
-Description
+Runs [drush](http://www.drush.org/en/master/) commands.
+
+  * The `config/drush` directory in your app will map to `~/.drush` inside the container.
+  * You can add custom command files and view your aliases in `config/drush`.
+  * There is a `drushrc.php` you can configure in `config/drush`.
+  * You can edit the php-cli config locally at `config/terminus/php.ini`.
+  * We automatically grab your Pantheon aliases files.
 
 `kbox drush`
+
+```bash
+# Get the status of your drupal site
+kbox drush status
+
+# See all my Pantheon and custom aliases
+kbox drush sa
+
+# Download views
+kbox drush dl views -y
+
+# Get the drush version
+kbox drush --version
+```
+
+!!! tip "Change Drush versions"
+    We use Drush 8 but you can change this by editing the `FROM` directive in `dockerfiles/terminus/Dockerfile` and running `kbox rebuild`. Please make sure the `terminus` service in the `kalabox-cli.yml` is switched from `image` to `build`.
 
 git
 ---
 
-Description
+Runs [git](https://git-scm.com/documentation) commands.
+
+  * We will create a `pantheon.kalabox.id_rsa` ssh key locally inside of `~/.ssh` and use this for all the `git` commands you run on this app.
+  * We will use the name and email associated with your Pantheon account for your `git` commits.
 
 `kbox git`
+
+```bash
+# Check the status of my git repo
+kbox git status
+
+# Stage all changes
+kbox git add --all
+
+# Commit all changes
+kbox git commit -m "My amazing commit"
+
+# Push master branch changes to some remote called origin
+kbox git push origin master
+
+# Get the git version
+kbox git --version
+```
+
+!!! note "Can I use my normal git?"
+    We only **officially** support using `kbox git` but you may find it faster and more convenient to run your own local `git`.
 
 grunt
 -----
 
-Description
+Runs [grunt](http://gruntjs.com/getting-started) commands.
 
 `kbox grunt`
+
+```bash
+# Run a grunt task called "grunt harder"
+kbox grunt harder
+
+# Get the grunt version
+kbox grunt --version
+```
 
 gulp
 ----
 
-Description
+Runs [gulp](https://github.com/gulpjs/gulp/blob/master/docs/getting-started.md) commands.
 
 `kbox gulp`
+
+```bash
+# Run a gulp task called "gulp quietly"
+kbox gulp quietly
+
+# Get the gulp version
+kbox gulp --version
+```
 
 mysql
 -----
 
-Description
+Drops you into a [mysql](http://dev.mysql.com/doc/refman/5.7/en/mysql-commands.html) shell.
+
+  * This command actually runs against the `appserver` container.
+  * By default we run commands as the `root` mysql user and against your application database.
 
 `kbox mysql`
+
+```bash
+# Drop into a mysql shell
+kbox mysql
+
+# Get the mysql version
+kbox mysql --version
+```
 
 node
 ----
 
-Description
+Runs [node](https://nodejs.org/api/repl.html) commands.
+
+  * We use node 4+
 
 `kbox node`
+
+```bash
+# Run an arbitrary node script located locally at `~/myscript.js`
+kbox node /src/myscript.js
+
+# Get the node version
+kbox node --version
+```
 
 npm
 ---
 
-Description
+Runs [npm](https://docs.npmjs.com/) commands.
 
 `kbox npm`
+
+```bash
+# Install dependencies
+kbox npm install
+
+# Get the npm version
+kbox npm --version
+```
 
 php
 ---
 
-Description
+Runs [php](http://php.net/manual/en/features.commandline.php) commands.
+
+  * You can edit the php-cli config locally at `config/terminus/php.ini`.
 
 `kbox php`
+
+```bash
+# Print out a list of enabled php modules
+kbox php -m
+
+# Run an arbitrary php script located in your code root
+# We assume you are actually in your code root for this
+kbox php hamsterdance.php
+
+# Get the php version
+kbox php --version
+```
 
 rsync
 -----
 
-Description
+Runs [rysnc](http://linux.die.net/man/1/rsync) commands on your files directory.
+
+  * This command always runs relative to your `files` directory.
 
 `kbox rsync`
+
+```bash
+# Get the rsync version
+kbox rsync --version
+
+# Sync down pantheon files manually
+kbox rsync -rlvz --size-only --ipv4 --progress -e 'ssh -p 2222' dev.3ef6264e-51d9-43b9-a60b-6cc22c3129308as83@appserver.dev.3ef6264e-51d9-43b9-a60b-6cc22c3129308as83.drush.in:code/sites/default/files/ /media
+```
 
 terminus
 --------
 
-Description
+Runs [terminus](https://pantheon.io/docs/terminus/) commands.
+
+  * The `config/terminus` directory in your app will map to `~/.terminus/cache` inside the container.
+  * We will automatically log you into terminus with the account you used to spin up the app.
+  * You can edit the php-cli config locally at `config/terminus/php.ini`.
 
 `kbox terminus`
+
+```bash
+# Refresh my Pantheon aliases
+kbox terminus sites aliases
+
+# Verify that I am still logged in
+kbox terminus auth whoami
+
+# Get the terminus version
+kbox terminus cli version
+```
 
 wp
 --
 
-Description
+Runs [wp](http://wp-cli.org/) commands.
 
 `kbox wp`
+
+  * You can edit the php-cli config locally at `config/terminus/php.ini`.
+
+```bash
+# Get the wp version
+kbox wp cli version
+```
 
 xdebug
 ------
 
-Description
+Enables users to debug their php code.
 
-more
-----
+### Sublime Text
+
+Install the Sublime Text [xdebug plugin](https://github.com/martomo/SublimeTextXdebug) and follow the instructions there.
