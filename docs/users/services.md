@@ -3,8 +3,7 @@ Services
 
 Each Pantheon app runs a number of services (each in their own Docker container) to approximate the Pantheon environment.
 
-!!! tip "Read about the Kalabox first"
-    The "Pantheon on Kalabox" docs discuss **only** the Pantheon use case. For this reason it is **highly recommended** you also read the generic [Kalabox docs](http://docs.kalabox.io)
+If you are not already familiar with the basics of how Kalabox Apps work please take some time to [read about it](http://docs.kalabox.io/users/started).
 
 appserver
 ---------

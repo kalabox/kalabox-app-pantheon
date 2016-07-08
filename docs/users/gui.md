@@ -3,8 +3,7 @@ Kalabox GUI for Pantheon Apps
 
 The Kalabox GUI allows you to pull down Pantheon sites, work on them, and push changes back to them, all with a few clicks.
 
-!!! tip "Read about the Kalabox first"
-    The "Pantheon on Kalabox" docs discuss **only** the Pantheon use case. For this reason it is **highly recommended** you also read the generic [Kalabox docs](http://docs.kalabox.io)
+If you are not already familiar with the basic Kalabox GUI please take some time to [read about it](http://docs.kalabox.io/users/gui).
 
 Access the Sidebar
 ------------------

@@ -3,8 +3,7 @@ Kalabox CLI for Pantheon Apps
 
 "Pantheon on Kalabox" adds and extends a number of commands beyond the [core command set](http://docs.kalabox.io/users/cli/) to help you pull down Pantheon sites, push changes back to them, and much more. With the exception of `kbox create pantheon`, all of these commands must be run from inside of an existing Pantheon site.
 
-!!! tip "Read about the Kalabox first"
-    The "Pantheon on Kalabox" docs discuss **only** the Pantheon use case. For this reason it is **highly recommended** you also read the generic [Kalabox docs](http://docs.kalabox.io)
+If you are not already familiar with the basic Kalabox commands or how the Kalabox CLI works in general please take some time to [read about it](http://docs.kalabox.io/users/cli).
 
 create pantheon
 ---------------
