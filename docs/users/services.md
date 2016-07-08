@@ -43,7 +43,7 @@ Inside your Pantheon app root you should see a `config` folder. This contains so
 
 ### Environment
 
-We also set a number of common [Pantheon environmental variables](https://pantheon.io/docs/read-environment-config/) so that code just for Pantheon also works on Kalabox. You can inspect these variables by running `phpinfo()`. They should appear both directly in the `appserver` environment and also in your `$_SERVER` global.
+We also set a number of common [Pantheon environmental variables](https://pantheon.io/docs/read-environment-config/) so that Pantheon-specific code also works on Kalabox. You can inspect these variables by running `phpinfo()`. They should appear both directly in the `appserver` environment and also in your `$_SERVER` global.
 
   * `NONCE_SALT`: Needed for Wordpress. We set this automatically.
   * `LOGGED_IN_SALT`: Needed for Wordpress. We set this automatically.

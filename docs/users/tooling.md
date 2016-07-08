@@ -3,7 +3,7 @@ Development Tools
 
 Each Pantheon app you create also comes with a number of development tools you can use. Remember that these development tools run inside of their own containers so the experience will be slightly different than running the same tools natively. Please see the documentation below for some the differences for each command.
 
-If you are interested in read more about how this all works, check out the core Kalabox docs on [tooling](http://docs.kalabox.io/users/config/#tooling)
+If you are interested in read more about how this all works, check out the core Kalabox docs on [tooling](http://docs.kalabox.io/users/config/#tooling).
 
 General considerations
 ----------------------
