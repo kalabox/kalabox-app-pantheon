@@ -44,6 +44,9 @@ Kalabox is an open-source project. As such, support is a community-lead effort. 
 Development Releases
 --------------------
 
+**Not For General Use**
+These builds are intended primarily for developers working on Kalabox and those who are experienced enough with the Kalabox framework and want to test apps before they are released. Most users won't be interested.
+
 We produce development releases for every commit merged into our `v0.13` branch. **These releases are not officially supported** but we have made them available to intrepid users who want to try the bleeding edge or are interested in trying out a recent bug fix before an official release is rolled.
 
   * **Windows** - [http://apps.kalabox.io/kalabox-app-pantheon-latest.zip](http://apps.kalabox.io/kalabox-app-pantheon-latest.zip)

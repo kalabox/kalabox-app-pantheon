@@ -1,24 +1,32 @@
 Best Practices
 ==============
 
-Pushing to Pantheon
--------------------
+We try to enforce as many best practices as possible. Particulary those that reinforce the Pantheon workflow. Here are a few things that we restrict **FOR YOUR OWN GOOD**.
 
-Note that the Test and Live environments are not listed as options. This both
-respects Pantheon's normal workflow and conventional best practices. If you're
-looking for a solution to bypass dev/test environments, examine either
-Pantheon's [Quicksilver Platform Hooks](https://pantheon.io/docs/quicksilver).
+* We do not allow direct pushes to either the `test` or `live` environment. This both respects Pantheon's preferred workflow and conventional development best practices.
+* We force you to create a commit and message even if you are just pushing database and files.
 
-If your site is in "SFTP" mode on Pantheon and a commit already exists, you
-will receive a warning that the push operation was not able to be completed.
-You'll need to commit that code on Pantheon before the push operation can
-be ran successfully.
+!!! tip "Level up your FLOWZZZ"
+    If you're looking for a solution to bypass dev/test environments, examine Pantheon's [Quicksilver Platform Hooks](https://pantheon.io/docs/quicksilver).
 
-Even if you don't have code changes, kbox push will still ask for a commit
-message. This will leave you a commit message to record what database or file
-changes you have deployed. We discourage a workflow that relies on deploying
-database and file changes to Pantheon; if you're dependent on this workflow for
-your day-to-day operations, consider the options available to you to store
-configuration as code and deploy it via Git.
+Recommended Practices
+---------------------
 
-**Important:** To avoid slow pulls on larger sites, Kalabox pulls from Pantheon's database backups, instead of the active database. If you would like to retrieve the most recent version of your database, you will need to indicate y when asked Retrieve latest DB instead of most recent backup? (y/N) or use the --newbackup flag.
+Here are some things you should **strongly consider** doing if you are not doing them already:
+
+* Put everything in code and never push your database.
+
+Working with Pantheon Multidev on Kalabox
+-----------------------------------------
+
+We've definitely gotten a lot of questions and had many discussions around the best way to use multidev with Kalabox. Basically the two camps are "Create one app per environment" or "Create the dev environment and then switch branches". Both approaches have their benefits and these are the circumstances we recommend using one vs the other.
+
+**Creating one app per multidev environment**
+
+* I am working on a **BIG** feature that requires a sandboxed database.
+* I require the database maintain its integrity.
+
+**Pulling the dev environment and switcthing branches**
+
+* I am working on a small in-code-only feature.
+* I am working on a feature that does not rely on interaction with the database.
