@@ -1,14 +1,15 @@
 Kalabox CLI for Pantheon Apps
-=====================
+=============================
 
-The Pantheon App exposes a number of commands via the CLI to help you pull down Pantheon 
-sites, push changes back to them, and much more. With the exception of `kbox create pantheon`,
-all of these commands must be run from inside of an existing Pantheon site that you've
-previously pulled.
+"Pantheon on Kalabox" adds and extends a number of commands beyond the [core command set](http://docs.kalabox.io/users/cli/) to help you pull down Pantheon sites, push changes back to them, and much more. With the exception of `kbox create pantheon`, all of these commands must be run from inside of an existing Pantheon site.
 
-## create pantheon
+!!! tip "Read about the Kalabox first"
+    The "Pantheon on Kalabox" docs discuss **only** the Pantheon use case. For this reason it is **highly recommended** you also read the generic [Kalabox docs](http://docs.kalabox.io)
 
-Pulls down one of your Pantheon sites.
+create pantheon
+---------------
+
+Pulls down one of your Pantheon sites and creates it locally on Kalabox.
 
 `kbox create pantheon`
 
@@ -28,24 +29,35 @@ Options:
   --from         Local path to override app skeleton (be careful with this) [string]
 ```
 
-Simply executing the above command will start a series of CLI prompts that will
-guide you through the site creation process.
+```bash
+# Create a pantheon site with interactive prompts
+kbox create pantheon
 
-Once the app creation is finished, the app should start automatically.
+# Completely non-interactively create a site from pantheon
+kbox create pantheon -- \
+  --email=jeanluc@picard.net \
+  --password=**** \
+  --site=ten-forward \
+  --env=dev \
+  --name=tenforward
 
-Note that you can choose any multi-dev environment to pull your code, database,
-and files from. Pulling files and database is optional. After pulling down your
-code, you can switch between the git branches on your Pantheon git repository as
-normal, or use [kbox git].
-
-## pull
-
-Refreshes an existing site by pulling code, database, and files.
-
+# Create a site but specify an alternate directory to create it in
+kbox create pantehon -- --dir=~/test/testapp
 ```
-cd ~/pantheon-app
-kbox pull
-```
+
+!!! danger "Must run `create` from your `USERS` directory"
+    Because of a file sharing restriction placed on us by [Boot2Docker](http://github.com/boot2docker/boot2docker) you **must** create your app inside of the `USERS` directory for your OS. Those directories are...
+
+      * **OSX** - `/Users`
+      * **Linux** - `/home`
+      * **Windows** - `C:\Users`
+
+pull
+----
+
+Refreshes an existing site by pulling code and optionally the database, and files.
+
+`kbox pull`
 
 ```
 Options:
@@ -56,19 +68,26 @@ Options:
   --files        Pull files from an env. Options are dev, test, live and none [string]
 ```
 
-Running `kbox pull` will start a series of command prompts that ask you if you want to
-pull down your code/database/files, and if you do, what environment you'd like to
-pull them from.
+```bash
+# Pull updates from my site using interactive prompts
+kbox pull
 
-## push
+# Non-interactively pull my sites code, database and files
+kbox pull -- --database=dev --files=dev
 
-Pushes your code (and optionally your database and files) up to your original
-Pantheon site.
-
+# Just pull my code
+kbox pull -- --database=none --files=none
 ```
-cd ~/pantheon-app
-kbox push
-```
+
+!!! note "Options also apply to multidev"
+    If you originally pulled from a multidev environment named `bob` instead of from `dev` you should see the name `bob` instead of `dev` in your `--database` and `--files` options.
+
+push
+----
+
+Pushes your code and optionally your database and files back up to your original Pantheon site.
+
+`kbox push`
 
 ```
 Options:
@@ -80,35 +99,51 @@ Options:
   --files        Push files to a spefic env. Options are dev and none   [string]
 ```
 
-Running `kbox push` will start a series of command prompts that allow you to
-push up a new code commit, and optionally your database and files, to the
-dev environment or one of your multi-dev environments.
+```bash
+# Push updates from my site using interactive prompts
+kbox push
 
-Note that the Test and Live environments are not listed as options. This both
-respects Pantheon's normal workflow and conventional best practices. If you're
-looking for a solution to bypass dev/test environments, examine either 
-Pantheon's [Quicksilver Platform Hooks](https://pantheon.io/docs/quicksilver).
+# Non-interactively push back to a multidev named bob
+kbox push -- --database=bob --files=bob -m "I love this song"
 
-If your site is in "SFTP" mode on Pantheon and a commit already exists, you
-will receive a warning that the push operation was not able to be completed.
-You'll need to commit that code on Pantheon before the push operation can
-be ran successfully.
-
-Even if you don't have code changes, kbox push will still ask for a commit
-message. This will leave you a commit message to record what database or file
-changes you have deployed. We discourage a workflow that relies on deploying
-database and file changes to Pantheon; if you're dependent on this workflow for
-your day-to-day operations, consider the options available to you to store
-configuration as code and deploy it via Git.
-
-## services
-
-Displays connection information for your database, Redis, and Solr.
-
+# Just push my code, will prompt for a commit message
+kbox push -- --database=none --files=none
 ```
-cd ~/pantheon-app
-kbox services
+
+!!! note "Options also apply to multidev"
+    If you originally pulled from a multidev environment named `bob` instead of from `dev` you should see the name `bob` instead of `dev` in your `--database` and `--files` options.
+
+Note that the Test and Live environments are not listed as options. This both respects Pantheon's normal workflow and conventional best practices. If you're looking for a solution to bypass dev/test environments, examine Pantheon's [Quicksilver Platform Hooks](https://pantheon.io/docs/quicksilver).
+
+If your site is in "SFTP" mode on Pantheon and a commit already exists, you will receive a warning that the push operation was not able to be completed. You'll need to commit that code on Pantheon before the push operation can be ran successfully.
+
+Even if you don't have code changes, kbox push will still ask for a commit message. This will leave you a commit message to record what database or file changes you have deployed. We discourage a workflow that relies on deploying database and file changes to Pantheon; if you're dependent on this workflow for your day-to-day operations, consider the options available to you to store configuration as code and deploy it via Git.
+
+rebuild
+-------
+
+Completely rebuilds your Pantheon site. This command is identical to the [core rebuild command](http://docs.kalabox.io/users/cli/#rebuild) except that it is slightly extended here so that the rebuild preserves your applications data.
+
+`kbox rebuild`
+
+```bash
+Options:
+  -h, --help     Display help message.                                 [boolean]
+  -v, --verbose  Use verbose output.                                   [boolean]
+  --debug        Use debug output.                                     [boolean]
 ```
+
+```bash
+# Rebuild my app with verbose mode on so I can see WTF is happening!
+kbox rebuild -- -v
+```
+
+services
+--------
+
+Displays relevant connection information for your Pantheon services. You can use this information to connect to your database from an external DB client like [SQLPro](http://www.sequelpro.com/).
+
+`kbox services`
 
 ```
 Options:
@@ -116,8 +151,3 @@ Options:
   -v, --verbose  Use verbose output.                                   [boolean]
   --debug        Use debug output.                                     [boolean]
 ```
-
-If you want to connect to your database, Redis, or Solr from a browser like
-[PHPMyAdmin](https://www.phpmyadmin.net), [SQLPro](http://www.sequelpro.com/),
-[Redis Desktop Manager](http://redisdesktop.com), or another client, use these 
-credentials.

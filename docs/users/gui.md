@@ -1,22 +1,27 @@
 Kalabox GUI for Pantheon Apps
-=====================
+=============================
 
 The Kalabox GUI allows you to pull down Pantheon sites, work on them, and push changes back to them, all with a few clicks.
 
-## Access the Sidebar
+!!! tip "Read about the Kalabox first"
+    The "Pantheon on Kalabox" docs discuss **only** the Pantheon use case. For this reason it is **highly recommended** you also read the generic [Kalabox docs](http://docs.kalabox.io)
+
+Access the Sidebar
+------------------
 
 ![Click add new site](../images/clickAddNew.png)
 
 The sidebar is where you can create Pantheon sites. To access the sidebar, either click "Add New Site" or the "+" button in the upper right-hand corner.
 
-## Connect a Pantheon Account
+Connect a Pantheon Account
+--------------------------
 
 ![Add pantheon account credentials](../images/addPantheonAccount.png)
 
 Click on "Pantheon" under "Add Account". Insert your username and password. Note that in the near future, we will be using Pantheon's Machine Tokens to authenticate. If you don't have a Pantheon account, [sign-up for a free one](http://support.kalabox.io/support/solutions/articles/pantheon.io/register).
 
-
-## Download a Site From Pantheon
+Download a Site From Pantheon
+-----------------------------
 
 First, click on your newly added Pantheon account:
 
@@ -54,7 +59,8 @@ When it has finished downloading, the green power light should be on and a color
 
 Click on the screenshot or site title to visit your site in the browser.
 
-## Get Database Connection Info
+Get Database Connection Info
+----------------------------
 
 ![Site actions dropdown](../images/siteActions.png)
 
@@ -62,8 +68,8 @@ If you click the "Actions" gear symbol on your new Pantheon app, you'll see a nu
 
 ![Connection info](../images/connectionInfo.png)
 
-
-## Pull Code, Database, and Files from Pantheon
+Pull Code, Database, and Files from Pantheon
+--------------------------------------------
 
 ![Refresh site](../images/refreshSite.png)
 
@@ -72,7 +78,8 @@ Clicking "Pull Site" from the Actions dropdown allows you to pull down the lates
 !!! warning "Merge Conflicts"
     If there's a merge conflict between the local code you have and the code that's on Pantheon, this operation won't succeed.
 
-## Push Work Back to Pantheon
+Push Work Back to Pantheon
+--------------------------
 
 When you're ready to deploy work back to Pantheon, select the "Push Site" option from the Actions dropdown.
 
@@ -81,6 +88,3 @@ When you're ready to deploy work back to Pantheon, select the "Push Site" option
 Even if you don't have code changes, you must fill out a commit message. This will leave you a commit message to record what database or file changes you have deployed.
 
 If your site is in "SFTP" mode on Pantheon and a commit already exists, you will receive a warning that the push operation was not able to be completed. You'll need to commit that code on Pantheon before the push operation can be ran successfully.
-
-
-

@@ -1,269 +1,61 @@
-# Kalabox Pantheon App
-## Overview
+Pantheon on Kalabox
+===================
 
-By default Kalabox can pull apps from and push apps to Pantheon... but this is much more than basic push/pull integration. Kalabox will build out a local Pantheon environment for each app. This means `solr`, `redis`, `ssl` and `terminus` all work just like they do on Pantheon. You can also use `drush`, `wp-cli`, `ssl` and toggle `php` version. YAY!
+**"Pantheon on Kalabox"** is a [Kalabox](http://kalabox.io) plugin that allows users to authenticate with their Pantheon account and then...
 
-## Creating and starting a Pantheon app
+  1. Pull down sites they have spun up on their Pantheon dashboard.
+  2. Achieve parity with the Pantheon environment locally, including access to power services like Solr and Redis.
+  3. Push changes back up to their Pantheon site.
+  4. Get Pantheon specific power tools such as Terminus, Drush and WP-CLI.
 
-This will spin up a Pantheon-on-Kalabox environment, set up relevant tools like `terminus`, `drush` and `wp-cli` and pull down the site and environment that you choose.
+While **"Pantheon on Kalabox"** is an external Kalabox plugin we actually include it as part of the default Kalabox offering along with the [**"PHP on Kalabox"**](http://github.com/kalabox/kalabox-app-php) plugin.
 
-```bash
-cd ~/dir/i/want/my/app/to/live (usually ~/Desktop/apps)
-kbox create pantheon # and follow the prompts
-```
+**We highly recommend you read the main [Kalabox docs](http://docs.kalabox.io) before continuing.**
 
-Or you can run non-interactively
+Getting Started
+---------------
 
-```bash
-cd ~/dir/i/want/my/app/to/live (usually ~/Desktop/apps)
-kbox create pantheon -- --email=me@me.com --password=**** --site=pantheon-site --env=pantheon-env --name=myApp
-```
+Your best bet to learn more about the various aspects of **"Pantheon on Kalabox"** is to check out [our documentation](http://pantheon.kalabox.io). Here are some good topics to get you started:
 
-**NOTE:** You **must** issue your `kbox create pantheon` from somewhere inside your `HOME` directory.
-**NOTE:** This 'create' functionality actually comes from the core kalabox-pantheon plugin.
+  * [Introduction to Pantheon Apps](http://pantheon.kalabox.io/users/started)
+  * [Using the Kalabox CLI with Pantheon apps](http://pantheon.kalabox.io/users/cli)
+  * [Using the Kalabox GUI with Pantheon apps](http://pantheon.kalabox.io/users/gui)
+  * [The Pantheon Services & Environment](http://pantheon.kalabox.io/users/services)
+  * [The Pantheon tooling with which we ship](http://pantheon.kalabox.io/users/tooling)
 
-## Tools and working with your code
+Support
+-------
 
-You can run various Pantheon-helpful tools like terminus. To see a list of all the things run `kbox` from inside of your app directory.
+To get help...
 
-```bash
-Usage: kbox <command> [-- <options>]
+  1. Make sure your question isn't answered in either the [core docs](http://support.kalabox.io/solution/categories), the [Pantheon app docs](http://pantheon.kalabox.io/), or the [PHP docs](http://php.kalabox.io/).
+  2. Thoroughly search the [Github issue queue](https://github.com/kalabox/kalabox/issues) for any existing issues similar to yours.
+  3. If all else fails, create an issue and follow the pre-populated guidelines and the [CONTRIB.MD](https://raw.githubusercontent.com/kalabox/kalabox-app-pantheon/v0.13/CONTRIBUTING.md) as best as possible.
 
-Global commands that can be run from anywhere
-  create
-      pantheon     Creates a Pantheon app.
-  env              Print Kalabox environmental vars.
-  list             Display list of apps.
-  update           Run this after you update your Kalabox code.
-  version          Display the kbox version.
+Some examples of good issue reporting:
 
-Actions that can be performed on this app
-  config           Display the kbox application's configuration.
-  destroy          Completely destroys and removes an app.
-  pull             Pull down new code and optionally data and files.
-  push             Push up new code and optionally data and files.
-  rebuild          Rebuilds your app while maintaining your app data.
-  restart          Stop and then start a running kbox application.
-  services         Display connection info for services.
-  start            Start an installed kbox application.
-  stop             Stop a running kbox application.
+  - [https://github.com/kalabox/kalabox/issues/565](https://github.com/kalabox/kalabox/issues/565)
+  - [https://github.com/kalabox/kalabox/issues/557](https://github.com/kalabox/kalabox/issues/557)
 
-Commands and tools this app can use
-  bower            Run a bower command
-  composer         Run a php cli command
-  drush            Run a drush 8 command on your codebase
-  git              Run a git command on your codebase
-  grunt            Run a grunt command
-  gulp             Run a gulp command
-  mysql            Drop into a mysql shell
-  node             Run a node command
-  npm              Run a npm command
-  php              Run a php cli command
-  rsync            Run a rsync command on your files directory
-  terminal         'ssh' into your appserver
-  terminus         Run a terminus command
-  wp               Run a wp-cli command on your codebase
+Kalabox is an open-source project. As such, support is a community-lead effort. Please help us keep issue noise to a minimum and be patient with the Kalabox community members who donate time to help out.
 
-Some things that are useful for development
-  down             Bring kbox container engine down.
-  status           Display status of kbox container engine.
-  up               Bring kbox container engine up.
+**If you are interested in dedicated support or customizations, check out [our support offerings.](http://kalabox.io/support)**
 
-Options:
-  -h, --help     Display help message.                                 [boolean]
-  -v, --verbose  Use verbose output.                                   [boolean]
+Development Releases
+--------------------
 
-```
+We produce development releases for every commit merged into our `v0.13` branch. **These releases are not officially supported** but we have made them available to intrepid users who want to try the bleeding edge or are interested in trying out a recent bug fix before an official release is rolled.
 
-## Pulling from Pantheon
+  * **Windows** - [http://apps.kalabox.io/kalabox-app-pantheon-latest.zip](http://apps.kalabox.io/kalabox-app-pantheon-latest.zip)
+  * **POSIX** - [http://apps.kalabox.io/kalabox-app-pantheon-latest.tar.gz](http://apps.kalabox.io/kalabox-app-pantheon-latest.tar.gz)
 
-You can refresh your local code and even your database and files by running `kbox pull` from inside of your Pantheon app.
+**NOTE:** Releases can take some time to build after we merge in commits. For that reason you might want to check the time of the last commit and if it is within a few hours you might want to hold off a bit before trying the new latest release.
 
-```
-kbox pull -- -h
-Options:
-  -h, --help     Display help message.
-  -v, --verbose  Use verbose output.
-  --database     Pull DB from an env. Options are dev, test, live and none
-  --files        Pull files from an env. Options are dev, test, live and none
-  --newbackup    True to generate a new DB backup
-```
+You can also easily verify that the release you downloaded matches the latest commit. All development releases look something like `0.13.0-alpha.1-4-g63b0db0`. This means 4 commits after the `0.13.0-alpha.1` tag and with commit hash `g63b0db0`. You should make sure this commit hash matches or comes before the latest commit.
 
-**Important:** To avoid slow pulls on larger sites, Kalabox pulls from Pantheon's database backups, instead of the active database. If you would like to retrieve the most recent version of your database, you will need to indicate y when asked Retrieve latest DB instead of most recent backup? (y/N) or use the --newbackup flag.
+Check out for help on [installing Kalabox plugins manually](http://docs.kalabox.io/developers/advanced/plugins)
 
-## Pushing to Pantheon
+Other Resources
+---------------
 
-You can easily push up code and even your database and files by running `kbox push`.
-
-```bash
-Options:
-  -h, --help     Display help message.                                 [boolean]
-  -v, --verbose  Use verbose output.                                   [boolean]
-  -m, --message  Tell us about your change                              [string]
-  --database     Push DB to specific env. Options are dev and none      [string]
-  --files        Push files to a spefic env. Options are dev and none   [string]
-```
-
-## Connecting to your database
-
-You can connect to your database using a third-party tool such as SequelPro
-or SqlWorkbench. To get the connection info run `kbox services` from inside a running pantheon app.
-
-```
-kbox services
-[
-  {
-    "name": "edge",
-    "project": "playbox",
-    "url": [
-      "http://edge.playbox.kbox",
-      "https://edge.playbox.kbox"
-    ]
-  },
-  {
-    "name": "appserver",
-    "project": "playbox",
-    "url": [
-      "http://playbox.kbox",
-      "https://playbox.kbox"
-    ]
-  },
-  {
-    "name": "db",
-    "project": "playbox",
-    "credentials": {
-      "database": "pantheon",
-      "user": "pantheon",
-      "password": "",
-      "host": "10.13.37.100",
-      "port": "32783"
-    }
-  },
-  {
-    "name": "solr",
-    "project": "playbox"
-  },
-  {
-    "name": "redis",
-    "project": "playbox"
-  }
-]
-```
-
-Your connection info will be listed in the DB object. This information
-may change between restarts.
-
-```json
-  {
-    "name": "db",
-    "project": "playbox",
-    "credentials": {
-      "database": "pantheon",
-      "user": "pantheon",
-      "password": "",
-      "host": "10.13.37.100",
-      "port": "32783"
-    }
-  }
-```
-
-## Using CLI tools
-
-We package a lot of common CLI tools into your app. You can use most of these
-more or less like you would if you had them natively installed. Here is a
-brief example of doing an `npm install` on a theme.
-
-```bash
-cd /path/to/my/pantheon/app
-cd code/sites/all/themes/kalatheme
-kbox npm install
-```
-
-## Edge
-
-To see what your site is like/how it behaves hitting the pantheon varnish
-edge you can go to `http(s)://edge.myapp.kbox`. **Note that this
-will likely interfere with your code sharing since varnish will be serving
-you back a cached page and not what is actually on your appserver.**
-
-## SSL
-
-You can use `https` by just typing in `https://myapp.kbox` in your browser. We self-sign the certs so you will need to allow this in your browser.
-
-Pantheon's ssl layer is at the edge so if you want to test SSL in a more
-realistica way you should route your traffic through our edgeserver at https://edge.myapp.kbox.
-
-## SOLR
-
-Apache Solr comes in each local Pantheon environment. You can use it the exact same way as you do on Pantheon.
-
-https://pantheon.io/docs/articles/sites/apache-solr/
-
-## Redis
-
-Just follow the same instructions from Pantheon to get redis to work locally.
-
-https://pantheon.io/docs/articles/sites/redis-as-a-caching-backend/
-
-The TL;DR for Drupal 7 (on php 5.3) here is
-
-1. Install the [redis module](http://drupal.org/project/redis) (only 2.x supported)
-2. Use this code snippet in settings.php
-
-```php
-// All Pantheon Environments.
-if (defined('PANTHEON_ENVIRONMENT')) {
-  // Use Redis for caching.
-  $conf['redis_client_interface'] = 'PhpRedis';
-  $conf['cache_backends'][] = 'sites/all/modules/redis/redis.autoload.inc';
-  $conf['cache_default_class'] = 'Redis_Cache';
-  $conf['cache_prefix'] = array('default' => 'pantheon-redis');
-  // Do not use Redis for cache_form (no performance difference).
-  $conf['cache_class_cache_form'] = 'DrupalDatabaseCache';
-  // Use Redis for Drupal locks (semaphore).
-  $conf['lock_inc'] = 'sites/all/modules/redis/redis.lock.inc';
-}
-```
-
-## Xdebug
-
-xdebug is set up on your php appserver. Here is an example SublimeText 2 config (similar settings have been tested on Codebug, Eclipse, and other debugging tools). Note that you may need to launch it in the browser the first time using XDEBUG_SESSION_START=1 as a query parameter (ex: http://my-app.kbox/some-page?XDEBUG_SESSION_START=1). If breakpoints aren't working in your debugger, try inserting xdebug_break() in your code.
-
-```json
-{
-  "folders":
-  [
-    {
-      "path": "/local/path/to/my/code"
-    }
-  ],
-  "settings":
-  {
-    "xdebug":
-    {
-      "max_children": 32,
-      "max_depth": 16,
-      "pretty_output": true,
-      "path_mapping":
-      {
-        "/code/": "/local/path/to/my/code/"
-      },
-      "port": 9000,
-      "url": "http://mysite.kbox/"
-    }
-  }
-}
-```
-
-## Other Resources
-
-* [API docs](http://api.kalabox.me/)
-* [Test coverage reports](http://coverage.kalabox.me/)
-* [Kalabox CI dash](http://ci.kalabox.me/)
 * [Mountain climbing advice](https://www.youtube.com/watch?v=tkBVDh7my9Q)
-* [Boot2Docker](https://github.com/boot2docker/boot2docker)
-* [Syncthing](https://github.com/syncthing/syncthing)
-* [Docker](https://github.com/docker/docker)
-
--------------------------------------------------------------------------------------
-(C) 2016 Kalabox Inc and friends
