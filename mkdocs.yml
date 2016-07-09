@@ -1,12 +1,21 @@
-site_name: Kalabox Pantheon Docs
+site_name: Pantheon on Kalabox Documentation
 theme: readthedocs
 repo_url: https://github.com/kalabox/kalabox-app-pantheon
 include_search: true
+markdown_extensions:
+  - markdown.extensions.toc
+  - markdown.extensions.admonition
+  - markdown.extensions.smarty
+  - markdown.extensions.nl2br
 pages:
-- Getting Started: index.md
-- Style tips: styles.md
-#- General:
-#  - Install: install.md
-#  - Install (alternatives): install-alternative.md
-#- Writing commands:
-#  - Context system: context.md
+  - 'Homepage': 'index.md'
+  - 'For Users':
+    - 'Installation': 'users/install.md'
+    - 'Using the CLI': 'users/cli.md'
+    - 'Using the GUI': 'users/gui.md'
+    - 'Services': 'users/services.md'
+    - 'Dev Tools': 'users/tooling.md'
+    - 'Configuration': 'users/config.md'
+    - 'Best Practices': 'users/best.md'
+  - 'For Developers': 'developers.md'
+  - 'Troubleshooting': 'troubleshooting.md'
