@@ -16,8 +16,8 @@ Here are some things you should **strongly consider** doing if you are not doing
 
 * Put everything in code and never push your database.
 
-Working with Pantheon Multidev on Kalabox
------------------------------------------
+Working with Pantheon Multidev
+------------------------------
 
 We've definitely gotten a lot of questions and had many discussions around the best way to use multidev with Kalabox. Basically the two camps are "Create one app per environment" or "Create the dev environment and then switch branches". Both approaches have their benefits and these are the circumstances we recommend using one vs the other.
 
