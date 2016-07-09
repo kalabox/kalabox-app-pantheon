@@ -1,9 +1,9 @@
 Kalabox CLI for Pantheon Apps
 =============================
 
-"Pantheon on Kalabox" adds and extends a number of commands beyond the [core command set](http://docs.kalabox.io/users/cli/) to help you pull down Pantheon sites, push changes back to them, and much more. With the exception of `kbox create pantheon`, all of these commands must be run from inside of an existing Pantheon site.
+"Pantheon on Kalabox" adds and extends a number of commands beyond the [core command set](http://docs.kalabox.io/en/stable/users/cli/) to help you pull down Pantheon sites, push changes back to them, and much more. With the exception of `kbox create pantheon`, all of these commands must be run from inside of an existing Pantheon site.
 
-If you are not already familiar with the basic Kalabox commands or how the Kalabox CLI works in general please take some time to [read about it](http://docs.kalabox.io/users/cli).
+If you are not already familiar with the basic Kalabox commands or how the Kalabox CLI works in general please take some time to [read about it](http://docs.kalabox.io/en/stable/users/cli).
 
 create pantheon
 ---------------
@@ -117,7 +117,7 @@ If your site is in "SFTP" mode on Pantheon and a commit already exists, you will
 rebuild
 -------
 
-Completely rebuilds your Pantheon site. This command is identical to the [core rebuild command](http://docs.kalabox.io/users/cli/#rebuild) except that it is slightly extended here so that the rebuild preserves your applications data.
+Completely rebuilds your Pantheon site. This command is identical to the [core rebuild command](http://docs.kalabox.io/en/stable/users/cli/#rebuild) except that it is slightly extended here so that the rebuild preserves your applications data.
 
 `kbox rebuild`
 

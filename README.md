@@ -55,7 +55,7 @@ We produce development releases for every commit merged into our `v0.13` branch.
 
 You can also easily verify that the release you downloaded matches the latest commit. All development releases look something like `0.13.0-alpha.1-4-g63b0db0`. This means 4 commits after the `0.13.0-alpha.1` tag and with commit hash `g63b0db0`. You should make sure this commit hash matches or comes before the latest commit.
 
-Check out for help on [installing Kalabox plugins manually](http://docs.kalabox.io/developers/plugins)
+Check out for help on [installing Kalabox plugins manually](http://docs.kalabox.io/en/stable/developers/plugins)
 
 Other Resources
 ---------------

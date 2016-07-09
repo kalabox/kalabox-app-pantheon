@@ -14,7 +14,7 @@ You should be able to use this guide to...
 Installation
 ------------
 
-Please use the [plugin installation guide](http://docs.kalabox.io/developers/plugins/#installation) to learn how to install the source version of this plugin.
+Please use the [plugin installation guide](http://docs.kalabox.io/en/stable/developers/plugins/#installation) to learn how to install the source version of this plugin.
 
 Code locations
 --------------
