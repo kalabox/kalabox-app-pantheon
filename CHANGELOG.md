@@ -3,6 +3,7 @@ v0.13.0-alpha.2
 
 * Rebooted documentation. [#1322](https://github.com/kalabox/kalabox/issues/1322)
 * Fixed `unison` file sharing to ignore the correct `FILEMOUNT`. [#1440](https://github.com/kalabox/kalabox/issues/1440)
+* Changed to a more robust PhantomJS download URL provided by Medium within their wrapper for installing via npm on github. [#1359](https://github.com/kalabox/kalabox/issues/1359)
 
 v0.13.0-alpha.1
 ==================
@@ -16,7 +17,6 @@ v0.13.0-alpha.1
 * Improved deployment [#1223](https://github.com/kalabox/kalabox/issues/1223)
 * Added tests to make sure we remove testing SSH keys from Pantheon. [#1321](https://github.com/kalabox/kalabox/issues/1321)
 * Fixed a redis typo in kalabox-compose.yml
-* Changed to a more robust PhantomJS download URL provided by Medium within their wrapper for installing via npm on github. [#1359](https://github.com/kalabox/kalabox/issues/1359)
 * Fixed an issue where the build process was not perserving script executable permissions [#1341](https://github.com/kalabox/kalabox/issues/1341)
 
 v0.12.0-beta1
