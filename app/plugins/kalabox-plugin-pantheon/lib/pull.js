@@ -29,18 +29,14 @@ module.exports = function(kbox, app) {
   /*
    * Pull down the site's screenshot for use in the gui.
    */
-  var pullScreenshot = function(site, env) {
+  var pullScreenshot = function(uuid, env) {
 
     app.status('Pulling screenshot.');
 
     // Get site aliases.
     return terminus.getSiteAliases()
-    // Get UUID of site.
-    .then(function() {
-      return terminus.getUUID(site);
-    })
     // Download screenshot.
-    .then(function(uuid) {
+    .then(function() {
       // Name of the image.
       var imageFilename = util.format(
         '%s_%s.png',
@@ -237,23 +233,16 @@ module.exports = function(kbox, app) {
   /*
    * Pull files via RSYNC
    */
-  var pullFilesRsync = function(site, env) {
+  var pullFilesRsync = function(uuid, env) {
 
     // Grab the rsync client
     var rsync = require('./cmd.js')(kbox, app).rsync;
 
-    // Get our UUID
-    return terminus.getUUID(site)
+    // Hack together an rsync command
+    var envSite = [env, uuid].join('.');
+    var fileBox = envSite + '@appserver.' + envSite + '.drush.in:files/';
+    return rsync(fileBox, '/media');
 
-    // Generate our rsync command
-    .then(function(uuid) {
-
-      // Hack together an rsync command
-      var envSite = [env, uuid].join('.');
-      var fileBox = envSite + '@appserver.' + envSite + '.drush.in:files/';
-      return rsync(fileBox, '/media');
-
-    });
   };
 
   /*
@@ -349,7 +338,7 @@ module.exports = function(kbox, app) {
   /*
    * Pull down our sites database
    */
-  var pullFiles = function(site, env, newBackup) {
+  var pullFiles = function(site, uuid, env, newBackup) {
 
     app.status('Pulling files.');
 
@@ -360,7 +349,7 @@ module.exports = function(kbox, app) {
       return pullFilesArchive(site, env, newBackup);
     }
     else {
-      return pullFilesRsync(site, env);
+      return pullFilesRsync(uuid, env);
     }
   };
 

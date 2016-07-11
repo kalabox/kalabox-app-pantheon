@@ -224,7 +224,7 @@ module.exports = function(kbox, app) {
 
           // Pull screenshot
           .then(function() {
-            return puller.pullScreenshot(pantheonConf.site, pantheonConf.env);
+            return puller.pullScreenshot(pantheonConf.uuid, pantheonConf.env);
           })
 
           // Pull our code
@@ -251,10 +251,11 @@ module.exports = function(kbox, app) {
 
               // Get our args
               var site = pantheonConf.site;
+              var uuid = pantheonConf.uuid;
               var files = choices.files;
               var newBackup = choices.newbackup;
 
-              return puller.pullFiles(site, files, newBackup);
+              return puller.pullFiles(site, uuid, files, newBackup);
             }
           })
 
@@ -342,7 +343,7 @@ module.exports = function(kbox, app) {
           // Push our files if selected
           .then(function() {
             if (choices.files && choices.files !== 'none') {
-              return pusher.pushFiles(pantheonConf.site, choices.files);
+              return pusher.pushFiles(pantheonConf.uuid, choices.files);
             }
           })
 

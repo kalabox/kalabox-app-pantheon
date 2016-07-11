@@ -245,32 +245,6 @@ Terminus.prototype.setConnectionMode = function(site, env, mode) {
 };
 
 /*
- * Get site uuid
- *
- * terminus site info --site="$PANTHEON_SITE" --field=id
- */
-Terminus.prototype.getUUID = function(site) {
-
-  // More of this sort of thing
-  var self = this;
-
-  // We run this a lot so lets cache per run and do a lookup before we
-  // make a request
-  if (self.uuid !== undefined) {
-    return self.kbox.Promise.resolve(self.uuid);
-  }
-
-  // Make a request
-  return self.__request(['site', 'info'], ['--format=json', '--site=' + site])
-
-  .then(function(data) {
-    self.uuid = data[0].id;
-    return self.kbox.Promise.resolve(self.uuid);
-  });
-
-};
-
-/*
  * Get site aliases
  *
  * terminus sites aliases --format=json
