@@ -26,7 +26,7 @@ module.exports = function(kbox, app) {
       return terminus.getSiteAliases()
       // Pull screensho
       .then(function() {
-        return puller.pullScreenshot(config.site, config.env);
+        return puller.pullScreenshot(config.uuid, config.env);
       })
       // Pull our code
       .then(function() {
@@ -44,7 +44,7 @@ module.exports = function(kbox, app) {
       .then(function() {
         if (opts.files && opts.files !== 'none') {
           self.update('Pulling files.');
-          return puller.pullFiles(config.site, opts.files);
+          return puller.pullFiles(config.site, config.uuid, opts.files);
         }
       })
       .then(function() {

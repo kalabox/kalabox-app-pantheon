@@ -43,6 +43,7 @@ RUN apt-get update && apt-get install -y \
     ldap \
     mcrypt \
     mbstring \
+    mysqli \
     opcache \
     pdo \
     pdo_mysql \

@@ -15,6 +15,10 @@ chown -Rf www-data:www-data /code
 chown -Rf www-data:www-data /media
 chown -Rf www-data:www-data /php
 
+# Emulate /srv/binding
+mkdir -p /srv/bindings
+ln -s / "$HOME" || true
+
 # Additional setup
 mkdir -p /src/logs
 

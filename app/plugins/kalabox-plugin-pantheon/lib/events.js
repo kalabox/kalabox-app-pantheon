@@ -26,7 +26,7 @@ module.exports = function(kbox, app) {
     var pantheonConf = app.config.pluginconfig.pantheon;
 
     // Pull the pantheon site screenshot
-    return puller.pullScreenshot(pantheonConf.site, pantheonConf.env)
+    return puller.pullScreenshot(pantheonConf.uuid, pantheonConf.env)
 
     // Pull our code for the first time
     .then(function() {
@@ -43,7 +43,11 @@ module.exports = function(kbox, app) {
     // Get our files
     .then(function() {
       if (!_.get(app.results, 'nofiles', false)) {
-        return puller.pullFiles(pantheonConf.site, pantheonConf.env);
+        return puller.pullFiles(
+          pantheonConf.site,
+          pantheonConf.uuid,
+          pantheonConf.env
+        );
       }
     })
 

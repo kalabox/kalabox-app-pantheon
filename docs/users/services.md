@@ -22,6 +22,7 @@ We try to [maintain parity](https://pantheon.io/docs/application-containers/) wi
   * ldap
   * mbstring
   * mcrypt
+  * mysqli
   * OAuth
   * pdo_mysql
   * redis
@@ -59,6 +60,7 @@ We also set a number of common [Pantheon environmental variables](https://panthe
   * `CACHE_HOST`: redis
   * `BACKDROP_SETTINGS`: JSON object of Backdrop config and settings.
   * `PRESSFLOW_SETTINGS`: JSON object of Drupal config and settings.
+  * `PANTHEON_BINDING`: kalabox
   * `PANTHEON_ENVIRONMENT`: kalabox
   * `PANTHEON_SITE_NAME`: Your Pantheon site name
   * `PANTHEON_SITE UUID`: Your Panthen `UUID`
@@ -72,7 +74,7 @@ We also set a number of common [Pantheon environmental variables](https://panthe
   * `DOCROOT`: /
   * `FRAMEWORK`: Either `drupal`, `drupal8`, `backdrop`, or `wordpress`
   * `USER`:  www-data
-  * `HOME`:  /var/www
+  * `HOME`:  /srv/bindings/kalabox
 
 !!! note "Where does this get set?"
     We set the Pantheon environment in two configuration files that you have control over: `config/php/prepend.php` and `config/php/www.conf`. You may edit these as you see fit.

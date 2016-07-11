@@ -138,25 +138,18 @@ module.exports = function(kbox, app) {
   /*
    * Pull down our sites database
    */
-  var pushFiles = function(site, env) {
+  var pushFiles = function(uuid, env) {
 
     app.status('Pushing files.');
 
     // Grab the rsync client
     var rsync = require('./cmd.js')(kbox, app).rsync;
 
-    // Get panthoen site UUID
-    return terminus.getUUID(site)
+    // Hack together an rsync command
+    var envSite = [env, uuid].join('.');
+    var fileBox = envSite + '@appserver.' + envSite + '.drush.in:files/';
+    return rsync('/media/', fileBox);
 
-    // Push up our files
-    .then(function(uuid) {
-
-      // Hack together an rsync command
-      var envSite = [env, uuid].join('.');
-      var fileBox = envSite + '@appserver.' + envSite + '.drush.in:files/';
-      return rsync('/media/', fileBox);
-
-    });
   };
 
   return {
