@@ -16,6 +16,7 @@ v0.13.0-alpha.1
 * Improved deployment [#1223](https://github.com/kalabox/kalabox/issues/1223)
 * Added tests to make sure we remove testing SSH keys from Pantheon. [#1321](https://github.com/kalabox/kalabox/issues/1321)
 * Fixed a redis typo in kalabox-compose.yml
+* Changed to a more robust PhantomJS download URL provided by Medium within their wrapper for installing via npm on github. [#1359](https://github.com/kalabox/kalabox/issues/1359)
 * Fixed an issue where the build process was not perserving script executable permissions [#1341](https://github.com/kalabox/kalabox/issues/1341)
 
 v0.12.0-beta1
@@ -28,7 +29,6 @@ v0.12.0-beta1
 sites. [#585](https://github.com/kalabox/kalabox/issues/585)
 * Fixed bug where `kbox drush uli` was returning `http://default` instead of the correct hostname. [#1287](https://github.com/kalabox/kalabox/issues/1287)
 * Added tests to verify drush is customizable at `config/drush` [#1298](https://github.com/kalabox/kalabox/issues/1298)
-* Switched mysql user to handle changes in upstream official mariadb container [#1358](https://github.com/kalabox/kalabox/issues/1358)
 
 v0.12.0-alpha12
 ===============
