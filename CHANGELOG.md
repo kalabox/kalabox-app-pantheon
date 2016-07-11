@@ -2,6 +2,7 @@ v0.13.0-alpha.2
 ==================
 
 * Rebooted documentation. [#1322](https://github.com/kalabox/kalabox/issues/1322)
+* Fixed `unison` file sharing to ignore the correct `FILEMOUNT`. [#1440](https://github.com/kalabox/kalabox/issues/1440)
 
 v0.13.0-alpha.1
 ==================
