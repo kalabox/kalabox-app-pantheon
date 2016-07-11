@@ -101,7 +101,7 @@ module.exports = function(kbox, app) {
       dbPassword: 'pantheon',
       dbName: 'pantheon',
       pantheonAccount: getConfig().email,
-      pantheonSite: 'UUID',
+      pantheonSite: getConfig().uuid,
       pantheonSiteName: app.name,
       pantheonEnvironment: 'kalabox',
       pressflowSettings: JSON.stringify(settings),
