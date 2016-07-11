@@ -3,6 +3,7 @@ v0.13.0-alpha.2
 
 * Rebooted documentation. [#1322](https://github.com/kalabox/kalabox/issues/1322)
 * Fixed `unison` file sharing to ignore the correct `FILEMOUNT`. [#1440](https://github.com/kalabox/kalabox/issues/1440)
+* Provided better support for Pantheon's `/srv/bindings/` convention. [#1384](https://github.com/kalabox/kalabox/issues/1384) [#1349](https://github.com/kalabox/kalabox/issues/1349)
 
 v0.13.0-alpha.1
 ==================

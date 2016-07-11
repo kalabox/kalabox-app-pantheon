@@ -102,6 +102,7 @@ kbox-retry-build() {
   $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "ldap" && \
   $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "mbstring" && \
   $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "mcrypt" && \
+  $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "mysqli" && \
   $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "OAuth" && \
   $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "pdo_mysql" && \
   $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "redis" && \
@@ -128,6 +129,7 @@ kbox-retry-build() {
   $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "ldap" && \
   $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "mbstring" && \
   $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "mcrypt" && \
+  $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "mysqli" && \
   $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "OAuth" && \
   $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "pdo_mysql" && \
   $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "redis" && \

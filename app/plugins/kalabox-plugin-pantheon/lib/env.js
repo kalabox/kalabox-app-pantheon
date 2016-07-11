@@ -68,7 +68,7 @@ module.exports = function(kbox, app) {
       conf: {
         pressflow_smart_start: true,
         pantheon_binding: 'kalabox',
-        pantheon_site_uuid: 'kalabox',
+        pantheon_site_uuid: getConfig().uuid,
         pantheon_environment: 'kalabox',
         pantheon_tier: 'kalabox',
         pantheon_index_host: 'solr',
@@ -101,6 +101,7 @@ module.exports = function(kbox, app) {
       dbPassword: 'pantheon',
       dbName: 'pantheon',
       pantheonAccount: getConfig().email,
+      pantheonBinding: 'kalabox',
       pantheonSite: getConfig().uuid,
       pantheonSiteName: app.name,
       pantheonEnvironment: 'kalabox',
