@@ -3,6 +3,7 @@ v0.13.0-alpha.2
 
 * Rebooted documentation. [#1322](https://github.com/kalabox/kalabox/issues/1322)
 * Fixed `unison` file sharing to ignore the correct `FILEMOUNT`. [#1440](https://github.com/kalabox/kalabox/issues/1440)
+* Changed to a more robust PhantomJS download URL provided by Medium within their wrapper for installing via npm on github. [#1359](https://github.com/kalabox/kalabox/issues/1359)
 
 v0.13.0-alpha.1
 ==================
@@ -28,7 +29,6 @@ v0.12.0-beta1
 sites. [#585](https://github.com/kalabox/kalabox/issues/585)
 * Fixed bug where `kbox drush uli` was returning `http://default` instead of the correct hostname. [#1287](https://github.com/kalabox/kalabox/issues/1287)
 * Added tests to verify drush is customizable at `config/drush` [#1298](https://github.com/kalabox/kalabox/issues/1298)
-* Switched mysql user to handle changes in upstream official mariadb container [#1358](https://github.com/kalabox/kalabox/issues/1358)
 
 v0.12.0-alpha12
 ===============
