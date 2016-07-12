@@ -19,9 +19,9 @@
   "dependencies": {
     "fs-extra": "^0.18.2",
     "lodash": "^3.9.3",
+    "restler": "^3.4.0",
     "ssh-fingerprint": "0.0.1",
     "ssh-keygen": "^0.2.1",
-    "restler": "^3.2.2",
     "verror": "1.6.x"
   },
   "devDependencies": {
