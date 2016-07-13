@@ -10,12 +10,8 @@ var _ = require('lodash');
  * Constructor.
  */
 function Terminus(kbox, app) {
-
-  // Kbox things
   this.app = app;
   this.kbox = kbox;
-  this.email = app.config.pluginconfig.pantheon.email;
-
 }
 
 /*
@@ -145,11 +141,7 @@ Terminus.prototype.getConnectionMode = function(site, env) {
   // Return the connection mode if we have it
   .then(function(environment) {
     if (_.has(environment[0], 'connection_mode')) {
-      // jshint camelcase:false
-      // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
       return environment[0].connection_mode;
-      // jshint camelcase:true
-      // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
     }
     // It's probably safest to assume this is sftp even if it isnt
     // this way we don't overwrite any changes and it forces us to
