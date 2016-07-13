@@ -21,7 +21,6 @@ cli:
   volumes:
     - $KALABOX_ENGINE_HOME/.kalabox/pantheon/keys:/home/$KALABOX_ENGINE_ID/.ssh
     - $KALABOX_APP_ROOT/config/scripts/usermap-cli.sh:/usr/local/bin/usermap
-    - $KALABOX_APP_ROOT/config/scripts/pantheon-keys.sh:/usr/local/bin/pantheon-keys
   volumes_from:
     - data
   environment:
@@ -60,11 +59,13 @@ terminus:
   entrypoint: usermap
   volumes:
     - $KALABOX_APP_ROOT:/src
+    - $KALABOX_ENGINE_HOME/.kalabox/pantheon/keys:/home/$KALABOX_ENGINE_ID/.ssh
     - $KALABOX_APP_ROOT/config/terminus:/home/$KALABOX_ENGINE_ID/.terminus
     - $KALABOX_ENGINE_HOME/.terminus/cache/tokens:/home/$KALABOX_ENGINE_ID/.terminus/cache/tokens
     - $KALABOX_APP_ROOT/config/drush:/home/$KALABOX_ENGINE_ID/.drush
     - $KALABOX_APP_ROOT/config/scripts/usermap.sh:/usr/local/bin/usermap
     - $KALABOX_APP_ROOT/config/terminus/php.ini:/usr/local/etc/php/conf.d/php.ini
+    - $KALABOX_APP_ROOT/config/scripts/pantheon-ensure-keys.sh:/usr/local/bin/pantheon-ensure-keys
   volumes_from:
     - data
   environment:
@@ -88,6 +89,7 @@ terminus:
     HOME: /home/$KALABOX_ENGINE_ID
     KALABOX_GID: $KALABOX_ENGINE_GID
     KALABOX_UID: $KALABOX_ENGINE_ID
+    KALABOX_SSH_KEY: pantheon.kalabox.id_rsa
     LOGGED_IN_KEY: $KALABOX_APP_PANTHEON_LOGGED_IN_KEY
     LOGGED_IN_SALT: $KALABOX_APP_PANTHEON_LOGGED_IN_SALT
     MYSQL_HOST: $KALABOX_APP_PANTHEON_DB_HOST

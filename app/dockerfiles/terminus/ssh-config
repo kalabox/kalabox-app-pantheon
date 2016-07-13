@@ -1,4 +1,3 @@
 Host *drush.in
   User root
   StrictHostKeyChecking no
-  IdentityFile /user/.ssh/pantheon.kalabox.id_rsa

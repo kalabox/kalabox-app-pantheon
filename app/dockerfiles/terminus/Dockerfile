@@ -14,7 +14,8 @@ RUN \
   apt-get update -y && apt-get install -y kdiff3-qt curl && \
   curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
   chmod +x wp-cli.phar && mv wp-cli.phar /usr/local/bin/wp && \
-  curl "https://github.com/pantheon-systems/terminus/releases/download/$TERMINUS_VERSION/terminus.phar" -L -o /usr/local/bin/terminus && \
+  #curl "https://github.com/pantheon-systems/terminus/releases/download/$TERMINUS_VERSION/terminus.phar" -L -o /usr/local/bin/terminus && \
+  curl "https://github.com/pirog/terminus/releases/download/0.11.2-sshKeyAdd/terminus.phar" -L -o /usr/local/bin/terminus && \
   chmod +x /usr/local/bin/terminus && \
   mkdir -p /usr/share/drush/commands && mkdir -p /root/.terminus/cache && \
   cd /usr/share/drush/commands && \
@@ -30,8 +31,8 @@ RUN \
 RUN \
   terminus cli version
 
-# Set up our kalabox specific stuff
-COPY ssh-config /root/.ssh/config
+# Set up our pantheon specific stuff
+COPY ssh-config $HOME/.ssh/config
 
 ENTRYPOINT ["/bin/bash"]
 CMD ["true"]

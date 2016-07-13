@@ -38,11 +38,7 @@ module.exports = function(kbox, app) {
     // Download screenshot.
     .then(function() {
       // Name of the image.
-      var imageFilename = util.format(
-        '%s_%s.png',
-        uuid,
-        env
-       );
+      var imageFilename = util.format('%s_%s.png', uuid, env);
       // Url of the image to download.
       var imageUrl = util.format(
         'http://s3.amazonaws.com/pantheon-screenshots/%s',
@@ -80,6 +76,7 @@ module.exports = function(kbox, app) {
 
     // Grab the git client
     var git = require('./cmd.js')(kbox, app).git;
+    var ensureSSHKeys = require('./cmd.js')(kbox, app).ensureSSHKeys;
 
     // Do this if we are gitting for the first time
     if (type === 'clone') {
@@ -103,8 +100,12 @@ module.exports = function(kbox, app) {
         // jshint camelcase:true
         // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
 
+        return ensureSSHKeys()
+
         // Clone the repo
-        return git(['clone', repo, './'])
+        .then(function() {
+          return git(['clone', repo, './']);
+        })
 
         // Grab branches if we need more than master
         .then(function() {

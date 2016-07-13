@@ -4,13 +4,26 @@ set -e
 # Set defaults
 : ${KALABOX_UID:='1000'}
 : ${KALABOX_GID:='50'}
+: ${KALABOX_SSH_KEY:='pantheon.kalabox.id_rsa'}
 
 # Move any config over and git correct perms
 chown -Rf $KALABOX_UID:$KALABOX_GID $HOME
 
 # Add local user to match host
 addgroup --force-badname --gecos "" "$KALABOX_GID" > /dev/null || true
-adduser --force-badname --quiet --gecos "" --disabled-password --home $HOME --gid "$KALABOX_GID" "$KALABOX_UID" > /dev/null
+adduser --force-badname --quiet --gecos "" --disabled-password --home "$HOME" --gid "$KALABOX_GID" "$KALABOX_UID" > /dev/null
+
+# Make sure we explicitly set the default ssh key
+echo -e "Host *\n\tIdentityFile $HOME/.ssh/$KALABOX_SSH_KEY\n" >> "$HOME/.ssh/config"
+
+# Check for an SSH key and make it has the correc permissions
+# We need to do this because VB SHARING ON WINDOZE may set the key as
+# 777
+if [ -f "$HOME/.ssh/$KALABOX_SSH_KEY" ]; then
+  chmod 700 $HOME/.ssh
+  chmod 600 $HOME/.ssh/$KALABOX_SSH_KEY
+  chown -Rf $KALABOX_UID:$KALABOX_UID $HOME/.ssh
+fi
 
 # Wait until our solr crt is ready and then whitelist it
 # @todo: i wish we had a better way to do this

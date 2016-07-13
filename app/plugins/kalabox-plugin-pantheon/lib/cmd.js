@@ -9,7 +9,7 @@ module.exports = function(kbox, app) {
   var _ = require('lodash');
 
   // kbox modules
-  var log = kbox.core.log.make('KBOX PANTHEON CLI');
+  var log = kbox.core.log.make('KBOX CLI');
 
   /*
    * Cli container def
@@ -83,6 +83,13 @@ module.exports = function(kbox, app) {
   };
 
   /*
+   * Run small script to ensure Pantheon SSH keys are setup correctly
+   */
+  var ensureSSHKeys = function() {
+    return run('usermap', ['pantheon-ensure-keys'], terminusContainer());
+  };
+
+  /*
    * Run rsync commands
    */
   var rsync = function(source, dest) {
@@ -114,7 +121,7 @@ module.exports = function(kbox, app) {
       '-p',
       '2222',
       '-i',
-      '/user/.ssh/pantheon.kalabox.id_rsa',
+      '$HOME/.ssh/pantheon.kalabox.id_rsa',
       '-o',
       'StrictHostKeyChecking=no'
     ], 'linux');
@@ -141,6 +148,7 @@ module.exports = function(kbox, app) {
 
   // Return our things
   return {
+    ensureSSHKeys: ensureSSHKeys,
     git: git,
     rsync: rsync,
     drush: drush
