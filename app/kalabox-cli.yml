@@ -1,15 +1,11 @@
-#
+##
 # This contains additional services needed by the cli plugin.
+#
+# See: http://docs.kalabox.io/en/stable/users/config/#tooling
 #
 
 #
 # Basic cli tooling.
-#
-# This is a small alpine linux container that contains some basic and common
-# cli tools like git, rsync and bash.
-#
-# It shares your entire user directory in at /usr. It also uses your Pantheon
-# keys and username for its git config.
 #
 cli:
 
@@ -46,9 +42,6 @@ cli:
 
 #
 # Pantheon tooling.
-#
-# This contains additional Pantheon specific tooling options such as
-# drush, wp-cli and terminus.
 #
 terminus:
 
