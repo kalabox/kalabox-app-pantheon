@@ -2,8 +2,14 @@
 
 module.exports = function(kbox, app) {
 
+  // node modules
+  var format = require('util').format;
+
   // npm modules
   var _ = require('lodash');
+
+  // kbox modules
+  var log = kbox.core.log.make('KBOX PANTHEON CLI');
 
   /*
    * Cli container def
@@ -46,8 +52,13 @@ module.exports = function(kbox, app) {
     runDef.opts.cmd = cmd;
 
     // Log the run
-    var log = kbox.core.log.make(entrypoint.toUpperCase());
-    log.info(runDef);
+    log.info(format(
+      'Running %s using %s with %j for app %s ',
+      cmd,
+      entrypoint,
+      runDef.compose,
+      runDef.project
+    ));
 
     return kbox.Promise.retry(function() {
       app.env.setEnv('KALABOX_CLI_WORKING_DIR', '/code');

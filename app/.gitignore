@@ -16,3 +16,5 @@ pantheon.aliases.drushrc.php
 build
 dist
 .sti*
+config/terminus/cache/*
+config/terminus/session

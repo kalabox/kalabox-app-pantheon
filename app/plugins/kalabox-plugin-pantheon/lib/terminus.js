@@ -1,5 +1,8 @@
 'use strict';
 
+// Node modules
+var format = require('util').format;
+
 // Npm modulez
 var _ = require('lodash');
 
@@ -12,12 +15,6 @@ function Terminus(kbox, app) {
   this.app = app;
   this.kbox = kbox;
   this.email = app.config.pluginconfig.pantheon.email;
-  // Kalabox session helper module
-  this.session = require('./reauth.js')(kbox);
-
-  // @todo: more caching?
-  this.uuid = undefined;
-  this.bindings = undefined;
 
 }
 
@@ -28,7 +25,7 @@ Terminus.prototype.__request = function(cmd, options) {
 
   // Mimicry
   var self = this;
-  var log = self.kbox.core.log.make('TERMINUS');
+  var log = self.kbox.core.log.make('KBOX TERMINUS');
 
   /*
    * Cli container def
@@ -45,97 +42,68 @@ Terminus.prototype.__request = function(cmd, options) {
     };
   };
 
-  // Do a check to see if we need to reauth
-  return self.kbox.Promise.try(function() {
-    return self.session.reAuthCheck(self.email)
+  // Run the command
+  return self.kbox.Promise.retry(function() {
 
-    // If we have answers then we need to reauth we are going to call the
-    // reauth method directly here otherwise we request ourselves and
-    // have to enter our password indefinitely
-    .then(function(answers) {
-      if (answers && answers.password) {
+    // Build run definition
+    var runDef = terminusContainer();
+    runDef.opts.entrypoint = ['bash', '--login', '-c'];
+    cmd.unshift('terminus');
+    cmd = cmd.concat(options);
+    runDef.opts.cmd = _.uniq(cmd);
 
-        // Cmd & opts
-        var loginCmd = ['auth', 'login', self.email];
-        var loginOptions = ['--password=' + answers.password];
+    // Log
+    log.info(format(
+      'Running %s with %j for app %s ',
+      cmd,
+      runDef.compose,
+      runDef.project
+    ));
 
-        // Build run definition
-        var loginDef = terminusContainer();
-        loginDef.opts.entrypoint = ['bash', '--login', '-c'];
-        loginCmd.unshift('terminus');
-        loginCmd = loginCmd.concat(loginOptions);
-        loginDef.opts.cmd = _.uniq(loginCmd);
+    // Run the thing
+    return self.kbox.engine.run(runDef)
 
-        // Log
-        log.info('Reauthenticating...', self.email);
+    // We can assume we only need the first response here since
+    // we are only running one terminus command at a time
+    .then(function(responses) {
+      return responses[0].split('\r\n');
+    })
 
-        // Run the thing
-        return self.kbox.engine.run(loginDef);
+    // Filter out empties
+    .filter(function(response) {
+      return !_.isEmpty(response);
+    })
+
+    // Return valid JSON objects
+    //
+    .map(function(response) {
+      try {
+        JSON.parse(response);
       }
-    });
-  })
+      catch (e) {
+        // Pass in valid json that we know will be filtered out
+        return {date: 'now'};
+      }
+      return JSON.parse(response);
+    })
 
-  // We shoudl be good to run terminus commands now!
-  .then(function() {
+    // Filter out meta messages
+    .filter(function(response) {
+      return !response.date && !response.level && !response.message;
+    })
 
-    // Run the command
-    return self.kbox.Promise.retry(function() {
+    // Catch errors
+    .catch(function(err) {
+      // Some errors are OK
+      if (!_.includes(err.message, 'No backups available.')) {
+        throw new Error(err);
+      }
+    })
 
-      // Build run definition
-      var runDef = terminusContainer();
-      runDef.opts.entrypoint = ['bash', '--login', '-c'];
-      cmd.unshift('terminus');
-      cmd = cmd.concat(options);
-      runDef.opts.cmd = _.uniq(cmd);
-
-      // Log
-      log.info('Run definition: ', runDef);
-
-      // Run the thing
-      return self.kbox.engine.run(runDef)
-
-      // We can assume we only need the first response here since
-      // we are only running one terminus command at a time
-      .then(function(responses) {
-        return responses[0].split('\r\n');
-      })
-
-      // Filter out empties
-      .filter(function(response) {
-        return !_.isEmpty(response);
-      })
-
-      // Return valid JSON objects
-      //
-      .map(function(response) {
-        try {
-          JSON.parse(response);
-        }
-        catch (e) {
-          // Pass in valid json that we know will be filtered out
-          return {date: 'now'};
-        }
-        return JSON.parse(response);
-      })
-
-      // Filter out meta messages
-      .filter(function(response) {
-        return !response.date && !response.level && !response.message;
-      })
-
-      // Catch errors
-      .catch(function(err) {
-        // Some errors are OK
-        if (!_.includes(err.message, 'No backups available.')) {
-          throw new Error(err);
-        }
-      })
-
-      // We can assume we only need the first response here
-      .then(function(result) {
-        log.info('Run returned: ', result);
-        return result;
-      });
+    // We can assume we only need the first response here
+    .then(function(result) {
+      log.debug(format('Terminus returned: %j', result));
+      return result;
     });
   });
 
@@ -146,31 +114,15 @@ Terminus.prototype.__request = function(cmd, options) {
  */
 
 /*
- * Auth
- *
- * terminus auth login EMAIL --password="password"
- */
-Terminus.prototype.auth = function(email, password) {
-
-  return this.__request(
-    ['auth', 'login', email],
-    ['--password=' + password, '--format=json']
-  );
-
-};
-
-/*
  * Wake the site
  *
  * terminus site wake --site="$PANTHEON_SITE" --env="$PANTHEON_ENV"
  */
 Terminus.prototype.wakeSite = function(site, env) {
-
   return this.__request(
     ['site', 'wake'],
     ['--site=' + site, '--env=' + env, '--format=json']
   );
-
 };
 
 /*
@@ -236,12 +188,10 @@ Terminus.prototype.hasChanges = function(site, env) {
  * terminus site set-connection-mode --site="$PANTHEON_SITE" --env="$PANTHEON_ENV" --mode=git
  */
 Terminus.prototype.setConnectionMode = function(site, env, mode) {
-
   return this.__request(
     ['site', 'set-connection-mode'],
     ['--format=json', '--site=' + site, '--env=' + env, '--mode=' + mode]
   );
-
 };
 
 /*
@@ -250,9 +200,7 @@ Terminus.prototype.setConnectionMode = function(site, env, mode) {
  * terminus sites aliases --format=json
  */
 Terminus.prototype.getSiteAliases = function() {
-
   return this.__request(['sites', 'aliases'], ['--format=json']);
-
 };
 
 /*
@@ -262,8 +210,6 @@ Terminus.prototype.getSiteAliases = function() {
  * --element=<type> --site=<site> --env=<env> --to=$HOME/Desktop/ --latest
  */
 Terminus.prototype.downloadBackup = function(site, env, type) {
-
-  // Download the backup and return its location
   return this.__request(
     ['site', 'backups', 'get'],
     [
@@ -275,7 +221,6 @@ Terminus.prototype.downloadBackup = function(site, env, type) {
       '--format=json'
     ]
   );
-
 };
 
 /*
@@ -285,9 +230,6 @@ Terminus.prototype.downloadBackup = function(site, env, type) {
  * --element=database --site=<site> --env=<env>
  */
 Terminus.prototype.createBackup = function(site, env, type) {
-
-  // @todo: validate type?
-
   return this.__request(
     ['site', 'backups', 'create'],
     [
@@ -297,7 +239,6 @@ Terminus.prototype.createBackup = function(site, env, type) {
       '--env=' + env
     ]
   );
-
 };
 
 /*
