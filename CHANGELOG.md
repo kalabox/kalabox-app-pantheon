@@ -5,6 +5,8 @@ v0.13.0-alpha.2
 * Fixed `unison` file sharing to ignore the correct `FILEMOUNT`. [#1440](https://github.com/kalabox/kalabox/issues/1440)
 * Provided better support for Pantheon's `/srv/bindings/` convention. [#1384](https://github.com/kalabox/kalabox/issues/1384) [#1349](https://github.com/kalabox/kalabox/issues/1349)
 * Changed to a more robust PhantomJS download URL provided by Medium within their wrapper for installing via npm on github. [#1359](https://github.com/kalabox/kalabox/issues/1359)
+* Fixed broken DNS tests. [#1429](https://github.com/kalabox/kalabox/issues/1429)
+* Added a tests to verify `kbox services` returns correctly. [#1351](https://github.com/kalabox/kalabox/issues/1351)
 
 v0.13.0-alpha.1
 ==================
