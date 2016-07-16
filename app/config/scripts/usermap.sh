@@ -13,8 +13,13 @@ chown -Rf $KALABOX_UID:$KALABOX_GID $HOME
 addgroup --force-badname --gecos "" "$KALABOX_GID" > /dev/null || true
 adduser --force-badname --quiet --gecos "" --disabled-password --home "$HOME" --gid "$KALABOX_GID" "$KALABOX_UID" > /dev/null
 
-# Make sure we explicitly set the default ssh key
-echo -e "Host *\n\tIdentityFile $HOME/.ssh/$KALABOX_SSH_KEY\n" >> "$HOME/.ssh/config"
+# Make sure we explicitly set the default ssh key to be used for all terminus commands
+cat > "$HOME/.ssh/config" <<EOF
+Host *drush.in
+  User root
+  StrictHostKeyChecking no
+  IdentityFile $HOME/.ssh/pantheon.kalabox.id_rsa
+EOF
 
 # Check for an SSH key and make it has the correc permissions
 # We need to do this because VB SHARING ON WINDOZE may set the key as

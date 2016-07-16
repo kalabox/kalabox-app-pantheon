@@ -205,7 +205,7 @@ module.exports = function(kbox, app) {
       // Construct our import definition
       var alias = ['@pantheon', site, env].join('.');
       var importRun = getDrushRun();
-      importRun.opts.entrypoint = ['bash', '-c'];
+      importRun.opts.entrypoint = ['usermap'];
       importRun.opts.cmd = [
         'drush',
         alias,

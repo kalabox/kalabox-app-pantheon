@@ -27,12 +27,5 @@ RUN \
   rm -rf && rm -rf /var/lib/cache/* && \
   rm -rf /var/lib/log/* && rm -rf /tmp/*
 
-# Verify that terminus is installed and good
-RUN \
-  terminus cli version
-
-# Set up our pantheon specific stuff
-COPY ssh-config $HOME/.ssh/config
-
 ENTRYPOINT ["/bin/bash"]
 CMD ["true"]

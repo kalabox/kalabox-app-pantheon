@@ -1,3 +1,0 @@
-Host *drush.in
-  User root
-  StrictHostKeyChecking no
