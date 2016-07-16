@@ -200,7 +200,6 @@ setup() {
 # Check that we have the correct DNS entries
 #
 @test "Check that we have the correct DNS entries." {
-  skip "Pass DNS for now"
   $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:http://${PANTHEON_DRUPAL7_NAME}.kbox 0 5 | grep 10.13.37.100
   $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:https://${PANTHEON_DRUPAL7_NAME}.kbox 0 5 | grep 10.13.37.100
   $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:http://edge.${PANTHEON_DRUPAL7_NAME}.kbox 0 5 | grep 10.13.37.100
@@ -226,6 +225,19 @@ setup() {
 }
 
 #
+# Run `kbox services`
+#
+@test "Check that '$KBOX services' returns some expected results." {
+  # Grep a bunch of things
+  $KBOX services | grep "\"name\": \"appserver\""
+  $KBOX services | grep "\"name\": \"edge\""
+  $KBOX services | grep "\"name\": \"db\""
+  $KBOX services | grep "\"name\": \"web\""
+  $KBOX services | grep "\"name\": \"solr\""
+  $KBOX services | grep "\"name\": \"redis\""
+}
+
+#
 # Run `kbox stop`
 #
 @test "Check that we can run '$KBOX stop' without an error." {
@@ -244,13 +256,6 @@ setup() {
 #
 @test "Check that we can run '$KBOX restart' without an error." {
   $KBOX $PANTHEON_DRUPAL7_NAME restart
-}
-
-#
-# Run `kbox rebuild`
-#
-@test "Check that we can run '$KBOX services' without an error." {
-  $KBOX $PANTHEON_DRUPAL7_NAME services
 }
 
 #
