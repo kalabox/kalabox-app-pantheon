@@ -225,6 +225,19 @@ setup() {
 }
 
 #
+# Run `kbox services`
+#
+@test "Check that '$KBOX services' returns some expected results." {
+  # Grep a bunch of things
+  $KBOX services | grep "\"name\": \"appserver\""
+  $KBOX services | grep "\"name\": \"edge\""
+  $KBOX services | grep "\"name\": \"db\""
+  $KBOX services | grep "\"name\": \"web\""
+  $KBOX services | grep "\"name\": \"solr\""
+  $KBOX services | grep "\"name\": \"redis\""
+}
+
+#
 # Run `kbox stop`
 #
 @test "Check that we can run '$KBOX stop' without an error." {
