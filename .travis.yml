@@ -8,9 +8,9 @@ before_install:
   - npm install -g grunt-cli
 
   # Install the app deps
-  - cd ${TRAVIS_BUILD_DIR}/app
+  - cd "$TRAVIS_BUILD_DIR/app"
   - npm install --production
-  - cd ${TRAVIS_BUILD_DIR}
+  - cd "$TRAVIS_BUILD_DIR"
 
   # Install kalabox
   - sudo apt-get -y update
@@ -20,6 +20,10 @@ before_install:
 
 before_script:
 
+  # Move our latest app code to teh sysconfroot
+  - mkdir -p "$HOME/.kalabox/plugins"
+  - cp -rfa "$TRAVIS_BUILD_DIR/." "$HOME/.kalabox/plugins/kalabox-app-pantheon"
+
   # Nice dev helpers to verify our env
   - ./scripts/travis-env.sh
 
@@ -28,6 +32,7 @@ before_script:
   - npm --version
   - grunt --version
   - kbox version
+  - kbox create || true
 
 script:
 

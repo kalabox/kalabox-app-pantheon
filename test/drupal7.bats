@@ -62,12 +62,13 @@ setup() {
     # Create a D7 site
     run $KBOX create pantheon \
       -- \
-      --token $PANTHEON_TOKEN \
-      --site $PANTHEON_DRUPAL7_SITE \
-      --env $PANTHEON_DRUPAL7_ENV \
-      --name $PANTHEON_DRUPAL7_NAME \
-      --dir $KBOX_APP_DIR \
-      --from $TRAVIS_BUILD_DIR/app
+      --token "$PANTHEON_TOKEN" \
+      --site "$PANTHEON_DRUPAL7_SITE" \
+      --env "$PANTHEON_DRUPAL7_ENV" \
+      --name "$PANTHEON_DRUPAL7_NAME" \
+      --dir "$KBOX_APP_DIR" \
+      --from "$TRAVIS_BUILD_DIR/app" \
+      -d
 
     # Check status code
     [ "$status" -eq 0 ]
@@ -421,7 +422,7 @@ setup() {
 @test "Check that we can remove the SSH key we posted." {
 
   # Get the fingerprint
-  SSH_KEY_FINGERPRINT=$(ssh-keygen -l -f ~/.ssh/pantheon.kalabox.id_rsa.pub | awk -F' ' '{print $2}' | sed 's/://g')
+  SSH_KEY_FINGERPRINT=$(ssh-keygen -l -f ~/.kalabox/pantheon/keys/pantheon.kalabox.id_rsa.pub | awk -F' ' '{print $2}' | sed 's/://g')
 
   # Delete the SSH key
   $KBOX terminus ssh-keys delete --fingerprint=$SSH_KEY_FINGERPRINT --yes
