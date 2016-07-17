@@ -20,9 +20,11 @@ fi
 
 # Check to see if we are on Darwin
 if [[ $(uname) == "Darwin" ]]; then
-  : ${ON_OSX:=true}
+  : ${PLATFORM:=Darwin}
+elif [[ $(uname) == "Linux" ]]; then
+  : ${PLATFORM:=Linux}
 else
-  : ${ON_OSX:=false}
+  : ${PLATFORM:=Windows}
 fi
 
 #
@@ -38,10 +40,13 @@ fi
 #
 
 # The "docker" binary, use `docker-machine ssh Kalabox2` on non-linux
-if [ -f "$HOME/.kalabox/bin/docker-machine" ]; then
-  : ${DOCKER:="$HOME/.kalabox/bin/docker-machine ssh Kalabox2 docker"}
-else
+# Check to see if we are on Darwin
+if [[ $(uname) == "Darwin" ]]; then
+  : ${DOCKER:="/Applications/Kalabox.app/Contents/MacOS/bin/docker-machine ssh Kalabox2 docker"}
+elif [[ $(uname) == "Linux" ]]; then
   : ${DOCKER:="/usr/share/kalabox/bin/docker"}
+else
+  : ${DOCKER:="C:\Program Files\Kalabox\bin\docker"}
 fi
 
 #

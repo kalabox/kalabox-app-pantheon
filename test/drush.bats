@@ -157,9 +157,9 @@ setup() {
 #
 @test "Check that the redis php class exists in the terminus container." {
 
-  # SKip this test on OSX
-  if [ $ON_OSX == true ]; then
-    skip "This test currently fails on OSX"
+  # SKip this test on non-linux
+  if [ "$PLATFORM" != "Linux" ]; then
+    skip "This test currently fails on non-Linux"
   fi
 
   $DOCKER run --entrypoint php kalabox/terminus:dev -r "new Redis();"

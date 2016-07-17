@@ -171,9 +171,9 @@ setup() {
 #
 @test "Check that we have tables in our pantheon database." {
 
-  # SKip this test on OSX
-  if [ $ON_OSX == true ]; then
-    skip "This test currently fails on OSX"
+  # SKip this test on non-linux
+  if [ "$PLATFORM" != "Linux" ]; then
+    skip "This test currently fails on non-Linux"
   fi
 
   # See if we have tables in the PANTHEON database
