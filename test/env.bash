@@ -52,11 +52,9 @@ fi
 # Uncomment to set a local creds
 # It probably makes the most sense to just do this
 #
-# `export PANTHEON_EMAIL=me@thing.com`
-# `export PANTHEON_PASSWORD=changeme`
+# `export PANTHEON_TOKEN=mytoken`
 #
-#: ${PANTHEON_PASSWORD:=changeme}
-#: ${PANTHEON_EMAIL:=mike@kalabox.io}
+#: ${PANTHEON_TOKEN:=mytoken}
 
 # Location of our dockerfiles
 : ${PANTHEON_DOCKERFILES_DIR:=${TRAVIS_BUILD_DIR}/app/dockerfiles/}

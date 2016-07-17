@@ -62,8 +62,7 @@ setup() {
     # Create a D8 site
     run $KBOX create pantheon \
       -- \
-      --email $PANTHEON_EMAIL \
-      --password $PANTHEON_PASSWORD \
+      --token $PANTHEON_TOKEN \
       --site $PANTHEON_BACKDROP_SITE \
       --env $PANTHEON_BACKDROP_ENV \
       --name $PANTHEON_BACKDROP_NAME \

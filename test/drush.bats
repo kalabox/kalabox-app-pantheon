@@ -37,8 +37,7 @@ setup() {
     # Create a D7 site
     run $KBOX create pantheon \
       -- \
-      --email $PANTHEON_EMAIL \
-      --password $PANTHEON_PASSWORD \
+      --token $PANTHEON_TOKEN \
       --site $PANTHEON_DRUPAL7_SITE \
       --env $PANTHEON_DRUPAL7_ENV \
       --name $PANTHEON_DRUPAL7_NAME \

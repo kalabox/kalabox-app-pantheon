@@ -62,8 +62,7 @@ setup() {
     # Create a D8 site
     run $KBOX create pantheon \
       -- \
-      --email $PANTHEON_EMAIL \
-      --password $PANTHEON_PASSWORD \
+      --token $PANTHEON_TOKEN \
       --site $PANTHEON_DRUPAL8_SITE \
       --env $PANTHEON_DRUPAL8_ENV \
       --name $PANTHEON_DRUPAL8_NAME \
