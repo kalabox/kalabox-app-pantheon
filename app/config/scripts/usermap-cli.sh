@@ -10,6 +10,14 @@ set -e
 addgroup "$KALABOX_GID" || true
 adduser -D -h "$HOME" -G "$KALABOX_GID" "$KALABOX_UID"
 
+# Make sure we explicitly set the default ssh key to be used for all SSH commands to Pantheon endpoints
+cat > "$HOME/.ssh/config" <<EOF
+Host *drush.in
+  User root
+  StrictHostKeyChecking no
+  IdentityFile $HOME/.ssh/pantheon.kalabox.id_rsa
+EOF
+
 # Check for an SSH key and make it has the correc permissions
 # We need to do this because VB SHARING ON WINDOZE may set the key as
 # 777

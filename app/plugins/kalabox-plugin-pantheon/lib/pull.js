@@ -10,12 +10,10 @@ module.exports = function(kbox, app) {
   // Npm modules
   var _ = require('lodash');
 
-  // Grab some kalabox modules
-  var engine = kbox.engine;
-
-  // Grab the terminus client
+  // Grab the generic clients we need
   var Terminus = require('./terminus.js');
   var terminus = new Terminus(kbox, app);
+  var commands = require('./cmd.js')(kbox, app);
 
   /*
    * Check to see if this is the first time we are going to do a pull or not
@@ -27,40 +25,32 @@ module.exports = function(kbox, app) {
   });
 
   /*
-   * Pull down the site's screenshot for use in the gui.
+   * Pull down the site's screenshot
    */
   var pullScreenshot = function(uuid, env) {
 
     app.status('Pulling screenshot.');
 
-    // Get site aliases.
-    return terminus.getSiteAliases()
-    // Download screenshot.
+    // Some meta data about image source and dest
+    var imageFilename = util.format('%s_%s.png', uuid, env);
+    var s3Bucket = 'http://s3.amazonaws.com/pantheon-screenshots/';
+    var imageUrl = util.format(s3Bucket + '%s', imageFilename);
+    var downloadFolder = app.config.appRoot;
+
+    // Download The image
+    return kbox.util.download.downloadFiles([imageUrl], downloadFolder)
+
+    // Rename file to scrrenshot.png.
     .then(function() {
-      // Name of the image.
-      var imageFilename = util.format('%s_%s.png', uuid, env);
-      // Url of the image to download.
-      var imageUrl = util.format(
-        'http://s3.amazonaws.com/pantheon-screenshots/%s',
-        imageFilename
-      );
-      // Folder to download image to.
-      var downloadFolder = app.config.appRoot;
-      // Download file.
-      return kbox.util.download.downloadFiles([imageUrl], downloadFolder)
-      // Rename file to scrrenshot.png.
-      .then(function() {
-        var src = path.join(downloadFolder, imageFilename);
-        var dest = path.join(downloadFolder, 'screenshot.png');
-        return kbox.Promise.fromNode(function(cb) {
-          fs.rename(src, dest, cb);
-        });
+      var src = path.join(downloadFolder, imageFilename);
+      var dest = path.join(downloadFolder, 'screenshot.png');
+      return kbox.Promise.fromNode(function(cb) {
+        fs.rename(src, dest, cb);
       });
     })
-    // Ignore errors.
-    .catch(function() {
 
-    });
+    // Ignore errors.
+    .catch(function() {});
 
   };
 
@@ -71,105 +61,40 @@ module.exports = function(kbox, app) {
 
     app.status('Pulling code.');
 
-    // Determine correct operation
-    var type = (firstTime()) ? 'clone' : 'pull';
-
-    // Grab the git client
-    var git = require('./cmd.js')(kbox, app).git;
-    var ensureSSHKeys = require('./cmd.js')(kbox, app).ensureSSHKeys;
-
     // Do this if we are gitting for the first time
-    if (type === 'clone') {
+    if (firstTime()) {
 
-      // Grab pantheon aliases
-      return terminus.getSiteAliases()
-
-      // Get connection info
-      .then(function() {
-        return terminus.connectionInfo(site, env);
-      })
+      // Get connection info for first clone
+      return terminus.connectionInfo(site, env)
 
       // Generate our code repo URL
       // NOTE: even multidev requires we use 'dev' instead of env
       .then(function(bindings) {
 
-        // jshint camelcase:false
-        // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        // Get the repo from bindings
-        var repo = bindings.git_url;
-        // jshint camelcase:true
-        // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
-
-        return ensureSSHKeys()
-
         // Clone the repo
-        .then(function() {
-          return git(['clone', repo, './']);
-        })
+        return commands.git(['clone', bindings.git_url, './'])
 
         // Grab branches if we need more than master
         .then(function() {
           if (env !== 'dev') {
-            return git(['fetch', 'origin']);
+            return commands.git(['fetch', 'origin']);
           }
         })
 
         // Checkout correct branch if needed
         .then(function() {
           if (env !== 'dev') {
-            return git(['checkout', env]);
+            return commands.git(['checkout', env]);
           }
-        })
-
-        // Symlink our files directory to media
-        .then(function() {
-
-          /*
-           * Helper to get a appserver run def template
-           */
-          var getAppRunner = function() {
-            return {
-              compose: app.composeCore,
-              project: app.name,
-              opts: {
-                services: ['appserver'],
-                app: app
-              }
-            };
-          };
-
-          // Construct our rm definition
-          var rmRun = getAppRunner();
-          rmRun.opts.entrypoint = 'rm';
-          rmRun.opts.cmd = [
-            '-rf',
-            '/code/' + app.env.getEnv('KALABOX_APP_PANTHEON_FILEMOUNT')
-          ];
-
-          // Construct our link definition
-          var linkRun = getAppRunner();
-          linkRun.opts.entrypoint = 'ln';
-          linkRun.opts.cmd = [
-            '-nsf',
-            '/media',
-            '/code/' + app.env.getEnv('KALABOX_APP_PANTHEON_FILEMOUNT')
-          ];
-
-          // Do the Remove
-          return engine.run(rmRun)
-          // Do the link
-          .then(function() {
-            return engine.run(linkRun);
-          });
-
         });
+
       });
     }
 
     // If we already have da git then just pull down the correct branch
     else {
       var branch = (env === 'dev') ? 'master' : env;
-      return git(['pull', 'origin', branch]);
+      return commands.git(['pull', 'origin', branch]);
     }
 
   };
@@ -181,52 +106,12 @@ module.exports = function(kbox, app) {
 
     app.status('Pulling database.');
 
-    /*
-     * Helper to get a DB run def template
-     */
-    var getDrushRun = function() {
-      return {
-        compose: app.composeCore,
-        project: app.name,
-        opts: {
-          mode: kbox.core.deps.get('mode') === 'gui' ? 'collect' : 'attach',
-          services: ['terminus'],
-          app: app
-        }
-      };
-    };
-
     // Make sure remote db is up
     return terminus.wakeSite(site, env)
 
     // Import the backup
     .then(function() {
-
-      // Construct our import definition
-      var alias = ['@pantheon', site, env].join('.');
-      var importRun = getDrushRun();
-      importRun.opts.entrypoint = ['usermap'];
-      importRun.opts.cmd = [
-        'drush',
-        alias,
-        'sql-connect',
-        '&&',
-        'drush',
-        alias,
-        'sql-dump',
-        '|',
-        'mysql',
-        '-u',
-        '$DB_USER',
-        '-p$DB_PASSWORD',
-        '-h',
-        '$DB_HOST',
-        '$DB_NAME'
-      ];
-
-      // Perform the run.
-      return engine.run(importRun);
-
+      return commands.importDB(['@pantheon', site, env].join('.'));
     });
 
   };
@@ -235,35 +120,10 @@ module.exports = function(kbox, app) {
    * Pull files via RSYNC
    */
   var pullFilesRsync = function(uuid, env) {
-
-    // Grab the rsync client
-    var rsync = require('./cmd.js')(kbox, app).rsync;
-
     // Hack together an rsync command
     var envSite = [env, uuid].join('.');
     var fileBox = envSite + '@appserver.' + envSite + '.drush.in:files/';
-    return rsync(fileBox, '/media');
-
-  };
-
-  /*
-   * Do a cache/registry rebuild if needed
-   */
-  var rebuild = function() {
-
-    // Grab the drush client
-    var drush = require('./cmd.js')(kbox, app).drush;
-
-    // Switch based on framework
-    // @todo: what does this look like on wordpress/backdrop
-    switch (app.config.pluginconfig.pantheon.framework) {
-      case 'drupal': return drush(['rr']);
-      case 'drupal8': return drush(['cr']);
-      //case 'wordpress': return wp(['']);
-      //case 'backdrop': return drush(['cr'])
-      default: return true;
-    }
-
+    return commands.rsync(fileBox, '/media');
   };
 
   /*
@@ -288,64 +148,21 @@ module.exports = function(kbox, app) {
 
     // Extract the backup and remove
     .then(function(filesDump) {
-
-      /*
-       * Helper to get a cli run def template
-       */
-      var getFilesRunner = function() {
-        return {
-          compose: app.composeCore,
-          project: app.name,
-          opts: {
-            services: ['cli'],
-            mode: kbox.core.deps.get('mode') === 'gui' ? 'collect' : 'attach',
-            app: app
-          }
-        };
-      };
-
-      // Construct our extract definition
-      var extractRun = getFilesRunner();
-      extractRun.opts.entrypoint = 'usermap';
-      extractRun.opts.cmd = [
-        'tar',
-        '-zxvf',
-        filesDump,
-        '-C',
-        '/tmp',
-        '&&',
-        'mv',
-        '/tmp/files_' + env + '/*',
-        '/media'
-      ];
-
-      // Construct our remove definition
-      var removeRun = getFilesRunner();
-      removeRun.opts.entrypoint = 'rm';
-      removeRun.opts.cmd = [
-        '-f',
-        filesDump
-      ];
-
-      // Extract and then remove the archive
-      return kbox.engine.run(extractRun)
-      .then(function() {
-        return kbox.engine.run(removeRun);
-      });
-
+      return commands.extract(filesDump, env);
     });
   };
 
   /*
-   * Pull down our sites database
+   * Pull down our sites files
+   *
+   * If this is the first time we want to grab the files from an archive
+   * since this will be way faster. subsequent pulls we will use rsync since
+   * this will be way faster
    */
   var pullFiles = function(site, uuid, env, newBackup) {
 
     app.status('Pulling files.');
 
-    // If this is the first time we want to grab the files from an archive
-    // since this will be way faster. subsequent pulls we will use rsync since
-    // this will be way faster
     if (firstTime()) {
       return pullFilesArchive(site, env, newBackup);
     }
@@ -354,12 +171,75 @@ module.exports = function(kbox, app) {
     }
   };
 
+  /*
+   * Do a cache/registry rebuild if needed
+   */
+  var rebuild = function() {
+
+    // Switch based on framework
+    // @todo: what does this look like on wordpress/backdrop
+    switch (app.config.pluginconfig.pantheon.framework) {
+      case 'drupal': return commands.drush(['rr']);
+      case 'drupal8': return commands.drush(['cr']);
+      //case 'wordpress': return wp(['']);
+      //case 'backdrop': return drush(['cr'])
+      default: return true;
+    }
+
+  };
+
+  /*
+   * Our primary pull method
+   */
+  var pull = function(conf, choices) {
+
+    // Start by ensuring our SSH keys are good to go
+    return commands.ensureSSHKeys()
+
+    // Then pull a screenshot
+    .then(function() {
+      return pullScreenshot(conf.uuid, conf.env);
+    })
+
+    // Then grab our Pantheon aliases
+    .then(function() {
+      return terminus.getSiteAliases();
+    })
+
+    // Then pull our code
+    .then(function() {
+      return pullCode(conf.site, conf.env);
+    })
+
+    // Then ensure our symlink
+    .then(function() {
+      return commands.ensureSymlink();
+    })
+
+    // Then pull our DB if selected
+    .then(function() {
+      if (choices.database && choices.database !== 'none') {
+        return pullDB(conf.site, choices.database, choices.newbackup);
+      }
+    })
+
+    // THen pull our files if selected
+    .then(function() {
+      if (choices.files && choices.files !== 'none') {
+        var newBackup = choices.newbackup;
+        return pullFiles(conf.site, conf.uuid, choices.files, newBackup);
+      }
+    })
+
+    // Then rebuild caches and registries as appropriate
+    .then(function() {
+      return rebuild();
+    });
+
+  };
+
   return {
-    pullCode: pullCode,
-    pullDB: pullDB,
-    pullFiles: pullFiles,
-    pullScreenshot: pullScreenshot,
-    rebuild: rebuild
+    pull: pull
   };
 
 };

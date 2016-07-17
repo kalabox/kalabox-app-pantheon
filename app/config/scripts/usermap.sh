@@ -13,7 +13,7 @@ chown -Rf $KALABOX_UID:$KALABOX_GID $HOME
 addgroup --force-badname --gecos "" "$KALABOX_GID" > /dev/null || true
 adduser --force-badname --quiet --gecos "" --disabled-password --home "$HOME" --gid "$KALABOX_GID" "$KALABOX_UID" > /dev/null
 
-# Make sure we explicitly set the default ssh key to be used for all terminus commands
+# Make sure we explicitly set the default ssh key to be used for all SSH commands to Pantheon endpoints
 cat > "$HOME/.ssh/config" <<EOF
 Host *drush.in
   User root

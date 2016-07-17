@@ -2,12 +2,10 @@
 
 module.exports = function(kbox, app) {
 
-  // Grab the terminus client
+  // Grab the generic clients we need
   var Terminus = require('./terminus.js');
   var terminus = new Terminus(kbox, app);
-
-  // Grab some kalabox modules
-  var engine = kbox.engine;
+  var commands = require('./cmd.js')(kbox, app);
 
   /*
    * Push up our sites code
@@ -52,21 +50,23 @@ module.exports = function(kbox, app) {
     // Push up our code
     .tap(function() {
 
-      // Grab the git client
-      var git = require('./cmd.js')(kbox, app).git;
-
       // Add in all our changes
-      return git(['add', '--all'], [])
+      return commands.git(['add', '--all'])
 
       // Commit our changes
       .then(function() {
-        return git(['commit', '--allow-empty', '-m', '"' + message + '"'], []);
+        return commands.git([
+          'commit',
+          '--allow-empty',
+          '-m',
+          '"' + message + '"'
+        ]);
       })
 
       // Push our changes
       .then(function() {
         var branch = (env === 'dev') ? 'master' : env;
-        return git(['push', 'origin', branch], []);
+        return commands.git(['push', 'origin', branch]);
       });
 
     })
@@ -85,21 +85,6 @@ module.exports = function(kbox, app) {
 
     app.status('Pushing database.');
 
-    /*
-     * Helper to get a DB run def template
-     */
-    var getDrushRun = function() {
-      return {
-        compose: app.composeCore,
-        project: app.name,
-        opts: {
-          mode: kbox.core.deps.get('mode') === 'gui' ? 'collect' : 'attach',
-          services: ['terminus'],
-          app: app
-        }
-      };
-    };
-
     // Make sure remote db is up
     return terminus.wakeSite(site, env)
 
@@ -110,27 +95,7 @@ module.exports = function(kbox, app) {
 
     // Push our DB up to pantheon
     .then(function(bindings) {
-
-      // Construct our import definition
-      var exportRun = getDrushRun();
-      var alias = '@kbox';
-      exportRun.opts.entrypoint = ['bash', '-c'];
-      // jshint camelcase:false
-      // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-      //
-      exportRun.opts.cmd = [
-        'drush',
-        alias,
-        'sql-dump',
-        '|',
-        bindings.mysql_command
-      ];
-      // jshint camelcase:true
-      // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
-
-      // Perform the run.
-      return engine.run(exportRun);
-
+      return commands.exportDB('@kbox', bindings.mysql_command);
     });
 
   };
@@ -142,20 +107,44 @@ module.exports = function(kbox, app) {
 
     app.status('Pushing files.');
 
-    // Grab the rsync client
-    var rsync = require('./cmd.js')(kbox, app).rsync;
-
     // Hack together an rsync command
     var envSite = [env, uuid].join('.');
     var fileBox = envSite + '@appserver.' + envSite + '.drush.in:files/';
-    return rsync('/media/', fileBox);
+    return commands.rsync('/media/', fileBox);
+
+  };
+
+  /*
+   * Our primary push method
+   */
+  var push = function(conf, choices) {
+
+    // Start by ensuring our SSH keys are good to go
+    return commands.ensureSSHKeys()
+
+    // Then push our code
+    .then(function() {
+      return pushCode(conf.site, conf.env, choices.message);
+    })
+
+    // Then push our DB if selected
+    .then(function() {
+      if (choices.database && choices.database !== 'none') {
+        return pushDB(conf.site, choices.database);
+      }
+    })
+
+    // THen push our files if selected
+    .then(function() {
+      if (choices.files && choices.files !== 'none') {
+        return pushFiles(conf.uuid, choices.files);
+      }
+    });
 
   };
 
   return {
-    pushCode: pushCode,
-    pushDB: pushDB,
-    pushFiles: pushFiles
+    push: push
   };
 
 };

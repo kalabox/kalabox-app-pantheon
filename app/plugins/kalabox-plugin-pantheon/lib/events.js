@@ -19,43 +19,22 @@ module.exports = function(kbox, app) {
    */
   app.events.on('post-create', function(done) {
 
-    // Get our push and pull stuff
+    // Get our pull stuff and app config
     var puller = require('./pull.js')(kbox, app);
-
-    // Our pantheon config for later on
     var pantheonConf = app.config.pluginconfig.pantheon;
 
-    // Pull the pantheon site screenshot
-    return puller.pullScreenshot(pantheonConf.uuid, pantheonConf.env)
+    // We do allow for a few choices on create
+    var skipDB = _.get(app.results, 'nodb', false);
+    var skipFiles = _.get(app.results, 'nofiles', false);
+    var choices = {
+      database: (skipDB) ? 'none' : pantheonConf.env,
+      files: (skipFiles) ? 'none' : pantheonConf.env,
+    };
 
-    // Pull our code for the first time
-    .then(function() {
-      return puller.pullCode(pantheonConf.site, pantheonConf.env);
-    })
+    // Pull the pantheon site
+    return puller.pull(pantheonConf, choices)
 
-    // Pull our DB
-    .then(function() {
-      if (!_.get(app.results, 'nodb', false)) {
-        return puller.pullDB(pantheonConf.site, pantheonConf.env);
-      }
-    })
-
-    // Get our files
-    .then(function() {
-      if (!_.get(app.results, 'nofiles', false)) {
-        return puller.pullFiles(
-          pantheonConf.site,
-          pantheonConf.uuid,
-          pantheonConf.env
-        );
-      }
-    })
-
-    // Then rebuild caches and registries as appropriate
-    .then(function() {
-      return puller.rebuild();
-    })
-
+    // Finish up
     .nodeify(done);
 
   });
