@@ -19,7 +19,7 @@ cli:
   # build: ./dockerfiles/cli
 
   volumes:
-    - $KALABOX_ENGINE_HOME/.kalabox/pantheon/keys:/home/$KALABOX_ENGINE_ID/.ssh
+    - $KALABOX_ENGINE_HOME/.kalabox/pantheon/keys:/home/$KALABOX_ENGINE_ID/keys
     - $KALABOX_APP_ROOT/config/scripts/usermap-cli.sh:/usr/local/bin/usermap
   volumes_from:
     - data
@@ -58,7 +58,7 @@ terminus:
   entrypoint: usermap
   volumes:
     - $KALABOX_APP_ROOT:/src
-    - $KALABOX_ENGINE_HOME/.kalabox/pantheon/keys:/home/$KALABOX_ENGINE_ID/.ssh
+    - $KALABOX_ENGINE_HOME/.kalabox/pantheon/keys:/home/$KALABOX_ENGINE_ID/keys
     - $KALABOX_APP_ROOT/config/terminus:/home/$KALABOX_ENGINE_ID/.terminus
     - $KALABOX_ENGINE_HOME/.terminus/cache/tokens:/home/$KALABOX_ENGINE_ID/.terminus/cache/tokens
     - $KALABOX_APP_ROOT/config/drush:/home/$KALABOX_ENGINE_ID/.drush
