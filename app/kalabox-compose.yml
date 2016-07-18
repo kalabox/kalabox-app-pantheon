@@ -194,6 +194,7 @@ redis:
   # build: dockerfiles/redis
 
   volumes:
+    - $KALABOX_APP_ROOT_BIND:/src
     - $KALABOX_APP_ROOT_BIND/config/redis/redis.conf:/usr/local/etc/redis/redis.conf
   command: redis-server /usr/local/etc/redis/redis.conf
   expose:

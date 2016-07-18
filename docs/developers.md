@@ -63,7 +63,7 @@ Building
 --------
 
 ```bash
-# Package the the plugin into a distributable archive
+# Package the plugin into a distributable archive
 grunt pkg
 cd dist
 ```

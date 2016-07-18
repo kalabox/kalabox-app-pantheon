@@ -17,10 +17,10 @@ Getting Started
 
 Your best bet to learn more about the various aspects of **"Pantheon on Kalabox"** is to check out [our documentation](http://pantheon.kalabox.io). Here are some good topics to get you started:
 
-  * [Using the Kalabox CLI with Pantheon apps](http://pantheon.kalabox.io/users/cli)
-  * [Using the Kalabox GUI with Pantheon apps](http://pantheon.kalabox.io/users/gui)
-  * [The Pantheon Services & Environment](http://pantheon.kalabox.io/users/services)
-  * [The Pantheon tooling with which we ship](http://pantheon.kalabox.io/users/tooling)
+  * [Using the Kalabox CLI with Pantheon apps](http://pantheon.kalabox.io/en/stable/users/cli)
+  * [Using the Kalabox GUI with Pantheon apps](http://pantheon.kalabox.io/en/stable/users/gui)
+  * [The Pantheon Services & Environment](http://pantheon.kalabox.io/en/stableusers/services)
+  * [The Pantheon tooling with which we ship](http://pantheon.kalabox.io/en/stableusers/tooling)
 
 Support
 -------
