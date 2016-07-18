@@ -163,7 +163,7 @@ module.exports = function(kbox, app) {
    * Run small script to ensure Pantheon SSH keys are setup correctly
    */
   var ensureSSHKeys = function() {
-    return run('usermap', ['pantheon-ensure-keys'], terminusContainer());
+    return run(['bash', '-c'], ['pantheon-ensure-keys'], terminusContainer());
   };
 
   /*
