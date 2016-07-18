@@ -7,6 +7,11 @@ v0.13.0-alpha.2
 * Changed to a more robust PhantomJS download URL provided by Medium within their wrapper for installing via npm on github. [#1359](https://github.com/kalabox/kalabox/issues/1359)
 * Fixed broken DNS tests. [#1429](https://github.com/kalabox/kalabox/issues/1429)
 * Added a tests to verify `kbox services` returns correctly. [#1351](https://github.com/kalabox/kalabox/issues/1351)
+* Switched authentication to use Pantheon machine tokens. [#1452](https://github.com/kalabox/kalabox/issues/1452)
+* Moved `ssh` creation and management to the container level. Now uses `terminus` directly. [#1396](https://github.com/kalabox/kalabox/issues/1396)
+* Fixed issue where `ssh` keys were not working on Windows causing the GUI to stall and CLI to prompt continuously for a password. [#1338](https://github.com/kalabox/kalabox/issues/1338)
+* Enforced `*.sh` files to retain `LF` line endings on `git` checkouts. [#1437](https://github.com/kalabox/kalabox/issues/1437)
+* Updated docs to reflect new machine token based authentication. [#1454](https://github.com/kalabox/kalabox/issues/1454)
 
 v0.13.0-alpha.1
 ==================
