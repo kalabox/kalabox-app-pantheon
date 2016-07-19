@@ -239,12 +239,19 @@ Runs [terminus](https://pantheon.io/docs/terminus/) commands.
   * The `config/terminus` directory in your app will map to `~/.terminus` inside the container.
   * We will automatically log you into terminus with the machine token you used to spin up the app.
   * You can edit the php-cli config locally at `config/terminus/php.ini`.
+  * By default we will set `TERMINUS_USER`, `TERMINUS_SITE` and `TERMINUS_ENV` to match the details of your app.
 
 `kbox terminus`
 
 ```bash
 # Refresh my Pantheon aliases
 kbox terminus sites aliases
+
+# Get information about my app on Pantheon
+kbox terminus site info
+
+# Get information about a different site on Pantheon
+kbox terminus site info --site=myothersite --env=dev
 
 # Verify that I am still logged in
 kbox terminus auth whoami
