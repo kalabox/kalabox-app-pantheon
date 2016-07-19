@@ -12,6 +12,7 @@ v0.13.0-alpha.2
 * Fixed issue where `ssh` keys were not working on Windows causing the GUI to stall and CLI to prompt continuously for a password. [#1338](https://github.com/kalabox/kalabox/issues/1338)
 * Enforced `*.sh` files to retain `LF` line endings on `git` checkouts. [#1437](https://github.com/kalabox/kalabox/issues/1437)
 * Updated docs to reflect new machine token based authentication. [#1454](https://github.com/kalabox/kalabox/issues/1454)
+* Fixed issue where older WordPress sites were siltently failing on DB import. [#1329](https://github.com/kalabox/kalabox/issues/1329)
 
 v0.13.0-alpha.1
 ==================
