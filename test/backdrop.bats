@@ -62,8 +62,7 @@ setup() {
     # Create a D8 site
     run $KBOX create pantheon \
       -- \
-      --email $PANTHEON_EMAIL \
-      --password $PANTHEON_PASSWORD \
+      --token $PANTHEON_TOKEN \
       --site $PANTHEON_BACKDROP_SITE \
       --env $PANTHEON_BACKDROP_ENV \
       --name $PANTHEON_BACKDROP_NAME \
@@ -172,9 +171,9 @@ setup() {
 #
 @test "Check that we have tables in our pantheon database." {
 
-  # SKip this test on OSX
-  if [ $ON_OSX == true ]; then
-    skip "This test currently fails on OSX"
+  # SKip this test on non-linux
+  if [ "$PLATFORM" != "Linux" ]; then
+    skip "This test currently fails on non-Linux"
   fi
 
   # See if we have tables in the PANTHEON database
@@ -424,7 +423,7 @@ setup() {
 @test "Check that we can remove the SSH key we posted." {
 
   # Get the fingerprint
-  SSH_KEY_FINGERPRINT=$(ssh-keygen -l -f ~/.ssh/pantheon.kalabox.id_rsa.pub | awk -F' ' '{print $2}' | sed 's/://g')
+  SSH_KEY_FINGERPRINT=$(ssh-keygen -l -f ~/.kalabox/pantheon/keys/pantheon.kalabox.id_rsa.pub | awk -F' ' '{print $2}' | sed 's/://g')
 
   # Delete the SSH key
   $KBOX terminus ssh-keys delete --fingerprint=$SSH_KEY_FINGERPRINT --yes

@@ -8,7 +8,7 @@ If you are not already familiar with the basic Kalabox commands or how the Kalab
 create pantheon
 ---------------
 
-Pulls down one of your Pantheon sites and creates it locally on Kalabox.
+Pulls down one of your Pantheon sites and creates it locally on Kalabox. You will need a Pantheon machine token to authenticate correctly. [Creating one from your Pantheon dashboard is fairly easy](https://dashboard.pantheon.io/machine-token/create/Kalabox).
 
 `kbox create pantheon`
 
@@ -16,14 +16,13 @@ Pulls down one of your Pantheon sites and creates it locally on Kalabox.
 Options:
   -h, --help     Display help message.                                      [boolean]
   -v, --verbose  Use verbose output.                                        [boolean]
-  --debug        Use debug output.                                          [boolean]
-  --email        Pantheon dashboard email.                                  [string]
-  --password     Pantheon dashboard password.                               [string]
-  --site         Pantheon site machine name.                                [string]
-  --env          Pantheon site environment.                                 [string]
+  -d, --debug    Use debug output.                                          [boolean]
+  --token        Pantheon machine token                                     [string]
+  --site         Pantheon site machine name                                 [string]
+  --env          Pantheon site environment                                  [string]
   --name         The name of your app.                                      [string]
-  --nofiles      Skip pulling my files directory.                           [boolean]
   --nodb         Skip pulling my database.                                  [boolean]
+  --nofiles      Skip pulling my files directory.                           [boolean]
   --dir          Creates the app in this directory. Defaults to CWD.        [string]
   --from         Local path to override app skeleton (be careful with this) [string]
 ```
@@ -34,11 +33,10 @@ kbox create pantheon
 
 # Completely non-interactively create a site from pantheon
 kbox create pantheon -- \
-  --email=jeanluc@picard.net \
-  --password=**** \
-  --site=ten-forward \
+  --token=myniftytoken
+  --site=borgcollective \
   --env=dev \
-  --name=tenforward
+  --name=borg
 
 # Create a site but specify an alternate directory to create it in
 kbox create pantehon -- --dir=~/test/testapp
@@ -60,11 +58,11 @@ Refreshes an existing site by pulling code and optionally the database, and file
 
 ```
 Options:
-  -h, --help     Display help message.                                        [boolean]
-  -v, --verbose  Use verbose output.                                          [boolean]
-  --debug        Use debug output.                                            [boolean]
-  --database     Pull DB from an env. Options are dev, test, live and none    [string]
-  --files        Pull files from an env. Options are dev, test, live and none [string]
+  -h, --help     Display help message.                                 [boolean]
+  -v, --verbose  Use verbose output.                                   [boolean]
+  -d, --debug    Use debug output.                                     [boolean]
+  --database     Pull DB from a supported env or none                   [string]
+  --files        Pull files from a supported env or none                [string]
 ```
 
 ```bash
@@ -92,10 +90,10 @@ Pushes your code and optionally your database and files back up to your original
 Options:
   -h, --help     Display help message.                                 [boolean]
   -v, --verbose  Use verbose output.                                   [boolean]
-  --debug        Use debug output.                                     [boolean]
+  -d, --debug    Use debug output.                                     [boolean]
   -m, --message  Tell us about your change                              [string]
-  --database     Push DB to specific env. Options are dev and none      [string]
-  --files        Push files to a spefic env. Options are dev and none   [string]
+  --database     Push DB to a supported env or none                     [string]
+  --files        Push files to a supported env or none                  [string]
 ```
 
 ```bash
@@ -125,7 +123,7 @@ Completely rebuilds your Pantheon site. This command is identical to the [core r
 Options:
   -h, --help     Display help message.                                 [boolean]
   -v, --verbose  Use verbose output.                                   [boolean]
-  --debug        Use debug output.                                     [boolean]
+  -d, --debug    Use debug output.                                     [boolean]
 ```
 
 ```bash
@@ -144,5 +142,5 @@ Displays relevant connection information for your Pantheon services. You can use
 Options:
   -h, --help     Display help message.                                 [boolean]
   -v, --verbose  Use verbose output.                                   [boolean]
-  --debug        Use debug output.                                     [boolean]
+  -d, --debug    Use debug output.                                     [boolean]
 ```

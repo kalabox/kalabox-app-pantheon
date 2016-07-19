@@ -11,7 +11,7 @@ General considerations
 Here are a couple of small things to take into consideration for all your commands.
 
   * Your entire app directory is mounted inside each container at `/src`
-  * Your entire `HOME` directory is mounted inside each container at `/user`
+  * We create and manage SSH keys so that we can use them for all the commands we run against Pantheon. These are stored in `~/.kalabox/pantheon/keys` by default.
 
 Here are a few examples of how these can be used:
 
@@ -20,7 +20,7 @@ Here are a few examples of how these can be used:
 kbox drush sql-dump --result-file=/src/test.sql
 
 # Use an alternate SSH key with rsync
-kbox rsync -Pav -e 'ssh -i /user/.ssh/mykey.rsa' username@hostname:/from/dir/ /to/dir/
+kbox rsync -Pav -e 'ssh -i ~/.ssh/mykey.rsa' username@hostname:/from/dir/ /to/dir/
 ```
 
 bower
@@ -88,7 +88,7 @@ git
 
 Runs [git](https://git-scm.com/documentation) commands.
 
-  * We will create a `pantheon.kalabox.id_rsa` ssh key locally inside of `~/.ssh` and use this for all the `git` commands you run on this app.
+  * We will create a `pantheon.kalabox.id_rsa` ssh key locally inside of `~/kalabox/pantheon/keys` and use this for all the `git` commands you run on this app.
   * We will use the name and email associated with your Pantheon account for your `git` commits.
 
 `kbox git`
@@ -236,8 +236,8 @@ terminus
 
 Runs [terminus](https://pantheon.io/docs/terminus/) commands.
 
-  * The `config/terminus` directory in your app will map to `~/.terminus/cache` inside the container.
-  * We will automatically log you into terminus with the account you used to spin up the app.
+  * The `config/terminus` directory in your app will map to `~/.terminus` inside the container.
+  * We will automatically log you into terminus with the machine token you used to spin up the app.
   * You can edit the php-cli config locally at `config/terminus/php.ini`.
 
 `kbox terminus`

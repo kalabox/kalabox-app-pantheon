@@ -20,9 +20,11 @@ fi
 
 # Check to see if we are on Darwin
 if [[ $(uname) == "Darwin" ]]; then
-  : ${ON_OSX:=true}
+  : ${PLATFORM:=Darwin}
+elif [[ $(uname) == "Linux" ]]; then
+  : ${PLATFORM:=Linux}
 else
-  : ${ON_OSX:=false}
+  : ${PLATFORM:=Windows}
 fi
 
 #
@@ -38,10 +40,13 @@ fi
 #
 
 # The "docker" binary, use `docker-machine ssh Kalabox2` on non-linux
-if [ -f "$HOME/.kalabox/bin/docker-machine" ]; then
-  : ${DOCKER:="$HOME/.kalabox/bin/docker-machine ssh Kalabox2 docker"}
-else
+# Check to see if we are on Darwin
+if [[ $(uname) == "Darwin" ]]; then
+  : ${DOCKER:="/Applications/Kalabox.app/Contents/MacOS/bin/docker-machine ssh Kalabox2 docker"}
+elif [[ $(uname) == "Linux" ]]; then
   : ${DOCKER:="/usr/share/kalabox/bin/docker"}
+else
+  : ${DOCKER:="C:\Program Files\Kalabox\bin\docker"}
 fi
 
 #
@@ -52,11 +57,9 @@ fi
 # Uncomment to set a local creds
 # It probably makes the most sense to just do this
 #
-# `export PANTHEON_EMAIL=me@thing.com`
-# `export PANTHEON_PASSWORD=changeme`
+# `export PANTHEON_TOKEN=mytoken`
 #
-#: ${PANTHEON_PASSWORD:=changeme}
-#: ${PANTHEON_EMAIL:=mike@kalabox.io}
+#: ${PANTHEON_TOKEN:=mytoken}
 
 # Location of our dockerfiles
 : ${PANTHEON_DOCKERFILES_DIR:=${TRAVIS_BUILD_DIR}/app/dockerfiles/}

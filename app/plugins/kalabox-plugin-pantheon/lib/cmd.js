@@ -2,8 +2,14 @@
 
 module.exports = function(kbox, app) {
 
+  // node modules
+  var format = require('util').format;
+
   // npm modules
   var _ = require('lodash');
+
+  // kbox modules
+  var log = kbox.core.log.make('PANTHEON CMD RUN');
 
   /*
    * Cli container def
@@ -15,6 +21,20 @@ module.exports = function(kbox, app) {
       opts: {
         mode: kbox.core.deps.get('mode') === 'gui' ? 'collect' : 'attach',
         services: ['cli'],
+        app: app
+      }
+    };
+  };
+
+  /*
+   * Appserver run def template
+   */
+  var appserverContainer = function() {
+    return {
+      compose: app.composeCore,
+      project: app.name,
+      opts: {
+        services: ['appserver'],
         app: app
       }
     };
@@ -36,18 +56,23 @@ module.exports = function(kbox, app) {
   };
 
   /*
-   * Helper to run commands on the cli container
+   * Helper to run commands on a container
    */
-  var run = function(entrypoint, cmd, opts) {
+  var run = function(entrypoint, cmd, service) {
 
     // Build run definition
-    var runDef = opts || defaultCliContainer();
+    var runDef = service || defaultCliContainer();
     runDef.opts.entrypoint = entrypoint;
     runDef.opts.cmd = cmd;
 
     // Log the run
-    var log = kbox.core.log.make(entrypoint.toUpperCase());
-    log.info(runDef);
+    log.info(format(
+      'Running %s using %s with %j for app %s ',
+      cmd,
+      entrypoint,
+      runDef.compose,
+      runDef.project
+    ));
 
     return kbox.Promise.retry(function() {
       app.env.setEnv('KALABOX_CLI_WORKING_DIR', '/code');
@@ -69,6 +94,89 @@ module.exports = function(kbox, app) {
   var drush = function(cmd) {
     cmd.unshift('drush');
     return run('usermap', cmd, terminusContainer());
+  };
+
+  /*
+   * Run Import DB command
+   */
+  var importDB = function(alias) {
+    var cmd = ['drush',
+      alias,
+      'sql-connect',
+      '&&',
+      'drush',
+      alias,
+      'sql-dump',
+      '|',
+      'mysql',
+      '-u',
+      '$DB_USER',
+      '-p$DB_PASSWORD',
+      '-h',
+      '$DB_HOST',
+      '$DB_NAME'
+    ];
+    return run('usermap', cmd, terminusContainer());
+  };
+
+  /*
+   * Run Export DB command
+   */
+  var exportDB = function(alias, connection) {
+    var cmd = [
+      'drush',
+      alias,
+      'sql-dump',
+      '|',
+      connection
+    ];
+    return run('usermap', cmd, terminusContainer());
+  };
+
+  /*
+   * Run extract commands
+   */
+  var extract = function(archive, env) {
+
+    // The extraction command
+    var extract = [
+      'tar',
+      '-zxvf',
+      archive,
+      '-C',
+      '/tmp',
+      '&&',
+      'mv',
+      '/tmp/files_' + env + '/*',
+      '/media'
+    ];
+
+    // Extract and remove
+    return run('usermap', extract)
+    .then(function() {
+      return run('rm', ['-f', archive]);
+    });
+
+  };
+
+  /*
+   * Run small script to ensure Pantheon SSH keys are setup correctly
+   */
+  var ensureSSHKeys = function() {
+    return run(['bash', '-c'], ['pantheon-ensure-keys'], terminusContainer());
+  };
+
+  /*
+   * Ensure our symlink is setup correctly
+   */
+  var ensureSymlink = function() {
+    // Get the correct filemount
+    var filemount = '/code/' + app.env.getEnv('KALABOX_APP_PANTHEON_FILEMOUNT');
+    // Force remove the filemount
+    return run('rm', ['-rf', filemount], appserverContainer())
+    .then(function() {
+      return run('ln', ['-nsf', '/media', filemount], appserverContainer());
+    });
   };
 
   /*
@@ -101,11 +209,7 @@ module.exports = function(kbox, app) {
     var sshOptions = kbox.util.shell.escSpaces([
       'ssh',
       '-p',
-      '2222',
-      '-i',
-      '/user/.ssh/pantheon.kalabox.id_rsa',
-      '-o',
-      'StrictHostKeyChecking=no'
+      '2222'
     ], 'linux');
 
     // Base command
@@ -130,6 +234,11 @@ module.exports = function(kbox, app) {
 
   // Return our things
   return {
+    ensureSSHKeys: ensureSSHKeys,
+    ensureSymlink: ensureSymlink,
+    extract: extract,
+    importDB: importDB,
+    exportDB: exportDB,
     git: git,
     rsync: rsync,
     drush: drush

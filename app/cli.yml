@@ -1,55 +1,12 @@
+##
 #
-# Cli plugin task definition
+# Pantheon CMD configuration
 #
-# If the cli plugin is enabled in kalabox.yml then this file will be
-# used used to specify the tooling commands that this app can run.
-#
-# Each object defines a specific task. When a task is implemnented correctly
-# it should show up when you run `kbox` inside of your app. T
-#
-# Tasks can use any of the services in kalabox-compose.yml, kalabox-cli.yml or
-# other compose files you load with your app.
-#
-# Here is a general description of a task object
-#
-# commandname:
-#
-#   service: [service] - The service on which to run the command.
-#
-#   stripfirst: [true|false] - If your commandname key is different from the
-#     entrypoint you might want to strip the commandname aka running `kgit git`
-#     vs `kgit`.
-#
-#   entrypoint: [string|array] - The binary to use. This will default to the
-#     entrypoint of the service.
-#
-#   description: [string] - A human readable description that will show up
-#     on the CLI.
-#
-#   precmdopts: [string] - A string of options to insert between the entrypoint
-#     and the command the user types.
-#
-#   postcmdopts: [string] - A string to append to the user entered command.
-#
-#   mapping: [string] - A string that maps an approot path to a path inside the container
-#     so we can set a accurate working directory for our task. You can use <> notation to
-#     map to other properties on the app object
-#
-#
-# NOTE: You will want to make sure your services correctly set relevant options
-# such as sharing config files or the working directory.
+# see: http://docs.kalabox.io/en/stable/users/config/#tooling
 #
 
 #
 # Adds a git command to your Pantheon app.
-#
-# You can still use your local git if you want. We also use a git wrapper called
-# `kgit` to handle sharing files correctly.
-#
-# By default your git commands will use your Pantheon ssh key and git user/email
-# will be based on your Pantheon info.
-#
-# This will run relative to your webroot.
 #
 git:
   service: cli
@@ -59,8 +16,6 @@ git:
 #
 # Adds a rsync command to your Pantheon app.
 #
-# This will run relative to your files directory.
-#
 rsync:
   service: cli
   description: Run a rsync command on your files directory
@@ -68,12 +23,6 @@ rsync:
 
 #
 # Adds a terminus command to your pantheon app.
-#
-# This will share the session that lives on your host at
-# ~/.kalabox/pantheon/session/EMAIL. It will also share the exact same
-# configuration as your appserver. It will also use your pantheon ssh key.
-#
-# Commands will be run relative to your webroot.
 #
 terminus:
   service: terminus
@@ -83,8 +32,6 @@ terminus:
 #
 # Adds a wp-cli command to your pantheon app.
 #
-# Commands will be run relative to your webroot.
-#
 wp:
   service: terminus
   description: Run a wp-cli command on your codebase
@@ -92,12 +39,6 @@ wp:
 
 #
 # Adds a drush 8 command to your pantheon app.
-#
-# This will share the drush config that lives in config/drush relative to your
-# app root. So you can drop custom aliases and command files in there. Drush
-# will also use your pantheon SSH key by default.
-#
-# Commands will be run relative to your webroot.
 #
 drush:
   service: terminus
@@ -107,8 +48,6 @@ drush:
 #
 # Adds a php cli command to your pantheon app.
 #
-# Commands will be run relative to your webroot.
-#
 php:
   service: terminus
   description: Run a php cli command
@@ -117,8 +56,6 @@ php:
 #
 # Adds a composer command to your pantheon app.
 #
-# Commands will be run relative to your webroot.
-#
 composer:
   service: terminus
   description: Run a composer cli command
@@ -126,8 +63,6 @@ composer:
 
 #
 # Adds a mysql command to your pantheon app.
-#
-# Commands will be run relative to your webroot.
 #
 mysql:
   service: appserver
@@ -139,8 +74,6 @@ mysql:
 #
 # Adds a node command to your pantheon app.
 #
-# Commands will be run relative to your webroot.
-#
 node:
   service: cli
   description: Run a node command
@@ -148,8 +81,6 @@ node:
 
 #
 # Adds a npm command to your pantheon app.
-#
-# Commands will be run relative to your webroot.
 #
 npm:
   service: cli
@@ -159,8 +90,6 @@ npm:
 #
 # Adds a grunt command to your pantheon app.
 #
-# Commands will be run relative to your webroot.
-#
 grunt:
   service: cli
   description: Run a grunt command
@@ -169,8 +98,6 @@ grunt:
 #
 # Adds a gulp command to your pantheon app.
 #
-# Commands will be run relative to your webroot.
-#
 gulp:
   service: cli
   description: Run a gulp command
@@ -178,8 +105,6 @@ gulp:
 
 #
 # Adds a bower command to your pantheon app.
-#
-# Commands will be run relative to your webroot.
 #
 bower:
   service: cli
