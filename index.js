@@ -6,9 +6,6 @@ module.exports = function(kbox) {
   // Node modules
   var path = require('path');
 
-  // NPM modules
-  var _ = require('lodash');
-
   // Grab client module
   var Client = require('./lib/client.js');
   var pantheon = new Client(kbox);
@@ -52,14 +49,12 @@ module.exports = function(kbox) {
 
     // Set the sites method of the api.
     api.methods.sites = function(token) {
-      return pantheon.getSites()
-      .then(function(sites) {
-        return _.map(sites, function(site) {
-          site.getEnvironments = function() {
-            return pantheon.getEnvs(token, site.name);
-          };
-          return site;
-        });
+      return pantheon.getSites(token)
+      .map(function(site) {
+        site.getEnvironments = function() {
+          return pantheon.getEnvs(token, site.name);
+        };
+        return site;
       })
       .wrap('Error getting sites.');
     };
