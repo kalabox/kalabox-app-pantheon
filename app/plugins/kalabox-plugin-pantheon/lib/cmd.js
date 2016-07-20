@@ -14,21 +14,21 @@ module.exports = function(kbox, app) {
   /*
    * Get the straight mysqldump command using pantheon connection info
    */
-  var mysqlDumpCmd = function(info) {
+  var mysqlDumpCmd = function(bindings) {
     return [
       'mysqldump',
       '-u',
-      info.mysql_username,
-      '-p' + info.mysql_password,
+      bindings.mysql_username,
+      '-p' + bindings.mysql_password,
       '-h',
-      info.mysql_host,
+      bindings.mysql_host,
       '-P',
-      info.mysql_port.toString(),
+      bindings.mysql_port.toString(),
       '--no-autocommit',
       '--single-transaction',
       '--opt',
       '-Q',
-      info.mysql_database
+      bindings.mysql_database
     ];
   };
 
@@ -51,7 +51,7 @@ module.exports = function(kbox, app) {
    * Switch to return the correct msyql command based on the framework
    * see: https://github.com/kalabox/kalabox/issues/1329
    */
-  var sqlDumpCmd = function(alias, info) {
+  var sqlDumpCmd = function(alias, bindings) {
 
     // Get the framework, default to the wordpress dump method since that is
     // generally more robust
@@ -59,7 +59,7 @@ module.exports = function(kbox, app) {
     var useDrush = (framework !== 'wordpress');
 
     // Return the correct DUMPER
-    return (useDrush) ? drushSqlDumpCmd(alias) : mysqlDumpCmd(info);
+    return (useDrush) ? drushSqlDumpCmd(alias) : mysqlDumpCmd(bindings);
 
   };
 
@@ -151,10 +151,10 @@ module.exports = function(kbox, app) {
   /*
    * Run Import DB command
    */
-  var importDB = function(alias, info) {
+  var importDB = function(alias, bindings) {
 
     // Get the dump command
-    var cmd = sqlDumpCmd(alias, info);
+    var cmd = sqlDumpCmd(alias, bindings);
 
     // And add the pipe
     cmd.push('|');
