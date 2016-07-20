@@ -12,6 +12,58 @@ module.exports = function(kbox, app) {
   var log = kbox.core.log.make('PANTHEON CMD RUN');
 
   /*
+   * Get the straight mysqldump command using pantheon connection info
+   */
+  var mysqlDumpCmd = function(bindings) {
+    return [
+      'mysqldump',
+      '-u',
+      bindings.mysql_username,
+      '-p' + bindings.mysql_password,
+      '-h',
+      bindings.mysql_host,
+      '-P',
+      bindings.mysql_port.toString(),
+      '--no-autocommit',
+      '--single-transaction',
+      '--opt',
+      '-Q',
+      bindings.mysql_database
+    ];
+  };
+
+  /*
+   * Get the mysql dump via drush based ssh tunnel
+   */
+  var drushSqlDumpCmd = function(alias) {
+    return [
+      'drush',
+      alias,
+      'sql-connect',
+      '&&',
+      'drush',
+      alias,
+      'sql-dump'
+    ];
+  };
+
+  /*
+   * Switch to return the correct msyql command based on the framework
+   * see: https://github.com/kalabox/kalabox/issues/1329
+   */
+  var sqlDumpCmd = function(alias, bindings) {
+
+    // Get the framework, default to the wordpress dump method since that is
+    // generally more robust
+    var framework = app.config.pluginconfig.pantheon.framework || 'wordpress';
+    var useDrush = (framework !== 'wordpress');
+
+    // Return the correct DUMPER
+    return (useDrush) ? drushSqlDumpCmd(alias) : mysqlDumpCmd(bindings);
+
+  };
+
+  /*
    * Cli container def
    */
   var defaultCliContainer = function() {
@@ -99,23 +151,22 @@ module.exports = function(kbox, app) {
   /*
    * Run Import DB command
    */
-  var importDB = function(alias) {
-    var cmd = ['drush',
-      alias,
-      'sql-connect',
-      '&&',
-      'drush',
-      alias,
-      'sql-dump',
-      '|',
-      'mysql',
-      '-u',
-      '$DB_USER',
-      '-p$DB_PASSWORD',
-      '-h',
-      '$DB_HOST',
-      '$DB_NAME'
-    ];
+  var importDB = function(alias, bindings) {
+
+    // Get the dump command
+    var cmd = sqlDumpCmd(alias, bindings);
+
+    // And add the pipe
+    cmd.push('|');
+    cmd.push('mysql');
+    cmd.push('-A');
+    cmd.push('-u');
+    cmd.push('$DB_USER');
+    cmd.push('-p$DB_PASSWORD');
+    cmd.push('-h');
+    cmd.push('$DB_HOST');
+    cmd.push('$DB_NAME');
+
     return run('usermap', cmd, terminusContainer());
   };
 
