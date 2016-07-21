@@ -49,7 +49,7 @@ terminus:
 
   # Comment this and uncomment 'build' below if you want to edit your
   # local dockerfile and build from there. This is useful for development
-  image: kalabox/terminus:dev
+  image: kalabox/terminus:0.11.2
 
   # Uncomment this and comment 'image' above if you want to edit your
   # local dockerfile and build from there. This is useful for development

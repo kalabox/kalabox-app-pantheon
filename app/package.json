@@ -1,6 +1,6 @@
 {
   "name": "pantheon",
-  "version": "0.13.0-alpha.1",
+  "version": "0.13.0-beta.1",
   "dependencies": {
     "fs-extra": "^0.18.2",
     "inquirer": "^0.9.0",
