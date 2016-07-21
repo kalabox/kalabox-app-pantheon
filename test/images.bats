@@ -139,21 +139,21 @@ kbox-retry-build() {
 # Check that we can build the edge image without an error.
 @test "Check that we can build the edge image without an error." {
   IMAGE=pantheon-edge
-  run kbox-retry-build kalabox/$IMAGE dev $PANTHEON_DOCKERFILES_DIR/$IMAGE
+  run kbox-retry-build kalabox/$IMAGE stable $PANTHEON_DOCKERFILES_DIR/$IMAGE
   [ "$status" -eq 0 ]
 }
 
 # Check that we can build the solr image without an error.
 @test "Check that we can build the solr image without an error." {
   IMAGE=pantheon-solr
-  run kbox-retry-build kalabox/$IMAGE dev $PANTHEON_DOCKERFILES_DIR/$IMAGE
+  run kbox-retry-build kalabox/$IMAGE stable $PANTHEON_DOCKERFILES_DIR/$IMAGE
   [ "$status" -eq 0 ]
 }
 
 # Check that we can build $PANTHOEN_TERMINUS without an error.
 @test "Check that we can build the terminus image without an error." {
   IMAGE=terminus
-  run kbox-retry-build kalabox/$IMAGE dev $PANTHEON_DOCKERFILES_DIR/$IMAGE
+  run kbox-retry-build kalabox/$IMAGE 0.11.2 $PANTHEON_DOCKERFILES_DIR/$IMAGE
   [ "$status" -eq 0 ]
 }
 
