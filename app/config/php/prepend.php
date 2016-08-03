@@ -4,6 +4,7 @@ if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROT
   // Let drupal know when to generate absolute links as https.
   // Used in drupal_settings_initialize()
   $_SERVER['HTTPS'] = 'on';
+  $_SERVER['HTTP_X_SSL'] = 'ON';
 }
 
 // @todo: We need a better ENV loader
