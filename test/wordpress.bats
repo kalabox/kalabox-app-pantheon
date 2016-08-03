@@ -16,18 +16,18 @@ setup() {
   mkdir -p "$KBOX_APP_DIR"
 
   # Versions to check
-  BOWER_VERSION=1.7
-  COMPOSER_VERSION=1.1
-  GIT_VERSION=2.6
-  GRUNT_VERSION=0.1
-  GULP_VERSION=1.2
+  BOWER_VERSION=1.
+  COMPOSER_VERSION=1.
+  GIT_VERSION=2.
+  GRUNT_VERSION=1.
+  GULP_VERSION=1.
   MYSQL_CLIENT_VERSION=14.
-  NODE_VERSION=4.4
-  NPM_VERSION=2.14
+  NODE_VERSION=4.
+  NPM_VERSION=2.
   PHP_VERSION=5.6
-  RSYNC_VERSION=3.1
+  RSYNC_VERSION=3.
   TERMINUS_VERSION=0.11.2
-  WP_CLI_VERSION=0.23
+  WP_CLI_VERSION=0.2
 
   # We need to actually go into this app dir until
   # https://github.com/kalabox/kalabox/issues/1221

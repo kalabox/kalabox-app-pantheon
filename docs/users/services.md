@@ -46,35 +46,45 @@ Inside your Pantheon app root you should see a `config` folder. This contains so
 
 We also set a number of common [Pantheon environmental variables](https://pantheon.io/docs/read-environment-config/) so that Pantheon-specific code also works on Kalabox. You can inspect these variables by running `phpinfo()`. They should appear both directly in the `appserver` environment and also in your `$_SERVER` global.
 
-  * `NONCE_SALT`: Needed for Wordpress. We set this automatically.
-  * `LOGGED_IN_SALT`: Needed for Wordpress. We set this automatically.
-  * `SECURE_AUTH_SALT`: Needed for Wordpress. We set this automatically.
-  * `AUTH_SALT`: Needed for Wordpress. We set this automatically.
-  * `LOGGED_IN_KEY`: Needed for Wordpress. We set this automatically.
-  * `SECURE_AUTH_KEY`: Needed for Wordpress. We set this automatically.
-  * `AUTH_KEY`: Needed for Wordpress. We set this automatically.
-  * `PANTHEON_INDEX_PORT`: 449
-  * `PANTHEON_INDEX_HOST`: solr
-  * `CACHE_PASSWORD`:
-  * `CACHE_PORT`: `8161`
-  * `CACHE_HOST`: redis
-  * `BACKDROP_SETTINGS`: JSON object of Backdrop config and settings.
-  * `PRESSFLOW_SETTINGS`: JSON object of Drupal config and settings.
-  * `PANTHEON_BINDING`: kalabox
-  * `PANTHEON_ENVIRONMENT`: kalabox
-  * `PANTHEON_SITE_NAME`: Your Pantheon site name
-  * `PANTHEON_SITE UUID`: Your Panthen `UUID`
-  * `DB_NAME`: pantheon
-  * `DB_PASSWORD`: pantheon
-  * `DB_USER`: pantheon
-  * `DB_PORT`: 3306
-  * `DB_HOST`: database
-  * `DRUPAL_HASH_SALT`: Needed for Drupal8. We set this automatically.
-  * `FILEMOUNT`: The location of your files directory
-  * `DOCROOT`: /
-  * `FRAMEWORK`: Either `drupal`, `drupal8`, `backdrop`, or `wordpress`
-  * `USER`:  www-data
-  * `HOME`:  /srv/bindings/kalabox
+* `AUTH_SALT`: Needed for Wordpress. We set this automatically.
+* `AUTH_KEY`: Needed for Wordpress. We set this automatically.
+* `NONCE_SALT`: Needed for Wordpress. We set this automatically.
+* `LOGGED_IN_SALT`: Needed for Wordpress. We set this automatically.
+* `SECURE_AUTH_SALT`: Needed for Wordpress. We set this automatically.
+* `LOGGED_IN_KEY`: Needed for Wordpress. We set this automatically.
+* `SECURE_AUTH_KEY`: Needed for Wordpress. We set this automatically.
+* `DRUPAL_HASH_SALT`: Needed for Drupal8. We set this automatically.
+>
+* `BACKDROP_SETTINGS`: JSON object of Backdrop config and settings.
+* `PRESSFLOW_SETTINGS`: JSON object of Drupal config and settings.
+>
+* `CACHE_PASSWORD`:
+* `CACHE_PORT`: `8161`
+* `CACHE_HOST`: redis
+>
+* `PANTHEON_BINDING`: kalabox
+* `PANTHEON_DATABASE_STATE`: `empty` or `undefined`
+* `PANTHEON_ENVIRONMENT`: kalabox
+* `PANTHEON_INDEX_PORT`: 449
+* `PANTHEON_INDEX_HOST`: solr
+* `PANTHEON_SITE_NAME`: Your Pantheon site name
+* `PANTHEON_SITE UUID`: Your Panthen `UUID`
+>
+* `DB_NAME`: pantheon
+* `DB_PASSWORD`: pantheon
+* `DB_USER`: pantheon
+* `DB_PORT`: 3306
+* `DB_HOST`: database
+>
+* `FILEMOUNT`: The location of your files directory
+* `DOCROOT`: /
+* `FRAMEWORK`: Either `drupal`, `drupal8`, `backdrop`, or `wordpress`
+>
+* `USER`:  www-data
+* `HOME`:  /srv/bindings/kalabox
+>
+* `HTTP_X_SSL`: `ON` or `undefined`
+* `HTTPS`: `on` or `undefined`
 
 !!! note "Where does this get set?"
     We set the Pantheon environment in two configuration files that you have control over: `config/php/prepend.php` and `config/php/www.conf`. You may edit these as you see fit.

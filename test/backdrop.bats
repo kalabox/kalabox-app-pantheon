@@ -26,7 +26,7 @@ setup() {
   NODE_VERSION=4.4
   NPM_VERSION=2.14
   PHP_VERSION=5.6
-  RSYNC_VERSION=3.1
+  RSYNC_VERSION=3.
   TERMINUS_VERSION=0.11.2
 
   # We need to actually go into this app dir until
