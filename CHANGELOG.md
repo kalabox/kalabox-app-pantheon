@@ -1,5 +1,10 @@
+v0.13.0-beta.3
+==============
+
+* Added `$_SERVER['HTTP_X_SSL']` to improve support for distributions like Webspark. [#1504](https://github.com/kalabox/kalabox/issues/1504)
+
 v0.13.0-beta.2
-==================
+==============
 
 * Rebooted documentation. [#1322](https://github.com/kalabox/kalabox/issues/1322)
 * Fixed `unison` file sharing to ignore the correct `FILEMOUNT`. [#1440](https://github.com/kalabox/kalabox/issues/1440)
