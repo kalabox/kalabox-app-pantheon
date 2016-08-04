@@ -87,3 +87,10 @@ When you're ready to deploy work back to Pantheon, select the "Push Site" option
 Even if you don't have code changes, you must fill out a commit message. This will leave you a commit message to record what database or file changes you have deployed.
 
 If your site is in "SFTP" mode on Pantheon and a commit already exists, you will receive a warning that the push operation was not able to be completed. You'll need to commit that code on Pantheon before the push operation can be ran successfully.
+
+Refreshing Your Site List
+-------------------------
+
+If you add new sites to your Pantheon account and don't see them in your site list on Kalabox, hit the refresh button next to the site search form after clicking on your Pantheon account in the sidebar:
+
+![Refresh sites list](../images/refreshSitesList.png)
