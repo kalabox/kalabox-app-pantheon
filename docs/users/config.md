@@ -33,6 +33,8 @@ pantheon:
   env: dev
   images: v0.13.0-alpha.1
   framework: drupal
+  skipdata:
+    - search_*
   php: 53
   upstream:
     url: 'https://github.com/populist/panopoly-drops-7.git'
@@ -55,3 +57,4 @@ pantheon:
 ### Changing the following should be considered SAFE FOR THE PUBLIC
 
 **php** - Either `53` or `55`. Change and run `kbox rebuild` to switch php versions.
+**skipdata** - An array of Drupal tables. The data of which should be skipped. [Uses Drush glob syntax](https://github.com/drush-ops/drush/blob/master/examples/example.drushrc.php#L234)
