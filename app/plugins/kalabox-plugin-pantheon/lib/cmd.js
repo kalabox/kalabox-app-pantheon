@@ -12,6 +12,22 @@ module.exports = function(kbox, app) {
   var log = kbox.core.log.make('PANTHEON CMD RUN');
 
   /*
+   * Get a string of dru[a; tables whose data to skip
+   */
+  var getDrupalSkipData = function() {
+
+    // Default options
+    var tables = ['cache', 'cache_*', 'history', 'sessions', 'watchdog'];
+
+    // Extra tables
+    var extras = app.config.pluginconfig.pantheon.skiptables || [];
+
+    // Create the string and return
+    return _.union(tables, extras).join(',');
+
+  };
+
+  /*
    * Get the straight mysqldump command using pantheon connection info
    */
   var mysqlDumpCmd = function(bindings) {
@@ -43,7 +59,8 @@ module.exports = function(kbox, app) {
       '&&',
       'drush',
       alias,
-      'sql-dump'
+      'sql-dump',
+      '--structure-tables-list=' + getDrupalSkipData()
     ];
   };
 
