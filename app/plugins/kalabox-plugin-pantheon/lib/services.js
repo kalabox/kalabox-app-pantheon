@@ -21,17 +21,40 @@ module.exports = function(kbox, app) {
 
     return _.map(services, function(service) {
 
-      // Get protocol
+      // Start with a hostnames collector
+      var hostnames = [];
+
+      // Handle 'default' key
+      if (service.default) {
+        hostnames.push(app.name);
+      }
+
+      // Handle legacy 'hostname' key
+      if (service.hostname) {
+        hostnames.push([service.hostname, app.name].join('.'));
+      }
+
+      // Handle 'subdomains'
+      if (service.subdomains) {
+        _.forEach(service.subdomains, function(subdomain) {
+          hostnames.push([subdomain, app.name].join('.'));
+        });
+      }
+
+      // Handle 'custom'
+      if (service.custom) {
+        _.forEach(service.custom, function(url) {
+          hostnames.push(url);
+        });
+      }
+
+      // Determine whether the protocol is http or https
       var protocol = (service.secure) ? 'https://' : 'http://';
 
-      // Get subdomain
-      var sub = (service.hostname) ? service.hostname + '.' : '';
-
-      // Get domain
-      var domain = sub + app.hostname;
-
-      // Return the urls
-      return protocol + domain;
+      // Return an array of parsed hostnames
+      return _.map(hostnames, function(hostname) {
+        return protocol + [hostname, app.domain].join('.');
+      });
 
     });
 
@@ -64,7 +87,7 @@ module.exports = function(kbox, app) {
         return key === name;
       });
       if (!_.isEmpty(proxied)) {
-        serviceSummary.url = getServiceUrls(proxied);
+        serviceSummary.url = _.flatten(getServiceUrls(proxied));
       }
 
       // Add in database credentials
