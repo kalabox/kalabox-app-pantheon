@@ -196,6 +196,22 @@ Terminus.prototype.getSiteAliases = function() {
 };
 
 /*
+ * Get environment drush version
+ *
+ * terminus site drush-version --env=dev --format=json
+ */
+Terminus.prototype.getDrushVersion = function(site, env) {
+  return this.__request(
+    ['site', 'drush-version'],
+    [
+      '--site=' + site,
+      '--env=' + env,
+      '--format=json'
+    ]
+  );
+};
+
+/*
  * Get latest backup of given site, env and type and save it
  *
  * terminus site backups get

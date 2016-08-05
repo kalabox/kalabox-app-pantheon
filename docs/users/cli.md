@@ -54,7 +54,7 @@ pull
 
 Refreshes an existing site by pulling code and optionally the database, and files.
 
-If you choose to pull the database we will automatically exclude the data from the following tables to speed the database pull: `cache, cache_*, history, sessions, watchdog`. This will only apply to Drupal and Backdrop sites. Users can add additional skip options in their `kalabox.yml` file. See [here](./config.md#pantheon) for details on that.
+If you choose to pull the database we will automatically exclude the data from the following tables to speed the database pull: `cache, cache_*, history, sessions, watchdog`. This will only apply to Drupal and Backdrop sites. Users can add additional skip options in their `kalabox.yml` file. See [here](./config.md#pantheon) for details on that. **This feature is only available to Pantehon environments running `drush 7` and higher.**
 
 `kbox pull`
 

@@ -1,3 +1,8 @@
+v0.13.0-beta.4
+==============
+
+* Restricted Drupal database pull optimization to only `drush 7+` enabled sites. [#1532](https://github.com/kalabox/kalabox/issues/1532)
+
 v0.13.0-beta.3
 ==============
 

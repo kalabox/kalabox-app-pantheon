@@ -58,3 +58,6 @@ pantheon:
 
 **php** - Either `53` or `55`. Change and run `kbox rebuild` to switch php versions.
 **skipdata** - An array of Drupal tables. The data of which should be skipped. [Uses Drush glob syntax](https://github.com/drush-ops/drush/blob/master/examples/example.drushrc.php#L234)
+
+!!! attention "`skipdata` on available on Drush 7 and higher"
+    This functionality is only available if your Pantheon environment is running `drush 7` or higher. You can use `kbox terminus site` to both check and set the drush version.

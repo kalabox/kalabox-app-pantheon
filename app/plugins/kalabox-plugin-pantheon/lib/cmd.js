@@ -10,6 +10,11 @@ module.exports = function(kbox, app) {
 
   // kbox modules
   var log = kbox.core.log.make('PANTHEON CMD RUN');
+  var Promise = kbox.Promise;
+
+  // Terminus client
+  var Terminus = require('./terminus.js');
+  var terminus = new Terminus(kbox, app);
 
   /*
    * Get a string of dru[a; tables whose data to skip
@@ -59,8 +64,7 @@ module.exports = function(kbox, app) {
       '&&',
       'drush',
       alias,
-      'sql-dump',
-      '--structure-tables-list=' + getDrupalSkipData()
+      'sql-dump'
     ];
   };
 
@@ -68,15 +72,42 @@ module.exports = function(kbox, app) {
    * Switch to return the correct msyql command based on the framework
    * see: https://github.com/kalabox/kalabox/issues/1329
    */
-  var sqlDumpCmd = function(alias, bindings) {
+  var sqlDumpCmd = function(site, env) {
 
-    // Get the framework, default to the wordpress dump method since that is
-    // generally more robust
+    // Get the framework, default to the wordpress dump since it is LCD
     var framework = app.config.pluginconfig.pantheon.framework || 'wordpress';
+
+    // Determine whether to use drush or not
     var useDrush = (framework !== 'wordpress');
 
-    // Return the correct DUMPER
-    return (useDrush) ? drushSqlDumpCmd(alias) : mysqlDumpCmd(bindings);
+    // Construct the alias
+    var alias = ['@pantheon', site, env].join('.');
+
+    // Get the connection info or drush version
+    return Promise.try(function() {
+      if (useDrush) {
+        return terminus.getDrushVersion(site, env);
+      }
+      else {
+        return terminus.connectionInfo(site, env);
+      }
+    })
+
+    // Construct the command and optimize if needed
+    .then(function(data) {
+
+      // Basic import command
+      var cmd = (useDrush) ? drushSqlDumpCmd(alias) : mysqlDumpCmd(data);
+
+      // If this is drush import and we are drush 7+ then optimize
+      if (useDrush && data >= 7) {
+        cmd.push('--structure-tables-list=' + getDrupalSkipData());
+      }
+
+      // Return cmd
+      return cmd;
+
+    });
 
   };
 
@@ -168,23 +199,25 @@ module.exports = function(kbox, app) {
   /*
    * Run Import DB command
    */
-  var importDB = function(alias, bindings) {
+  var importDB = function(site, env) {
 
     // Get the dump command
-    var cmd = sqlDumpCmd(alias, bindings);
+    return sqlDumpCmd(site, env)
 
-    // And add the pipe
-    cmd.push('|');
-    cmd.push('mysql');
-    cmd.push('-A');
-    cmd.push('-u');
-    cmd.push('$DB_USER');
-    cmd.push('-p$DB_PASSWORD');
-    cmd.push('-h');
-    cmd.push('$DB_HOST');
-    cmd.push('$DB_NAME');
+    // Add the pipe and return the command
+    .then(function(cmd) {
+      cmd.push('|');
+      cmd.push('mysql');
+      cmd.push('-A');
+      cmd.push('-u');
+      cmd.push('$DB_USER');
+      cmd.push('-p$DB_PASSWORD');
+      cmd.push('-h');
+      cmd.push('$DB_HOST');
+      cmd.push('$DB_NAME');
+      return run('usermap', cmd, terminusContainer());
+    });
 
-    return run('usermap', cmd, terminusContainer());
   };
 
   /*

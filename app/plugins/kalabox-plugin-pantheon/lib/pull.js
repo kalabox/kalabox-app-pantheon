@@ -109,14 +109,9 @@ module.exports = function(kbox, app) {
     // Make sure remote db is up
     return terminus.wakeSite(site, env)
 
-    // Get mysql connection info in case we need it as a fall back / wordpress
-    .then(function() {
-      return terminus.connectionInfo(site, env);
-    })
-
     // Import the backup
-    .then(function(bindings) {
-      return commands.importDB(['@pantheon', site, env].join('.'), bindings);
+    .then(function() {
+      return commands.importDB(site, env);
     });
 
   };
