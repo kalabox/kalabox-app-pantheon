@@ -4,7 +4,9 @@ v0.13.0-beta.3
 * Added `$_SERVER['HTTP_X_SSL']` to improve support for distributions like Webspark. [#1504](https://github.com/kalabox/kalabox/issues/1504)
 * Changed `php` version to be set automatically with site environment value instead of site default value. [#1500](https://github.com/kalabox/kalabox/issues/1500)
 * Provided fallback (until [#1438](https://github.com/kalabox/kalabox/issues/1438))) to php `5.5` for sites using php `7.0` or `5.6`[#1500](https://github.com/kalabox/kalabox/issues/1500)
-* Added `mysqli` to `terminus` container to stop `kbox wp` from reporting `Your PHP installation appears to be missing the MySQL extension which is required by WordPress`
+* Added `mysqli` to `terminus` container to stop `kbox wp` from reporting `Your PHP installation appears to be missing the MySQL extension which is required by WordPress` [#1500](https://github.com/kalabox/kalabox/issues/1500)
+* Optimized pulling `drupal` and `backdrop` databases by skipping data for `cache, cache_*, history, sessions, watchdog` [#1180](https://github.com/kalabox/kalabox/issues/1180)
+* Provided `skipdata` config option for users to skip data for additional `drupal` or `backdrop` tables database. [#1180](https://github.com/kalabox/kalabox/issues/1180)
 
 v0.13.0-beta.2
 ==============
