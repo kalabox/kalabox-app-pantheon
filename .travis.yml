@@ -41,7 +41,7 @@ script:
   # Ensure images
   - grunt test:images
   # Do the KALABOX_TEST_GROUP
-  - grunt test:$KALABOX_TEST_GROUP
+  #- grunt test:$KALABOX_TEST_GROUP
 
 before_deploy:
 

@@ -49,6 +49,21 @@ kbox-retry-build() {
 #
 # See: https://github.com/sstephenson/bats/issues/136
 #
+#
+
+# Check that we can pull all our images before we start. this serves as a pseudo cache
+@test "Check that we can pull all our images before we start." {
+  $DOCKER pull busybox
+  $DOCKER pull mariadb:5.5
+  $DOCKER pull redis:2.8
+  $DOCKER pull nginx:1.8.1
+  $DOCKER pull kalabox/cli:stable
+  $DOCKER pull kalabox/pantheon-appserver:53
+  $DOCKER pull kalabox/pantheon-appserver:55
+  $DOCKER pull kalabox/pantheon-edge:stable
+  $DOCKER pull kalabox/pantheon-solr:stable
+  $DOCKER pull kalabox/terminus:0.11.2
+}
 
 # Check that we can build the data image without an error.
 @test "Check that we can build the data image without an error." {
@@ -68,16 +83,15 @@ kbox-retry-build() {
   [ "$status" -eq 0 ]
 }
 
-# Check that we can build the cli image without an error.
-@test "Check that we can build the cli image without an error." {
-  IMAGE=cli
-  run kbox-retry-build kalabox/$IMAGE stable $PANTHEON_DOCKERFILES_DIR/$IMAGE
+# Check that we can build the nginx image without an error.
+@test "Check that we can build the nginx image without an error." {
+  run kbox-retry-build nginx 1.8.1 $PANTHEON_DOCKERFILES_DIR/nginx
   [ "$status" -eq 0 ]
 }
 
-# Check that we can build the nginx image without an error.
-@test "Check that we can build the nginx image without an error." {
-  IMAGE=nginx
+# Check that we can build the cli image without an error.
+@test "Check that we can build the cli image without an error." {
+  IMAGE=cli
   run kbox-retry-build kalabox/$IMAGE stable $PANTHEON_DOCKERFILES_DIR/$IMAGE
   [ "$status" -eq 0 ]
 }
