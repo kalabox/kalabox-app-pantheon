@@ -21,6 +21,7 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     libxml2-dev \
     mysql-client \
+    imagemagick \
     xfonts-base \
     xfonts-75dpi \
   && pecl install apc \
