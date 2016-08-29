@@ -1,3 +1,8 @@
+v0.13.0-rc.1
+============
+
+* Make sure we also install the `convert` binary for `imagemagick`. [#548](https://github.com/kalabox/kalabox/issues/548)
+
 v0.13.0-beta.4
 ==============
 

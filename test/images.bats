@@ -109,6 +109,13 @@ kbox-retry-build() {
   $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "zip"
 }
 
+# Check that the php 5.3 image has the convert binary.
+@test "Check that the php 5.3 image has the convert binary." {
+  IMAGE=pantheon-appserver
+  TAG=53
+  $DOCKER run kalabox/$IMAGE:$TAG which convert
+}
+
 # Check that we can build appserver without an error.
 @test "Check that we can build the php 5.5 appserver image without an error." {
   IMAGE=pantheon-appserver
@@ -136,6 +143,14 @@ kbox-retry-build() {
   $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "Zend OPcache" && \
   $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "zip"
 }
+
+# Check that the he php 5.5 image has the convert binary.
+@test "Check that the php 5.5 image has the convert binary." {
+  IMAGE=pantheon-appserver
+  TAG=55
+  $DOCKER run kalabox/$IMAGE:$TAG which convert
+}
+
 # Check that we can build the edge image without an error.
 @test "Check that we can build the edge image without an error." {
   IMAGE=pantheon-edge
