@@ -8,7 +8,7 @@ If you are not already familiar with the basics of how Kalabox Apps work please 
 appserver
 ---------
 
-The `appserver` service runs either [php-fpm 5.3](https://github.com/kalabox/kalabox-app-pantheon/tree/v0.13/app/dockerfiles/pantheon-appserver/53) or [php-fpm 5.5](https://github.com/kalabox/kalabox-app-pantheon/tree/v0.13/app/dockerfiles/pantheon-appserver/55). We will automatically use the same version of `php` you are running on your Pantheon site. The service is responsible for processing `php` files and returning the result to the `web` service for display to the user.
+The `appserver` service runs either [php-fpm 5.3](https://github.com/kalabox/kalabox-app-pantheon/tree/v0.13/app/dockerfiles/pantheon-appserver/53), [php-fpm 5.5](https://github.com/kalabox/kalabox-app-pantheon/tree/v0.13/app/dockerfiles/pantheon-appserver/55), [php-fpm 5.6](https://github.com/kalabox/kalabox-app-pantheon/tree/v0.13/app/dockerfiles/pantheon-appserver/56) or [php-fpm 7.0](https://github.com/kalabox/kalabox-app-pantheon/tree/v0.13/app/dockerfiles/pantheon-appserver/70). We will automatically use the same version of `php` you are running on your Pantheon site. The service is responsible for processing `php` files and returning the result to the `web` service for display to the user.
 
 ### Extensions
 
