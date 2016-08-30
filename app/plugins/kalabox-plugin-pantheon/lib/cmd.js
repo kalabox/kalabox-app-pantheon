@@ -17,101 +17,6 @@ module.exports = function(kbox, app) {
   var terminus = new Terminus(kbox, app);
 
   /*
-   * Get a string of dru[a; tables whose data to skip
-   */
-  var getDrupalSkipData = function() {
-
-    // Default options
-    var tables = ['cache', 'cache_*', 'history', 'sessions', 'watchdog'];
-
-    // Extra tables
-    var extras = app.config.pluginconfig.pantheon.skiptables || [];
-
-    // Create the string and return
-    return _.union(tables, extras).join(',');
-
-  };
-
-  /*
-   * Get the straight mysqldump command using pantheon connection info
-   */
-  var mysqlDumpCmd = function(bindings) {
-    return [
-      'mysqldump',
-      '-u',
-      bindings.mysql_username,
-      '-p' + bindings.mysql_password,
-      '-h',
-      bindings.mysql_host,
-      '-P',
-      bindings.mysql_port.toString(),
-      '--no-autocommit',
-      '--single-transaction',
-      '--opt',
-      '-Q',
-      bindings.mysql_database
-    ];
-  };
-
-  /*
-   * Get the mysql dump via drush based ssh tunnel
-   */
-  var drushSqlDumpCmd = function(alias) {
-    return [
-      'drush',
-      alias,
-      'sql-connect',
-      '&&',
-      'drush',
-      alias,
-      'sql-dump'
-    ];
-  };
-
-  /*
-   * Switch to return the correct msyql command based on the framework
-   * see: https://github.com/kalabox/kalabox/issues/1329
-   */
-  var sqlDumpCmd = function(site, env) {
-
-    // Get the framework, default to the wordpress dump since it is LCD
-    var framework = app.config.pluginconfig.pantheon.framework || 'wordpress';
-
-    // Determine whether to use drush or not
-    var useDrush = (framework !== 'wordpress');
-
-    // Construct the alias
-    var alias = ['@pantheon', site, env].join('.');
-
-    // Get the connection info or drush version
-    return Promise.try(function() {
-      if (useDrush) {
-        return terminus.getDrushVersion(site, env);
-      }
-      else {
-        return terminus.connectionInfo(site, env);
-      }
-    })
-
-    // Construct the command and optimize if needed
-    .then(function(data) {
-
-      // Basic import command
-      var cmd = (useDrush) ? drushSqlDumpCmd(alias) : mysqlDumpCmd(data);
-
-      // If this is drush import and we are drush 7+ then optimize
-      if (useDrush && data >= 7) {
-        cmd.push('--structure-tables-list=' + getDrupalSkipData());
-      }
-
-      // Return cmd
-      return cmd;
-
-    });
-
-  };
-
-  /*
    * Cli container def
    */
   var defaultCliContainer = function() {
@@ -197,6 +102,143 @@ module.exports = function(kbox, app) {
   };
 
   /*
+   * Run drush collect commands
+   */
+  var drushCollect = function(cmd) {
+    cmd.unshift('drush');
+    var runDef = terminusContainer();
+    runDef.opts.mode = 'collect';
+    return run('usermap', cmd, runDef);
+  };
+
+  /*
+   * Get a string of dru[a; tables whose data to skip
+   */
+  var getDrupalSkipData = function() {
+
+    // Default options
+    var tables = ['cache', 'cache_*', 'history', 'sessions', 'watchdog'];
+
+    // Extra tables
+    var extras = app.config.pluginconfig.pantheon.skiptables || [];
+
+    // Create the string and return
+    return _.union(tables, extras).join(',');
+
+  };
+
+  /*
+   * Get the straight mysqldump command using pantheon connection info
+   */
+  var mysqlDumpCmd = function(bindings) {
+    return [
+      'mysqldump',
+      '-u',
+      bindings.mysql_username,
+      '-p' + bindings.mysql_password,
+      '-h',
+      bindings.mysql_host,
+      '-P',
+      bindings.mysql_port.toString(),
+      '--no-autocommit',
+      '--single-transaction',
+      '--opt',
+      '-Q',
+      bindings.mysql_database
+    ];
+  };
+
+  /*
+   * Get the mysql dump via drush based ssh tunnel
+   */
+  var drushSqlDumpCmd = function(alias) {
+    return [
+      'drush',
+      alias,
+      'sql-connect',
+      '&&',
+      'drush',
+      alias,
+      'sql-dump'
+    ];
+  };
+
+  /*
+   * Determine whether we should use drush
+   */
+  var useDrush = function(site, env) {
+
+    // Get the framework, default to the wordpress dump since it is LCD
+    var framework = app.config.pluginconfig.pantheon.framework || 'wordpress';
+
+    // Do not use drush if we have a wordpress site
+    if (framework === 'wordpress') {
+      return Promise.resolve(false);
+    }
+
+    // Check to see whether we have an alias for this site or not
+    return drushCollect(['sa'])
+
+    .then(function(aliases) {
+      var list = aliases[0] || '';
+      var hasAlias = _.includes(list, ['@pantheon', site, env].join('.'));
+      log.info(format(
+        'Site %s %s is in Pantheon aliases %j: %s',
+        site,
+        env,
+        list,
+        hasAlias
+      ));
+      return hasAlias;
+    });
+
+  };
+
+  /*
+   * Switch to return the correct msyql command based on the framework
+   * see: https://github.com/kalabox/kalabox/issues/1329
+   */
+  var sqlDumpCmd = function(site, env) {
+
+    // Placeholder for drush usings
+    var shouldUseDrush;
+
+    // Check for wheter we can use drush or not
+    return useDrush(site, env)
+
+    // Get the connection info or drush version
+    .then(function(response) {
+      shouldUseDrush = response;
+      if (shouldUseDrush) {
+        return terminus.getDrushVersion(site, env);
+      }
+      else {
+        return terminus.connectionInfo(site, env);
+      }
+    })
+
+    // Construct the command and optimize if needed
+    .then(function(data) {
+
+      // Construct the alias
+      var alias = ['@pantheon', site, env].join('.');
+
+      // Basic import command
+      var cmd = (shouldUseDrush) ? drushSqlDumpCmd(alias) : mysqlDumpCmd(data);
+
+      // If this is drush import and we are drush 7+ then optimize
+      if (useDrush && data >= 7) {
+        cmd.push('--structure-tables-list=' + getDrupalSkipData());
+      }
+
+      // Return cmd
+      return cmd;
+
+    });
+
+  };
+
+  /*
    * Run Import DB command
    */
   var importDB = function(site, env) {
@@ -223,11 +265,19 @@ module.exports = function(kbox, app) {
   /*
    * Run Export DB command
    */
-  var exportDB = function(alias, connection) {
+  var exportDB = function(connection) {
     var cmd = [
-      'drush',
-      alias,
-      'sql-dump',
+      'mysqldump',
+      '-u',
+      '$DB_USER',
+      '-p$DB_PASSWORD',
+      '-h',
+      '$DB_HOST',
+      '--no-autocommit',
+      '--single-transaction',
+      '--opt',
+      '-Q',
+      '$DB_NAME',
       '|',
       connection
     ];
