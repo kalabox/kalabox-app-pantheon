@@ -95,7 +95,7 @@ module.exports = function(kbox, app) {
 
     // Push our DB up to pantheon
     .then(function(bindings) {
-      return commands.exportDB('@kbox', bindings.mysql_command);
+      return commands.exportDB(bindings.mysql_command);
     });
 
   };
