@@ -3,7 +3,7 @@ Kalabox Pantheon appserver
 
 A container that approximates the appserver used on Pantheon.
 
-``
+```
 # Pantheon 7.0 appserver mock for Kalabox
 #
 # docker build -t kalabox/pantheon-appserver:70 .
