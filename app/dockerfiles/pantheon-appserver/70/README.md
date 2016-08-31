@@ -3,13 +3,13 @@ Kalabox Pantheon appserver
 
 A container that approximates the appserver used on Pantheon.
 
-```
-# Pantheon 5.5 appserver mock for Kalabox
+``
+# Pantheon 7.0 appserver mock for Kalabox
 #
-# docker build -t kalabox/pantheon-appserver:55 .
-# docker run -d -e FRAMEWORK=backdrop kalabox/pantheon-appserver:55
+# docker build -t kalabox/pantheon-appserver:70 .
+# docker run -d -e FRAMEWORK=backdrop kalabox/pantheon-appserver:70
 
-FROM php:5.5-fpm
+FROM php:7.0-fpm
 
 # Install the PHP extensions we need
 RUN apt-get update && apt-get install -y \
@@ -24,11 +24,12 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     libxml2-dev \
     mysql-client \
+    imagemagick \
     xfonts-base \
     xfonts-75dpi \
   && pecl install imagick \
-  && pecl install oauth-1.2.3 \
-  && pecl install redis-2.2.8 \
+  && pecl install oauth-2.0.2 \
+  && pecl install redis-3.0.0 \
   && pecl install xdebug \
   && docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr \
   && docker-php-ext-configure imap --with-imap-ssl --with-kerberos \

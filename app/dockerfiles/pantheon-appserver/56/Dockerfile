@@ -1,9 +1,9 @@
-# Pantheon 5.5 appserver mock for Kalabox
+# Pantheon 5.6 appserver mock for Kalabox
 #
-# docker build -t kalabox/pantheon-appserver:55 .
-# docker run -d -e FRAMEWORK=backdrop kalabox/pantheon-appserver:55
+# docker build -t kalabox/pantheon-appserver:56 .
+# docker run -d -e FRAMEWORK=backdrop kalabox/pantheon-appserver:56
 
-FROM php:5.5-fpm
+FROM php:5.6-fpm
 
 # Install the PHP extensions we need
 RUN apt-get update && apt-get install -y \
