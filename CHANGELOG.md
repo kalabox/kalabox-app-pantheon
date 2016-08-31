@@ -3,6 +3,7 @@ v0.13.0-rc.1
 
 * Made sure we also installed the `convert` binary for `imagemagick`. [#548](https://github.com/kalabox/kalabox/issues/548)
 * Added organization sites to list of sites. [#1264](https://github.com/kalabox/kalabox/issues/1264)
+* Added basic support for `php 5.6` and `php 7.0`. [#1438](https://github.com/kalabox/kalabox/issues/1438)
 
 v0.13.0-beta.4
 ==============
