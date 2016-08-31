@@ -56,7 +56,7 @@ pantheon:
 
 ### Changing the following should be considered SAFE FOR THE PUBLIC
 
-**php** - Either `53` or `55`. Change and run `kbox rebuild` to switch php versions.
+**php** - Either `53`, `55`, `56` or `70`. Change and run `kbox rebuild` to switch php versions.
 **skipdata** - An array of Drupal tables. The data of which should be skipped. [Uses Drush glob syntax](https://github.com/drush-ops/drush/blob/master/examples/example.drushrc.php#L234)
 
 !!! attention "`skipdata` on available on Drush 7 and higher"
