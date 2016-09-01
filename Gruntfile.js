@@ -101,7 +101,7 @@ module.exports = function(grunt) {
         pushTo: 'origin',
         gitDescribeOptions: '--tags --always --abbrev=1 --dirty=-d',
         globalReplace: false,
-        prereleaseName: 'beta',
+        prereleaseName: 'rc',
         metadata: '',
         regExp: false
       }
