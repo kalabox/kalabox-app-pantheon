@@ -15,6 +15,14 @@ module.exports = function(kbox, app) {
   app.env.setEnvFromObj(app.config.pluginconfig.pantheon, identifier);
 
   /*
+   * Add pull/push to the app object.
+   */
+  app.events.on('post-app-load', function(app) {
+    app.pull = require('./pull.js')(kbox, app).pull;
+    app.push = require('./push.js')(kbox, app).push;
+  });
+
+  /*
    * Build the site after post-create happens
    */
   app.events.on('post-create', function(done) {

@@ -65,14 +65,12 @@ module.exports = function(kbox, app) {
           // Do the pull
           .then(function() {
 
-            // Get our pull module
-            var puller = require('./pull.js')(kbox, app);
-
             // Compute our choices
             var choices = setDefaultChoices(_.merge({}, options, answers));
 
             // Pull the site
-            return puller.pull(conf, choices);
+            return app.pull(conf, choices);
+
           })
 
           // Finish up
@@ -123,15 +121,11 @@ module.exports = function(kbox, app) {
 
           // Push our stuff
           .then(function() {
-
-            // Get our push module
-            var pusher = require('./push.js')(kbox, app);
-
             // Compute our choices
             var choices = setDefaultChoices(_.merge({}, options, answers));
 
             // Push our site
-            return pusher.push(conf, choices);
+            return app.push(conf, choices);
 
           })
 
