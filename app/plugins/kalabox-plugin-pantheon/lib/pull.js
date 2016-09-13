@@ -15,6 +15,9 @@ module.exports = function(kbox, app) {
   var terminus = new Terminus(kbox, app);
   var commands = require('./cmd.js')(kbox, app);
 
+  // kbox modules
+  var log = kbox.core.log.make('PANTHEON PULL');
+
   /*
    * Check to see if this is the first time we are going to do a pull or not
    * @todo: this is pretty weak for now
@@ -32,9 +35,9 @@ module.exports = function(kbox, app) {
     app.status('Pulling screenshot.');
 
     // Some meta data about image source and dest
-    var imageFilename = util.format('%s_%s.png', uuid, env);
-    var s3Bucket = 'http://s3.amazonaws.com/pantheon-screenshots/';
-    var imageUrl = util.format(s3Bucket + '%s', imageFilename);
+    var imageFilename = util.format('%s.jpg', uuid);
+    var host = 'http://s3.amazonaws.com/pantheon-screenshots-v2';
+    var imageUrl = [host, env, imageFilename].join('/');
     var downloadFolder = app.config.appRoot;
 
     // Download The image
@@ -46,11 +49,11 @@ module.exports = function(kbox, app) {
       var dest = path.join(downloadFolder, 'screenshot.png');
       return kbox.Promise.fromNode(function(cb) {
         fs.rename(src, dest, cb);
+      })
+      .then(function() {
+        log.info(util.format('Downloaded %s to %s.', imageUrl, dest));
       });
-    })
-
-    // Ignore errors.
-    .catch(function() {});
+    });
 
   };
 
