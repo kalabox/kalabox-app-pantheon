@@ -3,6 +3,7 @@ v0.13.0-rc.2
 
 * Switched to newest Pantheon screenshot endpoint. [#1571](https://github.com/kalabox/kalabox/issues/1571)
 * Added push/pull methods to the app object and deleted integrations code. [#1574](https://github.com/kalabox/kalabox/issues/1574)
+* Fixed issue where `solr` was complaining about a `self-signed certificate`. [#1364](https://github.com/kalabox/kalabox/issues/1364)
 
 v0.13.0-rc.1
 ============
