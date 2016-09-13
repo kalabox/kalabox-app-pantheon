@@ -22,5 +22,16 @@ ln -s / "$HOME" || true
 # Additional setup
 mkdir -p /src/logs
 
+# Wait until our solr crt is ready and then whitelist it
+NEXT_WAIT_TIME=0
+until [ -f /certs/binding.crt ] || [ $NEXT_WAIT_TIME -eq 5 ]; do
+  echo "Waiting for solr certs to be set up..."
+  sleep $(( NEXT_WAIT_TIME++ ))
+done
+mkdir -p /usr/share/ca-certificates/solr
+cp /certs/binding.crt /usr/share/ca-certificates/solr/binding.crt
+echo "solr/binding.crt" >> /etc/ca-certificates.conf
+update-ca-certificates --fresh
+
 # Run fpm with command options
 php-fpm "$@"
