@@ -17,7 +17,7 @@ Connect a Pantheon Account
 
 ![Add pantheon account credentials](../images/addPantheonAccount.png)
 
-Click on "Pantheon" under "Add Account". Insert your username and password. Note that in the near future, we will be using Pantheon's Machine Tokens to authenticate. If you don't have a Pantheon account, [sign-up for a free one](http://support.kalabox.io/support/solutions/articles/pantheon.io/register).
+Click on "Pantheon" under "Add Account". Provide an existing Pantheon Machine Token or click "Get a new one" to generate one on Pantheon. If you don't have a Pantheon account, [sign-up for a free one](http://support.kalabox.io/support/solutions/articles/pantheon.io/register).
 
 Download a Site From Pantheon
 -----------------------------
