@@ -37,13 +37,22 @@ module.exports = function(kbox, app) {
     // Some meta data about image source and dest
     var imageFilename = util.format('%s.jpg', uuid);
     var host = 'http://s3.amazonaws.com/pantheon-screenshots-v2';
-    var imageUrl = [host, env, imageFilename].join('/');
+    var envUrl = [host, env, imageFilename].join('/');
+    var devUrl = [host, 'dev', imageFilename].join('/');
     var downloadFolder = app.config.appRoot;
 
-    // Download The image
-    return kbox.util.download.downloadFiles([imageUrl], downloadFolder)
+    // Try to download the devUrl first and then replace with the envUrl
+    // if it exists, this should cover the case where the end
+    return kbox.util.download.downloadFiles([envUrl], downloadFolder)
 
-    // Rename file to scrrenshot.png.
+    // Seems like there is a problem downloading the env screenshot
+    .catch(function(err) {
+      log.info(util.format('Failed to grab %s screenshot %j', env, err));
+      log.info('Trying dev screenshot');
+      return kbox.util.download.downloadFiles([devUrl], downloadFolder);
+    })
+
+    // Rename file to screenshot.png.
     .then(function() {
       var src = path.join(downloadFolder, imageFilename);
       var dest = path.join(downloadFolder, 'screenshot.png');
@@ -51,8 +60,13 @@ module.exports = function(kbox, app) {
         fs.rename(src, dest, cb);
       })
       .then(function() {
-        log.info(util.format('Downloaded %s to %s.', imageUrl, dest));
+        log.info(util.format('Downloaded %s to %s.', imageFilename, dest));
       });
+    })
+
+    // Seems like there is a problem downloading the dev screenshot
+    .catch(function(err) {
+      log.info(util.format('Failed to grab %s screenshot %j', 'dev', err));
     });
 
   };
