@@ -152,7 +152,6 @@ setup() {
   $KBOX list | grep "\"name\": \"$PANTHEON_DRUPAL8_NAME\""
   $KBOX list | grep "\"url\": \"http://${PANTHEON_DRUPAL8_NAME}.kbox\""
   $KBOX list | grep "\"type\": \"pantheon\""
-  $KBOX list | grep "\"version\": \"0.13"
   $KBOX list | grep "\"location\": \"${KBOX_APP_DIR}/${PANTHEON_DRUPAL8_NAME}\""
   $KBOX list | grep "\"running\": true"
 
