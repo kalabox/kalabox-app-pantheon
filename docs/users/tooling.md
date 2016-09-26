@@ -282,3 +282,17 @@ Enables users to debug their php code.
 ### Sublime Text
 
 Install the Sublime Text [xdebug plugin](https://github.com/martomo/SublimeTextXdebug) and follow the instructions there.
+
+### PHPStorm
+
+1. Navigate to Preferences-> Languages & Frameworks -> PHP -> Servers
+2. Click the '+' to add a new server to the list.
+3. Name it anything you like. Configure the host to be the local domain of your site without the protocol. Ex: awesome.kbox
+4. Check the option that says "Use path mappings..." and a file browser will appear.
+5. Map the code directory to /code and /config/php/prepend.php should map to /src/config/php/prepend.php
+6. Click Apply
+7. Naviate to Run->Edit Configurations
+8. Click the '+' at the top left and select PHP Web Application
+9. Configure the server to the one you just configured in steps 1-6 and give this configuration a name
+10. Choose your default browser and click Apply
+11. Start debugging by clicking the bug icon in the top right of the window or go to Run->Debug (Name you configured in step 9)
