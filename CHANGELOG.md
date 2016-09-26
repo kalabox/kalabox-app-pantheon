@@ -3,6 +3,7 @@ v2.0.1
 
 * Altered `nginx` to prevent `PORT` being added to redirects. [#1612](https://github.com/kalabox/kalabox/issues/1612)
 * Added `client_max_body_size 100MB` to all frameworks.
+* Provided a fallback of `drupal` for when there is no `framework` specified. [#1608](https://github.com/kalabox/kalabox/issues/1608)
 
 v2.0.0
 ======
