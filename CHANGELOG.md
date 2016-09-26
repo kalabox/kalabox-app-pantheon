@@ -3,6 +3,7 @@ v2.0.1
 
 * Altered `nginx` to prevent `PORT` being added to redirects. [#1612](https://github.com/kalabox/kalabox/issues/1612)
 * Added `client_max_body_size 100MB` to all frameworks.
+* Added `mysql` `php` extension to `53`, `55` and `56` appservers. [#1620](https://github.com/kalabox/kalabox/issues/1620)
 
 v2.0.0
 ======
