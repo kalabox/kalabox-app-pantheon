@@ -66,6 +66,7 @@ terminus:
     - $KALABOX_APP_ROOT/config/scripts/usermap.sh:/usr/local/bin/usermap
     - $KALABOX_APP_ROOT/config/terminus/php.ini:/usr/local/etc/php/conf.d/php.ini
     - $KALABOX_APP_ROOT/config/scripts/pantheon-ensure-keys.sh:/usr/local/bin/pantheon-ensure-keys
+    - $KALABOX_APP_ROOT/config/composer:/composer
   volumes_from:
     - data
   environment:
