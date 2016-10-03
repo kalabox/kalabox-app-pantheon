@@ -281,18 +281,62 @@ Enables users to debug their php code.
 
 ### Sublime Text
 
-Install the Sublime Text [xdebug plugin](https://github.com/martomo/SublimeTextXdebug) and follow the instructions there.
+Install the Sublime Text [xdebug plugin](https://github.com/martomo/SublimeTextXdebug) and follow the instructions there. You will want to end up with `settings` in your `*.project` config that look something like this:
+
+```json
+"settings":
+  {
+    "xdebug":
+    {
+      "max_children": 64,
+      "max_depth": 8,
+      "path_mapping":
+      {
+        "/code/": "/Users/pirog/Desktop/apps/picard-fan-site/code/"
+      },
+      "port": 9000,
+      "pretty_output": true,
+      "url": "http://picard-fan-site.kbox/"
+    }
+  }
+```
+
+If the `xdebug` session is not automatically triggered on reload try loading the page you want with the `XDEBUG_SESSION_START=1` parameter added eg `http://picard-fan-site.kbox/?XDEBUG_SESSION_START=1`
 
 ### PHPStorm
 
-1. Navigate to Preferences-> Languages & Frameworks -> PHP -> Servers
+There are two ways to set up PHPStorm to use XDEBUG
+
+#### Listen for incoming XDEBUG Connections
+
+1. Use the default `xdebug` settings
+
+  ![Default XDEBUG settings for PHPSTORM](../images/phpStormXdebug1.png "Default XDEBUG settings for PHPSTORM")
+
+2. Click the "Start Listening for PHP Debug Connections" button
+3. Create a breakpoint
+4. Initiate a connection by requesting your site  with the `XDEBUG_SESSION_START` parameter eg `http://kalabox-drupal7.kbox/?XDEBUG_SESSION_START=1`
+
+PHPStorm will immediately pop up with this window; You may want to make sure `File path on server` is set correctly to `index.php`.
+
+  ![Listen xdebug settings](../images/phpStormXdebug2.png "Incoming connection info")
+
+For more details see: [https://github.com/kalabox/kalabox/issues/1507#issuecomment-249271578](https://github.com/kalabox/kalabox/issues/1507#issuecomment-249271578)
+
+Start Listening for PHP Debug Connections
+
+#### Configure an XDEBUG Server
+
+1. Navigate to Preferences -> Languages & Frameworks -> PHP -> Servers
 2. Click the '+' to add a new server to the list.
-3. Name it anything you like. Configure the host to be the local domain of your site without the protocol. Ex: awesome.kbox
+3. Name it anything you like. Configure the host to be the local domain of your site without the protocol. Ex: `awesome.kbox`
 4. Check the option that says "Use path mappings..." and a file browser will appear.
-5. Map the code directory to /code and /config/php/prepend.php should map to /src/config/php/prepend.php
+5. Map the code directory to `/code` and `/config/php/prepend.php` should map to `/src/config/php/prepend.php.`   ![Kalabox XDEBUG server settings for PHPSTORM](../images/phpStormXdebug3.png "Kalabox XDEBUG serversettings for PHPSTORM")
 6. Click Apply
-7. Naviate to Run->Edit Configurations
+7. Naviate to Run -> Edit Configurations
 8. Click the '+' at the top left and select PHP Web Application
-9. Configure the server to the one you just configured in steps 1-6 and give this configuration a name
+9. Configure the server to the one you just configured in steps 1-6 and give this configuration a name ![Kalabox XDEBUG server settings for PHPSTORM](../images/phpStormXdebug4.png "Kalabox XDEBUG serversettings for PHPSTORM")
 10. Choose your default browser and click Apply
-11. Start debugging by clicking the bug icon in the top right of the window or go to Run->Debug (Name you configured in step 9)
+11. Start debugging by clicking the bug icon in the top right of the window or go to Run -> Debug (Name you configured in step 9) ![Kalabox XDEBUG server settings for PHPSTORM](../images/phpStormXdebug5.png "Kalabox XDEBUG serversettings for PHPSTORM")
+
+For more details see: [https://github.com/kalabox/kalabox/issues/1507#issuecomment-249276227](https://github.com/kalabox/kalabox/issues/1507#issuecomment-249276227)

@@ -5,6 +5,7 @@ v2.0.1
 * Added `client_max_body_size 100MB` to all frameworks.
 * Provided a fallback of `drupal` for when there is no `framework` specified. [#1608](https://github.com/kalabox/kalabox/issues/1608)
 * Added `mysql` `php` extension to `53`, `55` and `56` appservers. [#1620](https://github.com/kalabox/kalabox/issues/1620)
+* Added better docs about `xdebug` on PhpStorm and SublimeText. [#1507](https://github.com/kalabox/kalabox/issues/1507)
 
 v2.0.0
 ======
