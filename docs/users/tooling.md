@@ -284,6 +284,7 @@ Enables users to debug their php code.
 Install the Sublime Text [xdebug plugin](https://github.com/martomo/SublimeTextXdebug) and follow the instructions there. You will want to end up with `settings` in your `*.project` config that look something like this:
 
 ```json
+{
 "settings":
   {
     "xdebug":
@@ -299,6 +300,7 @@ Install the Sublime Text [xdebug plugin](https://github.com/martomo/SublimeTextX
       "url": "http://picard-fan-site.kbox/"
     }
   }
+}
 ```
 
 If the `xdebug` session is not automatically triggered on reload try loading the page you want with the `XDEBUG_SESSION_START=1` parameter added eg `http://picard-fan-site.kbox/?XDEBUG_SESSION_START=1`
