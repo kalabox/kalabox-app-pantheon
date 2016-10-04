@@ -6,5 +6,8 @@ set -e
 : ${KALABOX_UID:='1000'}
 : ${KALABOX_GID:='50'}
 
+
 # Set potentially rooted perms back to the correct owner
-sudo chown $KALABOX_UID:$KALABOX_GID -R /code/.git
+if [ -f "/code/.git" ]; then
+  sudo chown $KALABOX_UID:$KALABOX_GID -R /code/.git
+fi
