@@ -111,7 +111,7 @@ module.exports = function(kbox, app) {
     // If we already have da git then just pull down the correct branch
     else {
       var branch = (env === 'dev') ? 'master' : env;
-      return commands.git(['pull', 'origin', branch]);
+      return commands.git(['pull', '-Xtheirs', '--no-edit', 'origin', branch]);
     }
 
   };
