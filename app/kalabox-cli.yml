@@ -22,6 +22,7 @@ cli:
     - $KALABOX_APP_ROOT_BIND:/src
     - $KALABOX_ENGINE_HOME/.kalabox/pantheon/keys:/home/$KALABOX_ENGINE_ID/keys
     - $KALABOX_APP_ROOT/config/scripts/usermap-cli.sh:/usr/local/bin/usermap
+    - $KALABOX_APP_ROOT/config/scripts/ensure-git-dir.sh:/usr/local/bin/ensure-git-dir
   volumes_from:
     - data
   environment:
