@@ -19,6 +19,9 @@ Host *drush.in
   IdentityFile $HOME/.ssh/pantheon.kalabox.id_rsa
 EOF
 
+# Sync up git perms
+/usr/local/bin/ensure-git-dir
+
 # Check for our ssh key and move it over to the correct location
 # We need to do this because VB SHARING ON WINDOZE sets the original key to have
 # 777 permissions since it is in a shared directory
