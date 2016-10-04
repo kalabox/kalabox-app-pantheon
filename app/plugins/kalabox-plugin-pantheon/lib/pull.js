@@ -218,6 +218,11 @@ module.exports = function(kbox, app) {
       return pullScreenshot(conf.uuid, conf.env);
     })
 
+    // Ensure our git perms are excellent
+    .then(function() {
+      return commands.ensureGitPerms();
+    })
+
     // Then grab our Pantheon aliases
     .then(function() {
       return terminus.getSiteAliases();
