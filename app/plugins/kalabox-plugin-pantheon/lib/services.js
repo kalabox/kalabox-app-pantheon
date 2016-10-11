@@ -107,6 +107,18 @@ module.exports = function(kbox, app) {
           port: portInfo[0].HostPort
         };
       }
+      if (name === 'redis') {
+
+        // Get port from inspect data
+        var portInfo = _.get(data, 'NetworkSettings.Ports.8161/tcp');
+        var host = [app.name, app.domain].join('.');
+
+        // Build a creds array
+        serviceSummary.external_connection_info = {
+          host: host,
+          port: portInfo[0].HostPort
+        };
+      }
 
       return serviceSummary;
 
