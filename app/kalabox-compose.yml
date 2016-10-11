@@ -199,6 +199,8 @@ redis:
   command: redis-server /usr/local/etc/redis/redis.conf
   expose:
     - "8160"
+  ports:
+    - "8161"
 
 #
 # This defines a Pantheon solr server.

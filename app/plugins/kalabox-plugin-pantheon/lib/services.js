@@ -90,19 +90,31 @@ module.exports = function(kbox, app) {
         serviceSummary.url = _.flatten(getServiceUrls(proxied));
       }
 
+      var host, portInfo;
+
       // Add in database credentials
       // @todo: get engine ip from provider.getIp()
       if (name === 'db') {
 
         // Get port from inspect data
-        var portInfo = _.get(data, 'NetworkSettings.Ports.3306/tcp');
-        var host = [app.name, app.domain].join('.');
+        portInfo = _.get(data, 'NetworkSettings.Ports.3306/tcp');
+        host = [app.name, app.domain].join('.');
 
         // Build a creds array
         serviceSummary.external_connection_info = {
           database: app.env.getEnv('KALABOX_APP_PANTHEON_DB_NAME'),
           user: app.env.getEnv('KALABOX_APP_PANTHEON_DB_USER'),
           password: app.env.getEnv('KALABOX_APP_PANTHEON_DB_PASSWORD'),
+          host: host,
+          port: portInfo[0].HostPort
+        };
+      }
+      if (name === 'redis') {
+
+        // Get port from inspect data
+        portInfo = _.get(data, 'NetworkSettings.Ports.8161/tcp');
+        host = [app.name, app.domain].join('.');
+        serviceSummary.external_connection_info = {
           host: host,
           port: portInfo[0].HostPort
         };
