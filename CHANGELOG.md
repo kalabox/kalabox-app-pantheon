@@ -1,3 +1,5 @@
+* Added host access to `redis` service. 
+
 v2.0.1
 ======
 
