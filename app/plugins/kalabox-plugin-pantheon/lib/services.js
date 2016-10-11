@@ -90,13 +90,15 @@ module.exports = function(kbox, app) {
         serviceSummary.url = _.flatten(getServiceUrls(proxied));
       }
 
+      var host, portInfo;
+
       // Add in database credentials
       // @todo: get engine ip from provider.getIp()
       if (name === 'db') {
 
         // Get port from inspect data
-        var portInfo = _.get(data, 'NetworkSettings.Ports.3306/tcp');
-        var host = [app.name, app.domain].join('.');
+        portInfo = _.get(data, 'NetworkSettings.Ports.3306/tcp');
+        host = [app.name, app.domain].join('.');
 
         // Build a creds array
         serviceSummary.external_connection_info = {
@@ -110,10 +112,8 @@ module.exports = function(kbox, app) {
       if (name === 'redis') {
 
         // Get port from inspect data
-        var portInfo = _.get(data, 'NetworkSettings.Ports.8161/tcp');
-        var host = [app.name, app.domain].join('.');
-
-        // Build a creds array
+        portInfo = _.get(data, 'NetworkSettings.Ports.8161/tcp');
+        host = [app.name, app.domain].join('.');
         serviceSummary.external_connection_info = {
           host: host,
           port: portInfo[0].HostPort
