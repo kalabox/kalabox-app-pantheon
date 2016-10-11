@@ -174,6 +174,9 @@ Setup should be identical to Pantheon. See: [https://pantheon.io/docs/redis/](ht
 !!! danger "Experimental Feature"
     We've only tested redis on Drupal 7 so YMMV on other frameworks.
 
+You can access your Redis server using the redis-cli command-line client, or any other GUI Redis client by connecting to the port identified using the `kbox services` command. Please review the [services command](./cli/#services) to find out more.
+
+
 solr
 ----
 
