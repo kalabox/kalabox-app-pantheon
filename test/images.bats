@@ -95,6 +95,9 @@ kbox-retry-build() {
   IMAGE=pantheon-appserver
   TAG=53
   $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "apc" && \
+  $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "bcmath" && \
+  $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "bz2" && \
+  $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "calendar" && \
   $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "curl" && \
   $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "gd" && \
   $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "imagick" && \
@@ -129,6 +132,9 @@ kbox-retry-build() {
 @test "Check that the php 5.5 image has the correct PHP extensions." {
   IMAGE=pantheon-appserver
   TAG=55
+  $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "bcmath" && \
+  $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "bz2" && \
+  $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "calendar" && \
   $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "curl" && \
   $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "gd" && \
   $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "imagick" && \
@@ -165,6 +171,9 @@ kbox-retry-build() {
 @test "Check that the php 5.6 image has the correct PHP extensions." {
   IMAGE=pantheon-appserver
   TAG=56
+  $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "bcmath" && \
+  $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "bz2" && \
+  $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "calendar" && \
   $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "curl" && \
   $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "gd" && \
   $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "imagick" && \
@@ -201,6 +210,9 @@ kbox-retry-build() {
 @test "Check that the php 7.0 image has the correct PHP extensions." {
   IMAGE=pantheon-appserver
   TAG=70
+  $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "bcmath" && \
+  $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "bz2" && \
+  $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "calendar" && \
   $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "curl" && \
   $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "gd" && \
   $DOCKER run kalabox/$IMAGE:$TAG php-fpm -m | grep "imagick" && \

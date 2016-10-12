@@ -11,6 +11,7 @@ COPY docker-php-ext-* /usr/local/bin/
 # Install the PHP extensions we need
 RUN apt-get update && apt-get install -y \
     bzip2 \
+    libbz2-dev \
     libc-client2007e-dev \
     libjpeg-dev \
     libkrb5-dev \
@@ -38,6 +39,9 @@ RUN apt-get update && apt-get install -y \
   && docker-php-ext-enable redis \
   && docker-php-ext-enable xdebug \
   && docker-php-ext-install \
+    bcmath \
+    bz2 \
+    calendar \
     gd \
     imap \
     ldap \
