@@ -17,7 +17,7 @@ RUN apt-get update -y && apt-get install -y \
     mysqli \
   && curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
   && chmod +x wp-cli.phar && mv wp-cli.phar /usr/local/bin/wp \
-  && curl "https://github.com/pantheon-systems/terminus/releases/download/$TERMINUS_VERSION/terminus.phar" -L -o /usr/local/bin/terminus && \
+  && curl "https://github.com/pantheon-systems/terminus/releases/download/$TERMINUS_VERSION/terminus.phar" -L -o /usr/local/bin/terminus \
   && chmod +x /usr/local/bin/terminus \
   && mkdir -p /usr/share/drush/commands && mkdir -p /root/.terminus/cache \
   && cd /usr/share/drush/commands \
