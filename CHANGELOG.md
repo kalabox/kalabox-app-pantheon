@@ -1,3 +1,8 @@
+v2.0.2
+======
+
+* Upgraded to `terminus` `0.13.3`. [#1631](https://github.com/kalabox/kalabox/issues/1631)
+
 v2.0.1
 ======
 
