@@ -26,7 +26,7 @@ setup() {
   NPM_VERSION=2.
   PHP_VERSION=5.6
   RSYNC_VERSION=3.
-  TERMINUS_VERSION=0.13.3
+  TERMINUS_VERSION=0.13.
   WP_CLI_VERSION=0.2
 
   # We need to actually go into this app dir until

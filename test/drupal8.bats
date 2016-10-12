@@ -27,7 +27,7 @@ setup() {
   NPM_VERSION=2.
   PHP_VERSION=5.6
   RSYNC_VERSION=3.
-  TERMINUS_VERSION=0.11.3
+  TERMINUS_VERSION=0.13.
 
   # We need to actually go into this app dir until
   # https://github.com/kalabox/kalabox/issues/1221
