@@ -1,5 +1,5 @@
-v2.0.2
-======
+v2.1.0-rc.1
+===========
 
 * Upgraded to `terminus` `0.13.3`. [#1631](https://github.com/kalabox/kalabox/issues/1631)
 

@@ -94,7 +94,7 @@ deploy:
     skip_cleanup: true
     on:
       repo: kalabox/kalabox-app-pantheon
-      branch: v2.0
+      branch: v2.1
   - provider: releases
     api_key:
       secure: ijAJXFDijXJpwcAtLVbpskEJVTFdQ1WBCNN246qZKiUAFvEDiFHfjEdm/UQAfSCUd5V1VLRLmOWx0X/b580ItZIJditA4W9Q3ym98GwcdeMTv8NBbklG61ogVkTLR86kpbWZKNJ1s9EsW4fAtn1Su4EjvXQnaTg0M/aoETyelfeta50LdwMV0vhRXG81LGtLcoU/bC4rO89yNVKTKPntTZIbn0I/Yu6pMewxbyLcP5KBS+D1uMrmLe//N6zSbH/s1t0UOy2lxv++pb+PpwQRDtqaVhLJ1Ut0DB/iqigm1uEkdpltLOfYLJBFot4mgWpSZrbz/m1hvM6ZxoXfa1VUVWijG7ktjNIWtaU6Cz+G+S5mhadSSOd6iAaka3wd4vK6BR2wndPoz0/1Vg/DpZFHh+/F207e3V/OhiRWYPbgjdx5JjoXd0DrW+3HHaoleZ8Ze67T8ews9epjqHVSnfYtELwC+dPoJDKcsxgnN1a540gh/YDGtdKKFC/8KSDcasjafeaRbBG75VzTzAlVtbaoFVFT9Pz7B+2CpELVusve2+sZGMa/dG9qSKcJlSNZX6FkrZLYDVh4t5719kKSq2gixBkxtQLiiHL400ZSdPu8LDAFLPyo0W/PARIdDPqMaRzKSX4beQaf+GUfz0MhyWh4WJ0cjjOtDTl0zq6dn+jlGHw=
