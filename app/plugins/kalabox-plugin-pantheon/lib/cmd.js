@@ -305,7 +305,7 @@ module.exports = function(kbox, app) {
     // Extract and remove
     return run('usermap', extract)
     .then(function() {
-      return run('rm', ['-f', '/media/files_' + env]);
+      return run('rm', ['-rf', '/media/files_' + env]);
     })
     .then(function() {
       return run('rm', ['-f', archive]);
