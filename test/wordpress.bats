@@ -198,10 +198,10 @@ setup() {
 # Check that we have the correct DNS entries
 #
 @test "Check that we have the correct DNS entries." {
-  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:http://${PANTHEON_WORDPRESS_NAME}.kbox 0 5 | grep 10.13.37.100
-  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:https://${PANTHEON_WORDPRESS_NAME}.kbox 0 5 | grep 10.13.37.100
-  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:http://edge.${PANTHEON_WORDPRESS_NAME}.kbox 0 5 | grep 10.13.37.100
-  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:https://edge.${PANTHEON_WORDPRESS_NAME}.kbox 0 5 | grep 10.13.37.100
+  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:http://${PANTHEON_WORDPRESS_NAME}.kbox 0 5
+  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:https://${PANTHEON_WORDPRESS_NAME}.kbox 0 5
+  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:http://edge.${PANTHEON_WORDPRESS_NAME}.kbox 0 5
+  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:https://edge.${PANTHEON_WORDPRESS_NAME}.kbox 0 5
 }
 
 #
@@ -282,24 +282,6 @@ setup() {
 #
 @test "Check that we can run '$KBOX push' without an error." {
   $KBOX $PANTHEON_WORDPRESS_NAME push -- --message "Pushing test commit from build $TRAVIS_COMMIT" --database $PANTHEON_WORDPRESS_ENV --files $PANTHEON_WORDPRESS_ENV
-}
-
-#
-# Do a deeper dive on some commands
-#
-#    restart          Stop and then start a running kbox application.
-
-#
-# Verify DNS after a restart
-#
-@test "Check that after '$KBOX restart' DNS is set correctly." {
-  run \
-  $KBOX $PANTHEON_WORDPRESS_NAME restart && \
-  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:http://${PANTHEON_WORDPRESS_NAME}.kbox 0 5 | grep 10.13.37.100 && \
-  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:https://${PANTHEON_WORDPRESS_NAME}.kbox 0 5 | grep 10.13.37.100 && \
-  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:http://edge.${PANTHEON_WORDPRESS_NAME}.kbox 0 5 | grep 10.13.37.100 && \
-  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:https://edge.${PANTHEON_WORDPRESS_NAME}.kbox 0 5 | grep 10.13.37.100
-  [ "$status" -eq 0 ]
 }
 
 #

@@ -198,10 +198,10 @@ setup() {
 # Check that we have the correct DNS entries
 #
 @test "Check that we have the correct DNS entries." {
-  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:http://${PANTHEON_DRUPAL8_NAME}.kbox 0 5 | grep 10.13.37.100
-  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:https://${PANTHEON_DRUPAL8_NAME}.kbox 0 5 | grep 10.13.37.100
-  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:http://edge.${PANTHEON_DRUPAL8_NAME}.kbox 0 5 | grep 10.13.37.100
-  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:https://edge.${PANTHEON_DRUPAL8_NAME}.kbox 0 5 | grep 10.13.37.100
+  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:http://${PANTHEON_DRUPAL8_NAME}.kbox 0 5
+  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:https://${PANTHEON_DRUPAL8_NAME}.kbox 0 5
+  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:http://edge.${PANTHEON_DRUPAL8_NAME}.kbox 0 5
+  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:https://edge.${PANTHEON_DRUPAL8_NAME}.kbox 0 5
 }
 
 #
