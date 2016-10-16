@@ -1,3 +1,8 @@
+v2.1.0
+======
+
+* Fix `nginx` and `php-fpm` entrypont scripts so Drupal 8 sites can be restarted.
+
 v2.1.0-rc.1
 ===========
 

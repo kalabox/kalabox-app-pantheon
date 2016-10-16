@@ -8,12 +8,12 @@ set -e
 # Correctly map users
 echo "Remapping permissions for VB sharing compat..."
 usermod -u "$KALABOX_UID" www-data
-groupmod -g "$KALABOX_GID" www-data || usermod -G staff www-data
+groupmod -g "$KALABOX_GID" www-data || usermod -G staff www-data || true
 
 # Make sure we have correct ownership
-chown -Rf www-data:www-data /code
-chown -Rf www-data:www-data /media
-chown -Rf www-data:www-data /php
+chown -Rf www-data:www-data /code || true
+chown -Rf www-data:www-data /media || true
+chown -Rf www-data:www-data /php || true
 
 # Emulate /srv/binding
 mkdir -p /srv/bindings
