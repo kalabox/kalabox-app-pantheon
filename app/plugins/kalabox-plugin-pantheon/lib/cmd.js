@@ -295,15 +295,18 @@ module.exports = function(kbox, app) {
       '-zxvf',
       archive,
       '-C',
-      '/tmp',
+      '/media',
       '&&',
       'mv',
-      '/tmp/files_' + env + '/*',
+      '/media/files_' + env + '/*',
       '/media'
     ];
 
     // Extract and remove
     return run('usermap', extract)
+    .then(function() {
+      return run('rm', ['-f', '/media/files_' + env]);
+    })
     .then(function() {
       return run('rm', ['-f', archive]);
     });
