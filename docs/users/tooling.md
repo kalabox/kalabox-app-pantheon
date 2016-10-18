@@ -80,8 +80,8 @@ kbox drush dl views -y
 kbox drush --version
 ```
 
-!!! tip "Change Drush versions"
-    We use Drush 8 but you can change this by editing the `FROM` directive in `dockerfiles/terminus/Dockerfile` and running `kbox rebuild`. Please make sure the `terminus` service in the `kalabox-cli.yml` is switched from `image` to `build`.
+!!! note "Drush can be different from app to app."
+    We will try to use a drush version on a php version that makes sense for your Pantheon settings. That said all Pantheon sites using `drush 5` will use `drush 7` on Kalabox.
 
 git
 ---

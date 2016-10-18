@@ -6,6 +6,7 @@ v2.1.0-rc.2
 * Simplified installation of deps. [#1656](https://github.com/kalabox/kalabox/issues/1656)
 * Added `kbox redis` command. [#1183](https://github.com/kalabox/kalabox/issues/1183)
 * Switched backend `web` service to common ports `443` and `80`. [#1090](https://github.com/kalabox/kalabox/issues/1090)
+* `drush` type and version will now match users settings. [#1213](https://github.com/kalabox/kalabox/issues/1213)
 
 v2.1.0-rc.1
 ===========
