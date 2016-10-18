@@ -160,11 +160,7 @@ module.exports = function(grunt) {
             cwd: 'build'
           }
         },
-        command: [
-          'npm install --production',
-          'cd app',
-          'npm install --production'
-        ].join(' && ')
+        command: 'npm install --production'
       }
     }
 

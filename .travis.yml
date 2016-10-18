@@ -7,11 +7,6 @@ before_install:
   # Global install some npm
   - npm install -g grunt-cli
 
-  # Install the app deps
-  - cd "$TRAVIS_BUILD_DIR/app"
-  - npm install --production
-  - cd "$TRAVIS_BUILD_DIR"
-
   # Install kalabox
   - sudo apt-get -y update
   - sudo apt-get -y install iptables cgroup-bin bridge-utils curl
