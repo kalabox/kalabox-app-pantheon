@@ -26,6 +26,7 @@ setup() {
   NODE_VERSION=4.
   NPM_VERSION=2.
   PHP_VERSION=5.6
+  REDIS_CLI_VERSION=2.8.
   RSYNC_VERSION=3.
   TERMINUS_VERSION=0.13.
 
@@ -384,6 +385,15 @@ setup() {
   run $KBOX php --version
   [ "$status" -eq 0 ]
   [[ $output == *"$PHP_VERSION"* ]]
+}
+
+#
+# REDIS
+#
+@test "Check that '$KBOX redis' returns the correct major version without an error." {
+  run $KBOX redis --version
+  [ "$status" -eq 0 ]
+  [[ $output == *"$REDIS_CLI_VERSION"* ]]
 }
 
 #

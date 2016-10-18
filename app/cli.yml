@@ -54,6 +54,21 @@ php:
   mapping: <config.sharing.codeDir>:/code
 
 #
+# Adds a redis-cli command to your pantheon app.
+#
+redis:
+  service: redis-cli
+  stripfirst: true
+  precmdopts:
+    - -h
+    - redis
+    - -p
+    - '8161'
+  entrypoint: redis-cli
+  description: Drop into a redis-cli shell
+  mapping: <config.sharing.codeDir>:/code
+
+#
 # Adds a composer command to your pantheon app.
 #
 composer:

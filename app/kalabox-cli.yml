@@ -45,6 +45,25 @@ cli:
   tty: true
 
 #
+# Redis CLI
+#
+redis-cli:
+  # Comment this and uncomment 'build' below if you want to edit your
+  # local dockerfile and build from there. This is useful for development
+  image: redis:2.8
+
+  # Uncomment this and comment 'image' above if you want to edit your
+  # local dockerfile and build from there. This is useful for development
+  #
+  # build: dockerfiles/redis
+
+  volumes:
+    - $KALABOX_APP_ROOT_BIND:/src
+  entrypoint: 'true'
+  links:
+    - redis:redis
+
+#
 # Pantheon tooling.
 #
 terminus:

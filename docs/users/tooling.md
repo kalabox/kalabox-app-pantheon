@@ -214,6 +214,21 @@ kbox php hamsterdance.php
 kbox php --version
 ```
 
+redis
+-----
+
+Runs [redis-cli](http://redis.io/topics/rediscli) commands on your app's redis cache.
+
+`kbox redis`
+
+```bash
+# Drop into a redis-cli shell
+kbox redis
+
+# Flush all redis caches
+kbox redis flushall
+```
+
 rsync
 -----
 
