@@ -19,6 +19,11 @@ Host *drush.in
   IdentityFile $HOME/.ssh/pantheon.kalabox.id_rsa
 EOF
 
+# Emulate /srv/binding
+mkdir -p /srv/bindings
+ln -s / "/srv/bindings/$PANTHEON_BINDING" || true
+ln -s /media "/srv/bindings/$PANTHEON_BINDING/files" || true
+
 # Sync up git perms
 /usr/local/bin/ensure-git-dir
 

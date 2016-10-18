@@ -14,6 +14,11 @@ addgroup --force-badname --gecos "" "$KALABOX_GID" > /dev/null || true
 adduser --force-badname --quiet --gecos "" --disabled-password --home "$HOME" --gid "$KALABOX_GID" "$KALABOX_UID" > /dev/null
 mkdir -p "$HOME/.ssh"
 
+# Emulate /srv/binding
+mkdir -p /srv/bindings
+ln -s / "/srv/bindings/$PANTHEON_BINDING" || true
+ln -s /media "/srv/bindings/$PANTHEON_BINDING/files" || true
+
 # Make sure we explicitly set the default ssh key to be used for all SSH commands to Pantheon endpoints
 cat > "$HOME/.ssh/config" <<EOF
 Host *drush.in
