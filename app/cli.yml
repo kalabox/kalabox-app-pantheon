@@ -41,8 +41,8 @@ wp:
 # Adds a drush 8 command to your pantheon app.
 #
 drush:
-  service: terminus
-  description: Run a drush 8 command on your codebase
+  service: drush
+  description: Run a version appropriate drush command on your codebase
   mapping: <config.sharing.codeDir>:/code
 
 #

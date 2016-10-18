@@ -18,7 +18,6 @@ setup() {
   # Versions to check
   BOWER_VERSION=1.
   COMPOSER_VERSION=1.
-  DRUSH_VERSION=8.
   GIT_VERSION=2.
   GRUNT_VERSION=1.
   GULP_VERSION=1.
@@ -318,8 +317,8 @@ setup() {
 #
 # DRUSH
 #
-@test "Check that '$KBOX drush' returns the correct major version without an error." {
-  run $KBOX drush --version
+@test "Check that '$KBOX drush' can run drush status" {
+  run $KBOX drush status
   [ "$status" -eq 0 ]
   [[ $output == *"$DRUSH_VERSION"* ]]
 }

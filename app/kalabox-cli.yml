@@ -64,7 +64,82 @@ redis-cli:
     - redis:redis
 
 #
-# Pantheon tooling.
+# Drush
+#
+drush:
+
+  # Comment this and uncomment 'build' below if you want to edit your
+  # local dockerfile and build from there. This is useful for development
+  image: drush/drush:$KALABOX_APP_PANTHEON_CONFIG_DRUSH
+
+  # Uncomment this and comment 'image' above if you want to edit your
+  # local dockerfile and build from there. This is useful for development
+  #
+  # build: ./dockerfiles/terminus
+
+  entrypoint: usermap
+  volumes:
+    - $KALABOX_APP_ROOT:/src
+    - $KALABOX_ENGINE_HOME/.kalabox/pantheon/keys:/home/$KALABOX_ENGINE_ID/keys
+    - $KALABOX_APP_ROOT/config/drush:/home/$KALABOX_ENGINE_ID/.drush
+    - $KALABOX_APP_ROOT/config/scripts/usermap.sh:/usr/local/bin/usermap
+    - $KALABOX_APP_ROOT/config/terminus/php.ini:/usr/local/etc/php/conf.d/php.ini
+    - $KALABOX_APP_ROOT/config/scripts/pantheon-ensure-keys.sh:/usr/local/bin/pantheon-ensure-keys
+    - $KALABOX_APP_ROOT/config/composer:/composer
+    - $KALABOX_APP_ROOT/config/scripts/ensure-git-dir.sh:/usr/local/bin/ensure-git-dir
+  volumes_from:
+    - data
+  environment:
+    AUTH_KEY: $KALABOX_APP_PANTHEON_AUTH_KEY
+    AUTH_SALT: $KALABOX_APP_PANTHEON_AUTH_SALT
+    BACKDROP_SETTINGS: $KALABOX_APP_PANTHEON_PRESSFLOW_SETTINGS
+    CACHE_HOST: $KALABOX_APP_PANTHEON_CACHE_HOST
+    CACHE_PASSWORD: $KALABOX_APP_PANTHEON_CACHE_PASSWORD
+    CACHE_PORT: $KALABOX_APP_PANTHEON_CACHE_PORT
+    DB_HOST: $KALABOX_APP_PANTHEON_DB_HOST
+    DB_NAME: $KALABOX_APP_PANTHEON_DB_NAME
+    DB_PASSWORD: $KALABOX_APP_PANTHEON_DB_PASSWORD
+    DB_PORT: $KALABOX_APP_PANTHEON_DB_PORT
+    DB_USER: $KALABOX_APP_PANTHEON_DB_USER
+    DOCROOT: $KALABOX_APP_PANTHEON_DOCROOT
+    DOMAIN: $KALABOX_DOMAIN
+    DRUPAL_HASH_SALT: $KALABOX_APP_PANTHEON_DRUPAL_HASH_SALT
+    FILEMOUNT: $KALABOX_APP_PANTHEON_FILEMOUNT
+    FRAMEWORK: $KALABOX_APP_PANTHEON_FRAMEWORK
+    HOSTNAME: $KALABOX_APP_HOSTNAME
+    HOME: /home/$KALABOX_ENGINE_ID
+    KALABOX_GID: $KALABOX_ENGINE_GID
+    KALABOX_UID: $KALABOX_ENGINE_ID
+    KALABOX_SSH_KEY: pantheon.kalabox.id_rsa
+    LOGGED_IN_KEY: $KALABOX_APP_PANTHEON_LOGGED_IN_KEY
+    LOGGED_IN_SALT: $KALABOX_APP_PANTHEON_LOGGED_IN_SALT
+    MYSQL_HOST: $KALABOX_APP_PANTHEON_DB_HOST
+    NONCE_SALT: $KALABOX_APP_PANTHEON_NONCE_SALT
+    PANTHEON_ACCOUNT: $KALABOX_APP_PANTHEON_PANTHEON_ACCOUNT
+    PANTHEON_BINDING: $KALABOX_APP_PANTHEON_PANTHEON_BINDING
+    PANTHEON_ENVIRONMENT: $KALABOX_APP_PANTHEON_PANTHEON_ENVIRONMENT
+    PANTHEON_INDEX_HOST: $KALABOX_APP_PANTHEON_PANTHEON_INDEX_HOST
+    PANTHEON_INDEX_PORT: $KALABOX_APP_PANTHEON_PANTHEON_INDEX_PORT
+    PANTHEON_SITE: $KALABOX_APP_PANTHEON_PANTHEON_SITE
+    PANTHEON_SITE_NAME: $KALABOX_APP_PANTHEON_PANTHEON_SITE_NAME
+    PHP_IDE_CONFIG: serverName=$KALABOX_APP_HOSTNAME
+    PRESSFLOW_SETTINGS: $KALABOX_APP_PANTHEON_PRESSFLOW_SETTINGS
+    SECURE_AUTH_KEY: $KALABOX_APP_PANTHEON_SECURE_AUTH_KEY
+    SECURE_AUTH_SALT: $KALABOX_APP_PANTHEON_SECURE_AUTH_SALT
+    TERM: xterm
+    TERMINUS_USER: $KALABOX_APP_PANTHEON_CONFIG_EMAIL
+    TERMINUS_SITE: $KALABOX_APP_PANTHEON_CONFIG_SITE
+    TERMINUS_ENV: $KALABOX_APP_PANTHEON_CONFIG_ENV
+  links:
+    - db:database
+    - redis:redis
+    - solr:solr
+  working_dir: $KALABOX_CLI_WORKING_DIR
+  stdin_open: true
+  tty: true
+
+#
+# Terminus
 #
 terminus:
 
