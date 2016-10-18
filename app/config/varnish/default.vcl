@@ -7,7 +7,7 @@ import std;
 
 backend styxgo {
   .host = "web";
-  .port = "8888";
+  .port = "80";
   .connect_timeout = 600s;
   .first_byte_timeout = 600s;
   .between_bytes_timeout = 600s;
