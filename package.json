@@ -16,6 +16,9 @@
     "url": "http://github.com/kalabox/kalabox-app-pantheon",
     "email": "mike@kalamuna.com"
   },
+  "scripts" : {
+    "postinstall" : "cd app && npm install"
+  },
   "dependencies": {
     "fs-extra": "^0.18.2",
     "lodash": "^3.9.3",
