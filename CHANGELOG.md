@@ -1,9 +1,10 @@
 v2.1.0-rc.2
 ===========
 
-* Fix `nginx` and `php-fpm` entrypont scripts so Drupal 8 sites can be restarted.
+* Fixed `nginx` and `php-fpm` entrypont scripts so Drupal 8 sites can be restarted.
 * More complete emulation of `/srv/bindings`. Helps things like CiviCRM support. [#1650](https://github.com/kalabox/kalabox/issues/1650)
-* Simplify installation of deps. [#1656](https://github.com/kalabox/kalabox/issues/1656)
+* Simplified installation of deps. [#1656](https://github.com/kalabox/kalabox/issues/1656)
+* Added `kbox redis` command. [#1183](https://github.com/kalabox/kalabox/issues/1183)
 
 v2.1.0-rc.1
 ===========
