@@ -106,8 +106,8 @@ web:
 
   hostname: $KALABOX_APP_HOSTNAME
   ports:
-    - "8888"
-    - "444"
+    - "80"
+    - "443"
   volumes:
     - $KALABOX_APP_ROOT_BIND:/src
     - $KALABOX_APP_ROOT_BIND/config/nginx/nginx.conf:/etc/nginx/nginx.conf

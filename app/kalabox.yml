@@ -44,9 +44,9 @@ pluginconfig:
   #
   services:
     web:
-      - port: 8888/tcp
+      - port: 80/tcp
         default: true
-      - port: 444/tcp
+      - port: 443/tcp
         default: true
         secure: true
     edge:
