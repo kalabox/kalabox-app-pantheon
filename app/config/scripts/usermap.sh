@@ -40,6 +40,11 @@ if [ -f "$HOME/keys/${KALABOX_SSH_KEY}" ]; then
   chown -Rf $KALABOX_UID:$KALABOX_UID "$HOME/.ssh"
 fi
 
+# If we have a composer installed drush lets symlink that to a common path
+if [ -f "/composer/vendor/drush/drush/drush" ]; then
+  ln -sf /composer/vendor/drush/drush/drush /usr/local/bin/drush
+fi
+
 # Wait until our solr crt is ready and then whitelist it
 # @todo: i wish we had a better way to do this
 if [[ "$@" == *"drush search-api"* ]] || [[ "$@" == *"drush solr-"* ]]; then
