@@ -2,6 +2,7 @@ v2.1.0
 ======
 
 * Fixed issue where `drush` installed by `composer` was reporting unknown command. [#1681](https://github.com/kalabox/kalabox/issues/1681)
+* Upgraded `mariaDB` to latest `10.0.x`. [#1671](https://github.com/kalabox/kalabox/issues/1671)
 
 v2.1.0-rc.2
 ===========
