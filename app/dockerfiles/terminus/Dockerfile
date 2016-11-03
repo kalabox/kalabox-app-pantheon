@@ -7,7 +7,7 @@
 FROM drush/drush:8-php5
 
 # Terminus versions
-ENV TERMINUS_VERSION 0.13.3
+ENV TERMINUS_VERSION 0.13.4
 
 # Install all the CLI magic
 RUN apt-get update -y && apt-get install -y \
@@ -19,7 +19,7 @@ RUN apt-get update -y && apt-get install -y \
   && chmod +x wp-cli.phar && mv wp-cli.phar /usr/local/bin/wp \
   # @TODO: Change back to versioned terminus.phar when available
   # && curl "https://github.com/pantheon-systems/terminus/releases/download/$TERMINUS_VERSION/terminus.phar" -L -o /usr/local/bin/terminus \
-  && curl "https://github.com/pantheon-systems/terminus/releases/download/0.x/terminus.phar" -L -o /usr/local/bin/terminus \
+  && curl "https://github.com/pantheon-systems/terminus/releases/download/0.13.x/terminus.phar" -L -o /usr/local/bin/terminus \
   && chmod +x /usr/local/bin/terminus \
   && mkdir -p /usr/share/drush/commands && mkdir -p /root/.terminus/cache \
   && cd /usr/share/drush/commands \
