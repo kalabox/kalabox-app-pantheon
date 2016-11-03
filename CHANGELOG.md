@@ -2,6 +2,7 @@ v2.1.1
 ======
 
 * Improved initial files grab by running `rsync` after archive DL.
+* Upgraded to latest `terminus` `0.13.4`.
 
 v2.1.0
 ======
