@@ -253,7 +253,7 @@ kbox-retry-build() {
 # Check that we can build $PANTHOEN_TERMINUS without an error.
 @test "Check that we can build the terminus image without an error." {
   IMAGE=terminus
-  run kbox-retry-build kalabox/$IMAGE 0.13.3 $PANTHEON_DOCKERFILES_DIR/$IMAGE
+  run kbox-retry-build kalabox/$IMAGE 0.13.4 $PANTHEON_DOCKERFILES_DIR/$IMAGE
   [ "$status" -eq 0 ]
 }
 
