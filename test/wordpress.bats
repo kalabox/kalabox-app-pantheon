@@ -151,7 +151,7 @@ setup() {
 
   # Grep a bunch of things
   $KBOX list | grep "\"name\": \"$PANTHEON_WORDPRESS_NAME\""
-  $KBOX list | grep "\"url\": \"http://${PANTHEON_WORDPRESS_NAME}.kbox\""
+  $KBOX list | grep "\"url\": \"http://${PANTHEON_WORDPRESS_NAME}.kbox.host\""
   $KBOX list | grep "\"type\": \"pantheon\""
   $KBOX list | grep "\"location\": \"${KBOX_APP_DIR}/${PANTHEON_WORDPRESS_NAME}\""
   $KBOX list | grep "\"running\": true"
@@ -199,10 +199,10 @@ setup() {
 # Check that we have the correct DNS entries
 #
 @test "Check that we have the correct DNS entries." {
-  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:http://${PANTHEON_WORDPRESS_NAME}.kbox 0 5
-  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:https://${PANTHEON_WORDPRESS_NAME}.kbox 0 5
-  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:http://edge.${PANTHEON_WORDPRESS_NAME}.kbox 0 5
-  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:https://edge.${PANTHEON_WORDPRESS_NAME}.kbox 0 5
+  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:http://${PANTHEON_WORDPRESS_NAME}.kbox.host 0 5
+  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:https://${PANTHEON_WORDPRESS_NAME}.kbox.host 0 5
+  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:http://edge.${PANTHEON_WORDPRESS_NAME}.kbox.host 0 5
+  $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:https://edge.${PANTHEON_WORDPRESS_NAME}.kbox.host 0 5
 }
 
 #
