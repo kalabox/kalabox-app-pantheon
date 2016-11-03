@@ -1,3 +1,8 @@
+v2.1.1
+======
+
+* Improved initial files grab by running `rsync` after archive DL.
+
 v2.1.0
 ======
 

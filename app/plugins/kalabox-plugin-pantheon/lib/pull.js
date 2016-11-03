@@ -181,7 +181,10 @@ module.exports = function(kbox, app) {
     app.status('Pulling files.');
 
     if (firstTime()) {
-      return pullFilesArchive(site, env, newBackup);
+      return pullFilesArchive(site, env, newBackup)
+      .then(function() {
+        return pullFilesRsync(uuid, env);
+      });
     }
     else {
       return pullFilesRsync(uuid, env);
