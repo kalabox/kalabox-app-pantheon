@@ -158,6 +158,17 @@ setup() {
 }
 
 #
+# Check that we have our dev certs
+#
+@test "Check that we have our dev certs" {
+
+  $KBOX . ls -lsa /certs | grep binding.pem
+  $KBOX . ls -lsa /certs | grep binding.crt
+  $KBOX . ls -lsa /certs | grep binding.key
+
+}
+
+#
 # Check that we have a git repo and its in a good spot
 #
 @test "Check that we have a git repo and it is in a good state." {

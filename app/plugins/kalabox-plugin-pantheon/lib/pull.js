@@ -214,7 +214,7 @@ module.exports = function(kbox, app) {
   var pull = function(conf, choices) {
 
     // Start by ensuring our SSH keys are good to go
-    return commands.ensureSSHKeys()
+    return commands.ensureKeys()
 
     // Then pull a screenshot
     .then(function() {

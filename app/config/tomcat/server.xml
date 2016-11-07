@@ -20,8 +20,8 @@
       protocol="org.apache.coyote.http11.Http11AprProtocol"
       port="449" maxThreads="200"
       scheme="https" secure="true" SSLEnabled="true"
-      SSLCertificateFile="/certs/binding.crt"
-      SSLCertificateKeyFile="/certs/binding.key" />
+      SSLCertificateFile="/certs/solr.crt"
+      SSLCertificateKeyFile="/certs/solr.key" />
 
     <Engine name="Catalina" defaultHost="localhost">
 
