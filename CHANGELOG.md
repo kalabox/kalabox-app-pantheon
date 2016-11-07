@@ -1,3 +1,8 @@
+v2.1.2
+======
+
+* Added support for `lockr`. [#1694](https://github.com/kalabox/kalabox/issues/1694)
+
 v2.1.1
 ======
 

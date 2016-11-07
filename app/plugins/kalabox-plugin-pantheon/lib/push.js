@@ -120,7 +120,7 @@ module.exports = function(kbox, app) {
   var push = function(conf, choices) {
 
     // Start by ensuring our SSH keys are good to go
-    return commands.ensureSSHKeys()
+    return commands.ensureKeys()
 
     // And our git perms are excellent
     .then(function() {

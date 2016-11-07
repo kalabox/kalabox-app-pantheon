@@ -94,4 +94,13 @@ module.exports = function(kbox, app) {
 
   });
 
+  /*
+   * Make sure we set up relevant "security" before we start spinning up
+   * services.
+   */
+  app.events.on('pre-start', function() {
+    var commands = require('./cmd.js')(kbox, app);
+    return commands.ensureKeys();
+  });
+
 };

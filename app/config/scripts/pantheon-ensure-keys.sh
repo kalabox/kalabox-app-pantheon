@@ -15,3 +15,24 @@ fi
 # Post that key to pantheon
 # NOTE: Pantheon is smart and will not add the same key twice
 terminus ssh-keys add --file="$HOME/keys/${KALABOX_SSH_KEY}.pub"
+
+# Move the SSH key to ROOT just incase we need it
+if [ -f "$HOME/keys/${KALABOX_SSH_KEY}" ]; then
+  mkdir -p "/root/.ssh"
+  cp -rf "$HOME/keys/${KALABOX_SSH_KEY}" "/root/.ssh/$KALABOX_SSH_KEY"
+  chmod 700 "/root/.ssh"
+  chmod 600 "/root/.ssh/$KALABOX_SSH_KEY"
+fi
+
+# Non interctive our SSH usage against pantheon
+cat > "/root/.ssh/config" <<EOF
+Host *drush.in
+  User root
+  StrictHostKeyChecking no
+  IdentityFile /root/.ssh/pantheon.kalabox.id_rsa
+EOF
+
+# If we don't have our dev certs already let's get them
+if [ ! -f "/certs/binding.pem" ] || [ ! -f "/certs/binding.crt" ] || [ ! -f "/certs/binding.key" ]; then
+  $(terminus site connection-info --field=sftp_command):certs/* /certs
+fi

@@ -323,7 +323,7 @@ module.exports = function(kbox, app) {
   /*
    * Run small script to ensure Pantheon SSH keys are setup correctly
    */
-  var ensureSSHKeys = function() {
+  var ensureKeys = function() {
     return run(['bash', '-c'], ['pantheon-ensure-keys'], terminusContainer());
   };
 
@@ -396,7 +396,7 @@ module.exports = function(kbox, app) {
   // Return our things
   return {
     ensureGitPerms: ensureGitPerms,
-    ensureSSHKeys: ensureSSHKeys,
+    ensureKeys: ensureKeys,
     ensureSymlink: ensureSymlink,
     extract: extract,
     importDB: importDB,
