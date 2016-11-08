@@ -32,7 +32,14 @@ Host *drush.in
   IdentityFile /root/.ssh/pantheon.kalabox.id_rsa
 EOF
 
-# If we don't have our dev certs already let's get them
-if [ ! -f "/certs/binding.pem" ] || [ ! openssl x509 -checkend 86400 -noout -in /certs/binding.pem ]; then
+# If we don't have our dev cert already let's get it
+if [ ! -f "/certs/binding.pem" ]; then
+  $(terminus site connection-info --field=sftp_command):certs/binding.pem /certs/binding.pem
+fi
+
+# Lets also check to see if we should refresh our cert
+if openssl x509 -checkend 86400 -noout -in /certs/binding.pem; then
+  echo "Cert is good!"
+else
   $(terminus site connection-info --field=sftp_command):certs/binding.pem /certs/binding.pem
 fi
