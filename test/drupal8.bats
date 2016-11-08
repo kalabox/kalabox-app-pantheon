@@ -158,17 +158,6 @@ setup() {
 }
 
 #
-# Check that we have our dev certs
-#
-@test "Check that we have our dev certs" {
-
-  $KBOX . ls -lsa /certs | grep binding.pem
-  $KBOX . ls -lsa /certs | grep binding.crt
-  $KBOX . ls -lsa /certs | grep binding.key
-
-}
-
-#
 # Check that we have a git repo and its in a good spot
 #
 @test "Check that we have a git repo and it is in a good state." {
@@ -213,6 +202,13 @@ setup() {
   $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:https://${PANTHEON_DRUPAL8_NAME}.kbox.host 0 5
   $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:http://edge.${PANTHEON_DRUPAL8_NAME}.kbox.host 0 5
   $DOCKER exec kalabox_proxy_1 redis-cli -p 8160 lrange frontend:https://edge.${PANTHEON_DRUPAL8_NAME}.kbox.host 0 5
+}
+
+#
+# Check that we have our dev cert
+#
+@test "Check that we have our dev cert" {
+  $KBOX . ls -lsa /certs | grep binding.pem
 }
 
 #
