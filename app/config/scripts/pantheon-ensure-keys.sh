@@ -33,6 +33,6 @@ Host *drush.in
 EOF
 
 # If we don't have our dev certs already let's get them
-if [ ! -f "/certs/binding.pem" ] || [ ! -f "/certs/binding.crt" ] || [ ! -f "/certs/binding.key" ]; then
-  $(terminus site connection-info --field=sftp_command):certs/* /certs
+if [ ! -f "/certs/binding.pem" ] || [ ! openssl x509 -checkend 86400 -noout -in /certs/binding.pem ]; then
+  $(terminus site connection-info --field=sftp_command):certs/binding.pem /certs/binding.pem
 fi
