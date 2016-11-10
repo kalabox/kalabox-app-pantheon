@@ -157,7 +157,7 @@ edge:
 
   # Comment this and uncomment 'build' below if you want to edit your
   # local dockerfile and build from there. This is useful for development
-  image: kalabox/pantheon-edge:stable
+  image: kalabox/pantheon-edge:hyperion5000
 
   # Uncomment this and comment 'image' above if you want to edit your
   # local dockerfile and build from there. This is useful for development
@@ -205,7 +205,7 @@ solr:
 
   # Comment this and uncomment 'build' below if you want to edit your
   # local dockerfile and build from there. This is useful for development
-  image: kalabox/pantheon-solr:stable
+  image: kalabox/pantheon-solr:hyperion5000
 
   # Uncomment this and comment 'image' above if you want to edit your
   # local dockerfile and build from there. This is useful for development
