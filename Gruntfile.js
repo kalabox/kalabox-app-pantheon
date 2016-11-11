@@ -49,6 +49,9 @@ module.exports = function(grunt) {
         expand: true,
         options: {
           mode: true,
+          noProcess: [
+            'app/*.{png,gif,jpg,ico,psd,ttf,otf,woff,svg}'
+          ],
           process: function(content, srcPath) {
             // Switch it up
             switch (srcPath) {
