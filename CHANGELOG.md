@@ -2,6 +2,7 @@ v2.1.3
 ======
 
 * Fixed broken screenshot. [#1601](https://github.com/kalabox/kalabox/issues/1601)
+* Fixed incorrect `files_directory_path`. [#1727](https://github.com/kalabox/kalabox/issues/1727) [#1728](https://github.com/kalabox/kalabox/issues/1728)
 
 v2.1.2
 ======

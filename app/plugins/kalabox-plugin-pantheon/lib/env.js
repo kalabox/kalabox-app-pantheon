@@ -78,7 +78,7 @@ module.exports = function(kbox, app) {
         redis_client_password: '',
         file_public_path: 'sites/default/files',
         file_private_path: 'sites/default/files/private',
-        file_directory_path: 'site/default/files',
+        file_directory_path: 'sites/default/files',
         file_temporary_path: '/tmp',
         file_directory_temp: '/tmp',
         css_gzip_compression: false,
