@@ -28,7 +28,7 @@ setup() {
   REDIS_CLI_VERSION=2.8.
   RSYNC_VERSION=3.
   TERMINUS_VERSION=0.13.
-  WP_CLI_VERSION=0.2
+  WP_CLI_VERSION=1.
 
   # We need to actually go into this app dir until
   # https://github.com/kalabox/kalabox/issues/1221
