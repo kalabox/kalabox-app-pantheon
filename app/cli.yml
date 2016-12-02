@@ -99,6 +99,7 @@ node:
 #
 npm:
   service: cli
+  postcmdopts: --unsafe-perm
   description: Run a npm command
   mapping: <config.sharing.codeDir>:/code
 
@@ -123,5 +124,6 @@ gulp:
 #
 bower:
   service: cli
+  postcmdopts: --allow-root
   description: Run a bower command
   mapping: <config.sharing.codeDir>:/code

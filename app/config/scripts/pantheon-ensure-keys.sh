@@ -3,25 +3,15 @@
 set -e
 
 # Set defaults
-: ${KALABOX_UID:='1000'}
-: ${KALABOX_GID:='50'}
 : ${KALABOX_SSH_KEY:='pantheon.kalabox.id_rsa'}
 
+# Add local user to match host
+mkdir -p "/home/root/.ssh"
+mkdir -p "/root/.ssh"
+
 # If we don't have an SSH key already let's create one
-if [ ! -f "$HOME/keys/${KALABOX_SSH_KEY}" ]; then
-  ssh-keygen -t rsa -N "" -C "${TERMINUS_USER}.kbox" -f "$HOME/keys/${KALABOX_SSH_KEY}"
-fi
-
-# Post that key to pantheon
-# NOTE: Pantheon is smart and will not add the same key twice
-terminus ssh-keys add --file="$HOME/keys/${KALABOX_SSH_KEY}.pub"
-
-# Move the SSH key to ROOT just incase we need it
-if [ -f "$HOME/keys/${KALABOX_SSH_KEY}" ]; then
-  mkdir -p "/root/.ssh"
-  cp -rf "$HOME/keys/${KALABOX_SSH_KEY}" "/root/.ssh/$KALABOX_SSH_KEY"
-  chmod 700 "/root/.ssh"
-  chmod 600 "/root/.ssh/$KALABOX_SSH_KEY"
+if [ ! -f "/home/root/keys/${KALABOX_SSH_KEY}" ]; then
+  ssh-keygen -t rsa -N "" -C "${TERMINUS_USER}.kbox" -f "/home/root/keys/${KALABOX_SSH_KEY}"
 fi
 
 # Non interctive our SSH usage against pantheon
@@ -31,6 +21,18 @@ Host *drush.in
   StrictHostKeyChecking no
   IdentityFile /root/.ssh/pantheon.kalabox.id_rsa
 EOF
+
+# Move the SSH key to ROOT just incase we need it
+if [ -f "/home/root/keys/${KALABOX_SSH_KEY}" ]; then
+  cp -rf "/home/root/keys/${KALABOX_SSH_KEY}" "/root/.ssh/$KALABOX_SSH_KEY"
+  chmod 700 "/root/.ssh"
+  chmod 600 "/root/.ssh/$KALABOX_SSH_KEY"
+  chown -Rf root:root "/root/.ssh"
+fi
+
+# Post that key to pantheon
+# NOTE: Pantheon is smart and will not add the same key twice
+terminus ssh-keys add --file="/home/root/keys/${KALABOX_SSH_KEY}.pub"
 
 # If we don't have our dev cert already let's get it
 if [ ! -f "/certs/binding.pem" ]; then

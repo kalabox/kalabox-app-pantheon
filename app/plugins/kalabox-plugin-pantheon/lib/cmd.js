@@ -314,13 +314,6 @@ module.exports = function(kbox, app) {
   };
 
   /*
-   * Run small script to ensure git perms are correct
-   */
-  var ensureGitPerms = function() {
-    return run(['bash', '-c'], ['ensure-git-dir']);
-  };
-
-  /*
    * Run small script to ensure Pantheon SSH keys are setup correctly
    */
   var ensureKeys = function() {
@@ -395,7 +388,6 @@ module.exports = function(kbox, app) {
 
   // Return our things
   return {
-    ensureGitPerms: ensureGitPerms,
     ensureKeys: ensureKeys,
     ensureSymlink: ensureSymlink,
     extract: extract,

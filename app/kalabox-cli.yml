@@ -19,17 +19,14 @@ cli:
   # build: ./dockerfiles/cli
 
   volumes:
-    - $KALABOX_APP_ROOT_BIND:/src
-    - $KALABOX_ENGINE_HOME/.kalabox/pantheon/keys:/home/$KALABOX_ENGINE_ID/keys
     - $KALABOX_APP_ROOT/config/scripts/usermap-cli.sh:/usr/local/bin/usermap
-    - $KALABOX_APP_ROOT/config/scripts/ensure-git-dir.sh:/usr/local/bin/ensure-git-dir
+    - $KALABOX_ENGINE_HOME/.kalabox/pantheon/keys:/home/root/keys
   volumes_from:
     - data
   environment:
     WEBROOT: /code
     TERM: xterm-color
     COLUMNS: 150
-    HOME: /home/$KALABOX_ENGINE_ID
     KALABOX_UID: $KALABOX_ENGINE_ID
     KALABOX_GID: $KALABOX_ENGINE_GID
     KALABOX_SSH_KEY: pantheon.kalabox.id_rsa
@@ -80,12 +77,11 @@ drush:
   entrypoint: usermap
   volumes:
     - $KALABOX_APP_ROOT:/src
-    - $KALABOX_ENGINE_HOME/.kalabox/pantheon/keys:/home/$KALABOX_ENGINE_ID/keys
-    - $KALABOX_APP_ROOT/config/drush:/home/$KALABOX_ENGINE_ID/.drush
+    - $KALABOX_ENGINE_HOME/.kalabox/pantheon/keys:/home/root/keys
+    - $KALABOX_APP_ROOT/config/drush:/home/root/.drush
     - $KALABOX_APP_ROOT/config/scripts/usermap.sh:/usr/local/bin/usermap
     - $KALABOX_APP_ROOT/config/terminus/php.ini:/usr/local/etc/php/conf.d/php.ini
     - $KALABOX_APP_ROOT/config/scripts/pantheon-ensure-keys.sh:/usr/local/bin/pantheon-ensure-keys
-    - $KALABOX_APP_ROOT/config/scripts/ensure-git-dir.sh:/usr/local/bin/ensure-git-dir
   volumes_from:
     - data
   environment:
@@ -106,7 +102,6 @@ drush:
     FILEMOUNT: $KALABOX_APP_PANTHEON_FILEMOUNT
     FRAMEWORK: $KALABOX_APP_PANTHEON_FRAMEWORK
     HOSTNAME: $KALABOX_APP_HOSTNAME
-    HOME: /home/$KALABOX_ENGINE_ID
     KALABOX_GID: $KALABOX_ENGINE_GID
     KALABOX_UID: $KALABOX_ENGINE_ID
     KALABOX_SSH_KEY: pantheon.kalabox.id_rsa
@@ -154,15 +149,14 @@ terminus:
   entrypoint: usermap
   volumes:
     - $KALABOX_APP_ROOT:/src
-    - $KALABOX_ENGINE_HOME/.kalabox/pantheon/keys:/home/$KALABOX_ENGINE_ID/keys
-    - $KALABOX_APP_ROOT/config/terminus:/home/$KALABOX_ENGINE_ID/.terminus
-    - $KALABOX_ENGINE_HOME/.terminus/cache/tokens:/home/$KALABOX_ENGINE_ID/.terminus/cache/tokens
-    - $KALABOX_APP_ROOT/config/drush:/home/$KALABOX_ENGINE_ID/.drush
+    - $KALABOX_ENGINE_HOME/.kalabox/pantheon/keys:/home/root/keys
+    - $KALABOX_APP_ROOT/config/terminus:/root/.terminus
+    - $KALABOX_ENGINE_HOME/.terminus/cache/tokens:/root/.terminus/cache/tokens
+    - $KALABOX_APP_ROOT/config/drush:/home/root/.drush
     - $KALABOX_APP_ROOT/config/scripts/usermap.sh:/usr/local/bin/usermap
     - $KALABOX_APP_ROOT/config/terminus/php.ini:/usr/local/etc/php/conf.d/php.ini
     - $KALABOX_APP_ROOT/config/scripts/pantheon-ensure-keys.sh:/usr/local/bin/pantheon-ensure-keys
     - $KALABOX_APP_ROOT/config/composer:/composer
-    - $KALABOX_APP_ROOT/config/scripts/ensure-git-dir.sh:/usr/local/bin/ensure-git-dir
   volumes_from:
     - data
   environment:
@@ -183,7 +177,6 @@ terminus:
     FILEMOUNT: $KALABOX_APP_PANTHEON_FILEMOUNT
     FRAMEWORK: $KALABOX_APP_PANTHEON_FRAMEWORK
     HOSTNAME: $KALABOX_APP_HOSTNAME
-    HOME: /home/$KALABOX_ENGINE_ID
     KALABOX_GID: $KALABOX_ENGINE_GID
     KALABOX_UID: $KALABOX_ENGINE_ID
     KALABOX_SSH_KEY: pantheon.kalabox.id_rsa
