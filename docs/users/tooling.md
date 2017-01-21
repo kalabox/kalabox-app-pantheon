@@ -342,3 +342,11 @@ Start Listening for PHP Debug Connections
 11. Start debugging by clicking the bug icon in the top right of the window or go to Run -> Debug (Name you configured in step 9) ![Kalabox XDEBUG server settings for PHPSTORM](../images/phpStormXdebug5.png "Kalabox XDEBUG serversettings for PHPSTORM")
 
 For more details see: [https://github.com/kalabox/kalabox/issues/1507#issuecomment-249276227](https://github.com/kalabox/kalabox/issues/1507#issuecomment-249276227)
+
+### Troubleshooting
+
+*My IDE doesn't seem to recognize the xdebug session.*
+
+Be sure that nothing else is communicating on port 9000.  On OS X or Linux you can try
+`sudo lsof -iTCP -n -P | grep "9000"`
+You should only see com.docker with `(CLOSE_WAIT)`, and your IDE with `(LISTEN)`.
