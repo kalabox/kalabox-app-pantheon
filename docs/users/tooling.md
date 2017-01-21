@@ -366,6 +366,7 @@ For more details see: [https://github.com/kalabox/kalabox/issues/1507#issuecomme
 xdebug.profiler_enable_trigger = 1
 xdebug.profiler_output_dir = /media/cachegrind
 ```
+3. Restart the app `kalabox restart`.
 3. Create the directory `<app root>/files/cachegrind`, and give it open permissions.
 4. Visit the URL of your app appended with `?XDEBUG_PROFILE=1`
 5. Note the `cachegrind.out.NNNN` file created in the directory above.
