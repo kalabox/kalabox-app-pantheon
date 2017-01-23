@@ -357,3 +357,17 @@ Start Listening for PHP Debug Connections
 11. Start debugging by clicking the bug icon in the top right of the window or go to Run -> Debug (Name you configured in step 9) ![Kalabox XDEBUG server settings for PHPSTORM](../images/phpStormXdebug5.png "Kalabox XDEBUG serversettings for PHPSTORM")
 
 For more details see: [https://github.com/kalabox/kalabox/issues/1507#issuecomment-249276227](https://github.com/kalabox/kalabox/issues/1507#issuecomment-249276227)
+
+### Profiling
+
+1. First get xdebug working.
+2. Edit `<app root>/config/php/php.ini` and add the following to the `Xdebug` section:
+```
+xdebug.profiler_enable_trigger = 1
+xdebug.profiler_output_dir = /media/cachegrind
+```
+3. Restart the app `kalabox restart`.
+3. Create the directory `<app root>/files/cachegrind`, and give it open permissions.
+4. Visit the URL of your app appended with `?XDEBUG_PROFILE=1`
+5. Note the `cachegrind.out.NNNN` file created in the directory above.
+6. Use your cachegrind analysis tool of choice to find performance problems. E.g. [Webgrind](https://github.com/jokkedk/webgrind)
