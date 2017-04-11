@@ -49,6 +49,7 @@ We also set a number of common [Pantheon environmental variables](https://panthe
 * `AUTH_SALT`: Needed for Wordpress. We set this automatically.
 * `AUTH_KEY`: Needed for Wordpress. We set this automatically.
 * `NONCE_SALT`: Needed for Wordpress. We set this automatically.
+* `NONCE_KEY`: Needed for Wordpress. We set this automatically.
 * `LOGGED_IN_SALT`: Needed for Wordpress. We set this automatically.
 * `SECURE_AUTH_SALT`: Needed for Wordpress. We set this automatically.
 * `LOGGED_IN_KEY`: Needed for Wordpress. We set this automatically.
