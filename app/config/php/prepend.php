@@ -53,6 +53,7 @@ $_ENV['AUTH_SALT'] = getenv('AUTH_SALT');
 $_ENV['SECURE_AUTH_SALT'] = getenv('SECURE_AUTH_SALT');
 $_ENV['LOGGED_IN_SALT'] = getenv('LOGGED_IN_SALT');
 $_ENV['NONCE_SALT'] = getenv('NONCE_SALT');
+$_ENV['NONCE_KEY'] = getenv('NONCE_KEY');
 
 /**
  * We need to set this on Drupal 8 to make sure we are getting
