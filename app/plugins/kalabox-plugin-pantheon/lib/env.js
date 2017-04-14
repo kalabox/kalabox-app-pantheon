@@ -45,7 +45,6 @@ module.exports = function(kbox, app) {
       default: {
         default: {
           driver: 'mysql',
-          prefix: '',
           database: 'pantheon',
           username: 'pantheon',
           password: 'pantheon',
