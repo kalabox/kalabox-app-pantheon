@@ -46,7 +46,7 @@ appserver:
   volumes_from:
     - data
   entrypoint: /src/config/scripts/php-fpm.sh
-  command: --fpm-config /src/config/php/www.conf -c /src/config/php -d xdebug.remote_host=$KALABOX_ENGINE_REMOTE_IP
+  command: -R --fpm-config /src/config/php/www.conf -c /src/config/php -d xdebug.remote_host=$KALABOX_ENGINE_REMOTE_IP
   working_dir: /code
   links:
     - db:database
