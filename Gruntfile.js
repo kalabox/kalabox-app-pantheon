@@ -220,8 +220,8 @@ module.exports = function(grunt) {
   // Standards and code
   grunt.registerTask('test:code', [
     'jshint',
-    'jscs',
-    'mdlint'
+    'jscs'
+    // 'mdlint'
   ]);
 
   /*

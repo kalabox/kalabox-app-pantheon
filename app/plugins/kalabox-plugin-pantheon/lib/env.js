@@ -117,7 +117,8 @@ module.exports = function(kbox, app) {
       authSalt: getHash(app.domain + framework),
       secureAuthSalt: getHash(app.name + app.domain),
       loggedInSalt: getHash(app.name + app.name),
-      nonceSalt: getHash(app.domain + app.domain)
+      nonceSalt: getHash(app.domain + app.domain),
+      nonceKey: getHash(app.domain + app.domain)
     };
 
     return env;
