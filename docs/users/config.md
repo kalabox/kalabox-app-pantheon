@@ -28,7 +28,7 @@ Here is an example of a normal `pantheon` section in your `kalabox.yml` file.
 
 ```yaml
 pantheon:
-  email: mike@kalamuna.com
+  email: mike@lando.dev
   site: playbox
   env: dev
   images: v0.13.0-alpha.1
