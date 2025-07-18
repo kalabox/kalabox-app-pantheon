@@ -14,7 +14,7 @@
   },
   "bugs": {
     "url": "http://github.com/kalabox/kalabox-app-pantheon",
-    "email": "mike@kalamuna.com"
+    "email": "mike@lando.dev"
   },
   "scripts": {
     "postinstall": "cd app && npm install"
