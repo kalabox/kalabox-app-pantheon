@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "fs-extra": "^0.18.2",
-    "lodash": "^3.9.3",
+    "lodash": "^4.17.19",
     "restler": "^3.4.0",
     "verror": "1.6.x"
   },
